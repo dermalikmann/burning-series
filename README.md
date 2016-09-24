@@ -1,1 +1,1 @@
-burning-series
+Burning Series App (Rework)

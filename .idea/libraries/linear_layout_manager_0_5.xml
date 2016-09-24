@@ -1,0 +1,12 @@
+<component name="libraryTable">
+  <library name="linear-layout-manager-0.5">
+    <CLASSES>
+      <root url="file://$PROJECT_DIR$/app/build/intermediates/exploded-aar/org.solovyev.android.views/linear-layout-manager/0.5/res" />
+      <root url="jar://$PROJECT_DIR$/app/build/intermediates/exploded-aar/org.solovyev.android.views/linear-layout-manager/0.5/jars/classes.jar!/" />
+    </CLASSES>
+    <JAVADOC />
+    <SOURCES>
+      <root url="jar://$USER_HOME$/.gradle/caches/modules-2/files-2.1/org.solovyev.android.views/linear-layout-manager/0.5/2fbe07bd3dd19b1baa1a518ea344593f74f6ad8e/linear-layout-manager-0.5-sources.jar!/" />
+    </SOURCES>
+  </library>
+</component>

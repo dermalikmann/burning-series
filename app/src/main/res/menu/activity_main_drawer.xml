@@ -1,0 +1,33 @@
+<?xml version="1.0" encoding="utf-8"?>
+<menu xmlns:android="http://schemas.android.com/apk/res/android">
+
+    <item android:title="@string/series">
+            <menu android:checkableBehavior="single">
+                <item
+                    android:id="@+id/nav_series"
+                    android:icon="@drawable/ic_view_module"
+                    android:title="@string/allSeries" />
+                <item
+                    android:id="@+id/nav_genres"
+                    android:icon="@drawable/ic_view_list"
+                    android:title="@string/genres" />
+                <item
+                    android:id="@+id/nav_favs"
+                    android:icon="@drawable/ic_star"
+                    android:title="@string/favs" />
+            </menu>
+    </item>
+    <item android:title="@string/misc">
+            <menu android:checkableBehavior="single">
+                <item
+                    android:id="@+id/nav_share"
+                    android:icon="@drawable/ic_menu_send"
+                    android:title="@string/share" />
+                <item
+                    android:id="@+id/nav_settings"
+                    android:icon="@drawable/ic_settings"
+                    android:title="@string/settings" />
+            </menu>
+    </item>
+
+</menu>

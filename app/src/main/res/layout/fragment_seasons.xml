@@ -1,0 +1,58 @@
+<?xml version="1.0" encoding="utf-8"?>
+<android.support.v4.widget.NestedScrollView xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    app:layout_behavior="@string/appbar_scrolling_view_behavior"
+    tools:context=".ShowActivity">
+
+    <LinearLayout
+        android:orientation="vertical"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent">
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:textAppearance="?android:attr/textAppearanceMedium"
+            android:text="Beschreibung:"
+            android:id="@+id/textView"
+            android:textColor="#595959"
+            android:layout_marginLeft="@dimen/text_margin"
+            android:layout_marginTop="@dimen/text_margin"
+            android:layout_marginRight="@dimen/text_margin" />
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:id="@+id/descriptionTextView"
+            android:textColor="#494949"
+            android:textSize="15dp"
+            android:layout_margin="@dimen/text_margin" />
+        
+        <View
+            android:layout_width="fill_parent"
+            android:layout_height="2px"
+            android:background="#afafaf" />
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:textAppearance="?android:attr/textAppearanceMedium"
+            android:text="Staffeln:"
+            android:id="@+id/textView2"
+            android:textColor="#595959"
+            android:layout_margin="@dimen/text_margin" />
+
+        <ListView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:id="@+id/seasonsListView"
+            android:divider="@null"
+            android:dividerHeight="0dp"></ListView>
+
+    </LinearLayout>
+
+
+</android.support.v4.widget.NestedScrollView>

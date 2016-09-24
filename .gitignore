@@ -9,7 +9,7 @@
 *.class
 
 # Androidstudio folder
-.idea
+.idea/
 
 # Generated files
 bin/

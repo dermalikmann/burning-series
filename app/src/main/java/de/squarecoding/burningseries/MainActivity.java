@@ -1,15 +1,26 @@
 package de.squarecoding.burningseries;
 
+import android.app.SearchManager;
+import android.content.ComponentName;
+import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
-import android.util.Log;
 import android.support.design.widget.NavigationView;
 import android.support.v4.view.GravityCompat;
+import android.support.v4.view.MenuItemCompat;
 import android.support.v4.widget.DrawerLayout;
+import android.support.v4.app.Fragment;
+import android.support.v4.app.FragmentManager;
+import android.support.v4.app.FragmentTransaction;
 import android.support.v7.app.ActionBarDrawerToggle;
 import android.support.v7.app.AppCompatActivity;
+import android.support.v7.widget.SearchView;
 import android.support.v7.widget.Toolbar;
+import android.view.Menu;
+import android.view.MenuInflater;
 import android.view.MenuItem;
+
+import com.google.firebase.iid.FirebaseInstanceId;
 
 import de.squarecoding.burningseries.mainFragments.GenresFragment;
 import de.squarecoding.burningseries.mainFragments.SeriesFragment;
@@ -20,20 +31,14 @@ public class MainActivity extends AppCompatActivity
     NavigationView navigationView = null;
     Toolbar toolbar = null;
 
+    public static Menu menu;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
         toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
-
-        //Set Start Fragment
-
-        SeriesFragment fragment = new SeriesFragment();
-        android.support.v4.app.FragmentTransaction fragmentTransaction =
-                getSupportFragmentManager().beginTransaction();
-        fragmentTransaction.replace(R.id.fragmentContainerMain, fragment);
-        fragmentTransaction.commit();
 
         DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
         ActionBarDrawerToggle toggle = new ActionBarDrawerToggle(
@@ -54,49 +59,60 @@ public class MainActivity extends AppCompatActivity
         }
     }
 
-    /*@Override
+    @Override
     public boolean onCreateOptionsMenu(Menu menu) {
+        this.menu = menu;
         MenuInflater inflater = getMenuInflater();
-        inflater.inflate(R.menu.toolbar_options, menu);
+        inflater.inflate(R.menu.menu_main, menu);
+
+        setStartFragment();
 
         return true;
-    }*/
+    }
 
     @SuppressWarnings("StatementWithEmptyBody")
     @Override
     public boolean onNavigationItemSelected(MenuItem item) {
         // Handle navigation view item clicks here.
-        int id = item.getItemId();
 
-        if (id == R.id.nav_series) {
-            android.support.v4.app.FragmentTransaction fragmentTransaction =
-                    getSupportFragmentManager().beginTransaction();
-            fragmentTransaction.replace(R.id.fragmentContainerMain, new SeriesFragment());
-            fragmentTransaction.commit();
+        FragmentManager fragmentManager = getSupportFragmentManager();
+        FragmentTransaction transaction = fragmentManager.beginTransaction();
 
-        } else if (id == R.id.nav_genres) {
-            android.support.v4.app.FragmentTransaction fragmentTransaction =
-                    getSupportFragmentManager().beginTransaction();
-            fragmentTransaction.replace(R.id.fragmentContainerMain, new GenresFragment());
-            fragmentTransaction.commit();
+        switch (item.getItemId()) {
 
-        } /* else if (id == R.id.nav_favs) {
+            case R.id.nav_series:
+                transaction.replace(R.id.fragmentContainerMain, new SeriesFragment());
+                transaction.commit();
+                break;
 
-            android.support.v4.app.FragmentTransaction fragmentTransaction =
-                    getSupportFragmentManager().beginTransaction();
-            fragmentTransaction.replace(R.id.fragmentContainerMain, new FavsFragment());
-            fragmentTransaction.commit();
-            Log.e("TAG", "Fragment set");
+            case R.id.nav_genres:
+                transaction.replace(R.id.fragmentContainerMain, new GenresFragment());
+                transaction.commit();
+                break;
 
-        } */else if (id == R.id.nav_share) {
+            case R.id.nav_favs: /*
+                transaction.replace(R.id.fragmentContainerMain, new FavsFragment());
+                transaction.commit();*/
+                break;
 
-        } else if (id == R.id.nav_settings) {
-            Intent intent = new Intent(this, SettingsActivity.class);
-            startActivity(intent);
+            case R.id.nav_share:
+                break;
+
+            case R.id.nav_settings:
+                Intent intent = new Intent(this, SettingsActivity.class);
+                startActivity(intent);
+                break;
         }
 
         DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
         drawer.closeDrawer(GravityCompat.START);
         return true;
+    }
+
+    private void setStartFragment() {
+        FragmentManager fragmentManager = getSupportFragmentManager();
+        FragmentTransaction transaction = fragmentManager.beginTransaction();
+        transaction.replace(R.id.fragmentContainerMain, new SeriesFragment());
+        transaction.commit();
     }
 }

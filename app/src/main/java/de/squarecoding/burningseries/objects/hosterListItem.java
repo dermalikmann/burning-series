@@ -7,12 +7,12 @@ public class hosterListItem {
 
     private String url;
     private String hosterLable;
-    //private Integer part;
+    private String partLable;
 
-    public hosterListItem(String url, String hosterLable/*, Integer part*/) {
+    public hosterListItem(String url, String hosterLable, String partLable) {
         this.url = url;
         this.hosterLable = hosterLable;
-        //this.part = part;
+        this.partLable = partLable;
     }
 
     public String getUrl() {
@@ -23,7 +23,7 @@ public class hosterListItem {
         return hosterLable;
     }
 
-    /*public Integer getPart() {
-        return part;
-    }*/
+    public String getPartLable() {
+        return partLable;
+    }
 }

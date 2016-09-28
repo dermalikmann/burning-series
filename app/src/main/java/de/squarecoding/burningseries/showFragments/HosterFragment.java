@@ -97,7 +97,7 @@ public class HosterFragment extends Fragment {
 
                 webDoc.select("ul.pages").remove();
 
-                String url, lable;
+                String url;
 
                 Elements hosterList = webDoc.select("#sp_left ul li");
 
@@ -105,30 +105,9 @@ public class HosterFragment extends Fragment {
                     Element link = hoster.select("a").first();
 
                     url = link.attr("abs:href").toString();
-                    String tmpLable = link.text();
-                    if (tmpLable.toLowerCase().contains("vivo")) {
-                        lable = "Vivo";
-                    } else if (tmpLable.toLowerCase().contains("openload")) {
-                        lable = "OpenLoad";
-                    } else if (tmpLable.toLowerCase().contains("flashx")) {
-                        lable = "FlashX";
-                    } else if (tmpLable.toLowerCase().contains("powerwatch")) {
-                        lable = "Powerwatch";
-                    } else if (tmpLable.toLowerCase().contains("cloudtime")) {
-                        lable = "Cloudtime";
-                    } else if (tmpLable.toLowerCase().contains("shared")) {
-                        lable = "Shared";
-                    } else if (tmpLable.toLowerCase().contains("streamcloud")) {
-                        lable = "Streamcloud";
-                    } else if (tmpLable.toLowerCase().contains("wholecloud")) {
-                        lable = "WholeCloud";
-                    } else if (tmpLable.toLowerCase().contains("youwatch")) {
-                        lable = "YouWatch";
-                    } else {
-                        lable = "Other";
-                    }
+                    String[] chost = link.text().split(" - ");
 
-                    hostersList.add(new hosterListItem(url, lable));
+                    hostersList.add(new hosterListItem(url, chost[0], chost[1]));
                 }
 
 

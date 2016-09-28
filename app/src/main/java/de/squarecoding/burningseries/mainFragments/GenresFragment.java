@@ -5,8 +5,13 @@ import android.content.Intent;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
+import android.support.v4.view.MenuItemCompat;
+import android.support.v7.widget.SearchView;
 import android.util.Log;
 import android.view.LayoutInflater;
+import android.view.Menu;
+import android.view.MenuInflater;
+import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.AdapterView;
@@ -22,6 +27,7 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 
+import de.squarecoding.burningseries.MainActivity;
 import de.squarecoding.burningseries.R;
 import de.squarecoding.burningseries.ShowActivity;
 import de.squarecoding.burningseries.objects.genresListItem;
@@ -59,6 +65,13 @@ public class GenresFragment extends Fragment {
         progressDialog.setCancelable(false);
         progressDialog.setCanceledOnTouchOutside(false);
 
+        MenuItem menuItem = MainActivity.menu.findItem(R.id.action_search);
+        menuItem.setVisible(false);
+
+        SearchView searchView = (SearchView) MenuItemCompat.getActionView(menuItem);
+        searchView.setOnQueryTextListener(null);
+
+
         new getGenres().execute();
 
         return rootView;
@@ -80,15 +93,11 @@ public class GenresFragment extends Fragment {
         @Override
         protected Void doInBackground(Void... params) {
 
-            Log.d("DEBUG", "1");
-
             try {
                 webDoc = Jsoup.connect(allGenresURL).get();
-                Log.d("DEBUG", "2");
 
                 for (Element genre : webDoc.select("div.genre")) {
                     String curGenre = genre.select("span").first().text();
-                    Log.d("GENRES", curGenre + " added.");
                     genresList.add(new genresListItem(curGenre));
 
                 }

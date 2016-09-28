@@ -12,6 +12,7 @@ import android.support.v7.widget.Toolbar;
 import android.util.Log;
 import android.view.MenuItem;
 import android.view.View;
+import android.widget.FrameLayout;
 import android.widget.TextView;
 
 import org.jsoup.Jsoup;
@@ -129,6 +130,7 @@ public class ShowActivity extends AppCompatActivity {
 
             TextView descriptionTextView = (TextView) findViewById(R.id.descriptionTextView);
             descriptionTextView.setText(description);
+            setTitle(title);
         }
     }
 
@@ -154,7 +156,6 @@ public class ShowActivity extends AppCompatActivity {
         if (hfrag != null && hfrag.isVisible()) {
             switchHosterToEpisodes();
         }
-
 
         super.onBackPressed();
     }
@@ -192,26 +193,23 @@ public class ShowActivity extends AppCompatActivity {
     /** Fragment transactions **/
 
     public void switchSeasonsToEpisodes() {
-        Fragment fragment = new EpisodesFragment();
         FragmentManager fragmentManager = getSupportFragmentManager();
         FragmentTransaction transaction = fragmentManager.beginTransaction();
-        transaction.replace(R.id.fragmentContainerShow, fragment, "EPISODES");
+        transaction.replace(R.id.fragmentContainerShow, new EpisodesFragment(), "EPISODES");
         transaction.commit();
     }
 
     public void switchEpisodesToSeasons() {
-        Fragment fragment = new SeasonsFragment();
         FragmentManager fragmentManager = getSupportFragmentManager();
         FragmentTransaction transaction = fragmentManager.beginTransaction();
-        transaction.replace(R.id.fragmentContainerShow, fragment, "SEASONS");
+        transaction.replace(R.id.fragmentContainerShow, new SeasonsFragment(), "SEASONS");
         transaction.commit();
     }
 
     public void switchEpisodesToHosters() {
-        Fragment fragment = new HosterFragment();
         FragmentManager fragmentManager = getSupportFragmentManager();
         FragmentTransaction transaction = fragmentManager.beginTransaction();
-        transaction.replace(R.id.fragmentContainerShow, fragment, "HOSTERS");
+        transaction.replace(R.id.fragmentContainerShow, new HosterFragment(), "HOSTERS");
         transaction.commit();
     }
 

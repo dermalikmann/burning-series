@@ -2,13 +2,23 @@ package de.squarecoding.burningseries.mainFragments;
 
 
 import android.app.ProgressDialog;
+import android.app.SearchManager;
+import android.content.ComponentName;
+import android.content.Context;
 import android.content.Intent;
 import android.database.sqlite.SQLiteDatabase;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
+import android.support.v4.app.FragmentManager;
+import android.support.v4.app.FragmentTransaction;
+import android.support.v4.view.MenuItemCompat;
+import android.support.v7.widget.SearchView;
 import android.util.Log;
 import android.view.LayoutInflater;
+import android.view.Menu;
+import android.view.MenuInflater;
+import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.AdapterView;
@@ -26,6 +36,7 @@ import java.util.Arrays;
 import java.util.Comparator;
 import java.util.List;
 
+import de.squarecoding.burningseries.MainActivity;
 import de.squarecoding.burningseries.R;
 import de.squarecoding.burningseries.database.MainDBHelper;
 import de.squarecoding.burningseries.ShowActivity;
@@ -57,7 +68,6 @@ public class SeriesFragment extends Fragment {
                              Bundle savedInstanceState) {
         View rootView = inflater.inflate(R.layout.fragment_series, container, false);
         seriesListView = (ListView) rootView.findViewById(R.id.seriesListView);
-        Log.d("DEBUG", "list view set");
         progressDialog = new ProgressDialog(getActivity());
         progressDialog.setMessage("Serienliste wird erstellt.\nBitte warten...");
 
@@ -68,10 +78,41 @@ public class SeriesFragment extends Fragment {
         //mainDBHelper = new MainDBHelper(getContext());
         //db = mainDBHelper.getWritableDatabase();
 
-
         new getSeries().execute();
 
+        MenuItem menuItem = MainActivity.menu.findItem(R.id.action_search);
+        menuItem.setVisible(true);
+
+        SearchView searchView = (SearchView) MenuItemCompat.getActionView(menuItem);
+        searchView.setOnQueryTextListener(new SearchView.OnQueryTextListener() {
+            @Override
+            public boolean onQueryTextSubmit(String query) {
+                return true;
+            }
+
+            @Override
+            public boolean onQueryTextChange(String newText) {
+                filterList(newText);
+                return false;
+            }
+        });
+
         return rootView;
+    }
+
+    public void filterList(String query) {
+
+        System.out.println(query);
+
+        List<showsListItem> filteredList = new ArrayList<>();
+
+        for (showsListItem single : seriesList) {
+            if (single.getTitle().contains(query)) filteredList.add(single);
+        }
+
+        System.out.println(Integer.toString(filteredList.size()));
+
+        refreshList(filteredList);
     }
 
     class getSeries extends AsyncTask<Void, Void, Void> {
@@ -152,22 +193,30 @@ public class SeriesFragment extends Fragment {
         protected void onPostExecute(Void aVoid) {
             super.onPostExecute(aVoid);
 
-            populateList();
+            refreshList(null);
             progressDialog.dismiss();
         }
     }
 
-    private void populateList() {
-        ArrayAdapter<showsListItem> adapter = new seriesListAdapter();
-        seriesListView.setAdapter(adapter);
+    private void refreshList(List<showsListItem> list) {
+        if (list == null) {
+            list = seriesList;
+        }
 
-        seriesListView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
-            @Override
-            public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
-                TextView urlView = (TextView) view.findViewById(R.id.seriesUrl);
-                showSeries(urlView.getText().toString());
-            }
-        });
+        if (list.size() >= 1) {
+            ArrayAdapter<showsListItem> adapter = new seriesListAdapter(list);
+            seriesListView.setAdapter(adapter);
+
+            seriesListView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+                @Override
+                public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
+                    TextView urlView = (TextView) view.findViewById(R.id.seriesUrl);
+                    showSeries(urlView.getText().toString());
+                }
+            });
+        } else {
+            seriesListView.setAdapter(null);
+        }
     }
 
     private void showSeries(String url) {
@@ -178,8 +227,11 @@ public class SeriesFragment extends Fragment {
 
     class seriesListAdapter extends ArrayAdapter<showsListItem> {
 
-        public seriesListAdapter() {
+        private List<showsListItem> list;
+
+        public seriesListAdapter(List<showsListItem> list) {
             super(getActivity(), R.layout.list_item_series, seriesList);
+            this.list = list;
         }
 
         @Override
@@ -188,7 +240,7 @@ public class SeriesFragment extends Fragment {
                 view = getActivity().getLayoutInflater().inflate(R.layout.list_item_series, parent, false);
             }
 
-            showsListItem current = seriesList.get(pos);
+            showsListItem current = list.get(pos);
 
             TextView title = (TextView) view.findViewById(R.id.seriesTitle);
             title.setText(current.getTitle());
@@ -200,6 +252,11 @@ public class SeriesFragment extends Fragment {
             url.setText(current.getUrl());
 
             return view;
+        }
+
+        @Override
+        public int getCount() {
+            return list != null ? list.size() : 0;
         }
     }
 }

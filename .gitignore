@@ -8,8 +8,9 @@
 # Java class files
 *.class
 
-# Androidstudio folder
+# Androidstudio/IntelliJ folder
 .idea/
+.idea/*
 
 # Generated files
 bin/

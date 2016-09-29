@@ -107,10 +107,8 @@ public class SeriesFragment extends Fragment {
         List<showsListItem> filteredList = new ArrayList<>();
 
         for (showsListItem single : seriesList) {
-            if (single.getTitle().contains(query)) filteredList.add(single);
+            if (single.getTitle().toLowerCase().contains(query.toLowerCase())) filteredList.add(single);
         }
-
-        System.out.println(Integer.toString(filteredList.size()));
 
         refreshList(filteredList);
     }

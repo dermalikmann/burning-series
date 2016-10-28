@@ -1,6 +1,11 @@
 <?xml version="1.0" encoding="utf-8"?>
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
-    package="de.squarecoding.burningseries">
+    package="de.m4lik.monarchcode.burningseries">
+
+    <!-- To auto-complete the email text field in the login form with the user's emails -->
+    <uses-permission android:name="android.permission.GET_ACCOUNTS" />
+    <uses-permission android:name="android.permission.READ_PROFILE" />
+    <uses-permission android:name="android.permission.READ_CONTACTS" />
 
     <application
         android:allowBackup="true"
@@ -24,6 +29,7 @@
             <intent-filter>
                 <action android:name="android.intent.action.SEARCH" />
             </intent-filter>
+
             <meta-data
                 android:name="android.app.searchable"
                 android:resource="@xml/searchable" />
@@ -34,12 +40,21 @@
             android:parentActivityName=".MainActivity">
             <meta-data
                 android:name="android.support.PARENT_ACTIVITY"
-                android:value="de.squarecoding.burningseries.MainActivity" />
+                android:value="de.m4lik.monarchcode.burningseries.MainActivity" />
         </activity>
         <activity
             android:name=".ShowActivity"
             android:label="@string/title_activity_scrolling"
             android:theme="@style/BurningSeries.NoActionBar" />
+        <!--
+            <meta-data
+            android:name="io.fabric.ApiKey"
+            android:value="2e4738791df023e8d655324723e04d3a23040b6a"
+            />
+        -->
+        <activity
+            android:name=".LoginActivity"
+            android:label="@string/title_activity_login"></activity>
     </application>
 
 </manifest>

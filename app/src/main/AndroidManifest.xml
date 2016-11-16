@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
-    package="de.m4lik.monarchcode.burningseries">
+    package="de.monarchcode.m4lik.burningseries">
 
     <!-- To auto-complete the email text field in the login form with the user's emails -->
     <uses-permission android:name="android.permission.GET_ACCOUNTS" />
@@ -25,7 +25,8 @@
         <activity
             android:name=".MainActivity"
             android:label="@string/app_name"
-            android:theme="@style/BurningSeries.NoActionBar">
+            android:theme="@style/BurningSeries.NoActionBar"
+            android:screenOrientation="portrait">
             <intent-filter>
                 <action android:name="android.intent.action.SEARCH" />
             </intent-filter>
@@ -35,26 +36,24 @@
                 android:resource="@xml/searchable" />
         </activity>
         <activity
-            android:name=".SettingsActivity"
-            android:label="@string/title_activity_settings"
-            android:parentActivityName=".MainActivity">
-            <meta-data
-                android:name="android.support.PARENT_ACTIVITY"
-                android:value="de.m4lik.monarchcode.burningseries.MainActivity" />
-        </activity>
-        <activity
             android:name=".ShowActivity"
             android:label="@string/title_activity_scrolling"
-            android:theme="@style/BurningSeries.NoActionBar" />
-        <!--
-            <meta-data
-            android:name="io.fabric.ApiKey"
-            android:value="2e4738791df023e8d655324723e04d3a23040b6a"
-            />
-        -->
+            android:theme="@style/BurningSeries.NoActionBar"
+            android:screenOrientation="portrait"/>
         <activity
             android:name=".LoginActivity"
-            android:label="@string/title_activity_login"></activity>
+            android:label="@string/title_activity_login"
+            android:screenOrientation="portrait"/>
+        <activity
+            android:name=".simpleVideoPlayer"
+            android:label="@string/title_activity_video_player"
+            android:screenOrientation="landscape"/>
+        <activity
+            android:name=".FullScreenVideoPlayer"
+            android:screenOrientation="landscape"
+            android:configChanges="orientation|keyboardHidden|screenSize"
+            android:label="@string/title_activity_full_screen_video_player"
+            android:theme="@style/FullscreenTheme"></activity>
     </application>
 
 </manifest>

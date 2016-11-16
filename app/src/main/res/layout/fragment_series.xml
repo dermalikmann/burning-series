@@ -11,6 +11,5 @@
             android:id="@+id/seriesListView"
             android:layout_gravity="center_horizontal"
             android:divider="@null"
-            android:dividerHeight="0dp"
-            android:paddingTop="5dp" />
+            android:dividerHeight="0dp" />
     </LinearLayout>

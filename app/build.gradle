@@ -5,16 +5,18 @@ android {
     buildToolsVersion "24.0.2"
 
     defaultConfig {
-        applicationId "de.squarecoding.burningseries"
+        applicationId "de.monarchcode.m4lik.burningseries"
         minSdkVersion 15
         targetSdkVersion 24
         versionCode 1
         versionName "1.0"
+        vectorDrawables.useSupportLibrary = true
     }
     buildTypes {
         release {
-            minifyEnabled false
+            minifyEnabled true
             proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
+            debuggable false
         }
     }
 }
@@ -35,11 +37,11 @@ dependencies {
 
     compile 'com.devbrackets.android:exomedia:3.0.5'
 
-    compile 'com.google.android.gms:play-services-gcm:9.6.1'
+    compile 'com.google.android.gms:play-services-gcm:9.8.0'
     compile 'com.google.code.gson:gson:2.7'
-    compile 'com.google.firebase:firebase-auth:9.6.1'
-    compile 'com.google.firebase:firebase-core:9.6.1'
-    compile 'com.google.firebase:firebase-messaging:9.6.1'
+    compile 'com.google.firebase:firebase-auth:9.8.0'
+    compile 'com.google.firebase:firebase-core:9.8.0'
+    compile 'com.google.firebase:firebase-messaging:9.8.0'
 
     compile 'com.github.bumptech.glide:glide:3.7.0'
     compile 'com.github.nirhart:parallaxscroll:1.0'

@@ -1,6 +1,9 @@
 <?xml version="1.0" encoding="utf-8"?>
 <menu xmlns:android="http://schemas.android.com/apk/res/android">
-
+    <item
+        android:id="@+id/login_menu_item"
+        android:icon="@drawable/ic_login_logout"
+        android:title="Login"  />
     <item android:title="@string/series">
             <menu android:checkableBehavior="single">
                 <item
@@ -17,6 +20,14 @@
                     android:title="@string/favs" />
             </menu>
     </item>
+    <!--<item>
+        <menu android:checkableBehavior="single">
+        <item
+            android:id="@+id/nav_shoutbox"
+            android:icon="@drawable/ic_nav_message"
+            android:title="@string/nav_shoutbox" />
+        </menu>
+    </item>-->
     <item android:title="@string/misc">
             <menu android:checkableBehavior="single">
                 <item
@@ -27,7 +38,10 @@
                     android:id="@+id/nav_settings"
                     android:icon="@drawable/ic_settings"
                     android:title="@string/settings" />
+                <item
+                    android:id="@+id/logout_menu_item"
+                    android:icon="@drawable/ic_login_logout"
+                    android:title="Logout"  />
             </menu>
     </item>
-
 </menu>

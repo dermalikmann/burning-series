@@ -31,7 +31,6 @@ public final class SeriesContract {
     static final String SQL_CREATE_SERIES_TABLE =
             "CREATE TABLE " + seriesTable.TABLE_NAME + " (" +
                     seriesTable._ID + " INTEGER PRIMARY KEY"    + "," +
-                    seriesTable._ID + " INTEGER PRIMARY KEY"    + "," +
                     seriesTable.COLUMN_NAME_ID + " INTEGER"     + "," +
                     seriesTable.COLUMN_NAME_TITLE + " TEXT"     + "," +
                     seriesTable.COLUMN_NAME_GENRE + " TEXT"     + "," +
@@ -52,6 +51,9 @@ public final class SeriesContract {
 
     static final String SQL_DELETE_FAVORITES_TABLE =
             "DROP TABLE IF EXISTS " + favoritesTable.TABLE_NAME;
+
+    public static final String SQL_TRUNCATE_SERIES_TABLE =
+            "DELETE FROM " + seriesTable.TABLE_NAME;
 
     public static final String SQL_TRUNCATE_FAVORITES_TABLE =
             "DELETE FROM " + favoritesTable.TABLE_NAME;

@@ -1,5 +1,6 @@
 package de.monarchcode.m4lik.burningseries;
 
+import android.app.ProgressDialog;
 import android.content.ContentValues;
 import android.content.Context;
 import android.content.Intent;
@@ -16,38 +17,47 @@ import android.support.v4.widget.DrawerLayout;
 import android.support.v7.app.ActionBarDrawerToggle;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
-import android.util.Log;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.TextView;
 
+import java.util.Arrays;
+import java.util.Iterator;
 import java.util.List;
+import java.util.Map;
 
 import de.monarchcode.m4lik.burningseries.api.API;
 import de.monarchcode.m4lik.burningseries.api.APIInterface;
 import de.monarchcode.m4lik.burningseries.database.MainDBHelper;
 import de.monarchcode.m4lik.burningseries.database.SeriesContract;
-import de.monarchcode.m4lik.burningseries.database.SeriesContract.favoritesTable;
 import de.monarchcode.m4lik.burningseries.mainFragments.FavsFragment;
 import de.monarchcode.m4lik.burningseries.mainFragments.GenresFragment;
 import de.monarchcode.m4lik.burningseries.mainFragments.SeriesFragment;
+import de.monarchcode.m4lik.burningseries.objects.GenreMap;
+import de.monarchcode.m4lik.burningseries.objects.GenreObj;
 import de.monarchcode.m4lik.burningseries.objects.ShowObj;
 import okhttp3.ResponseBody;
 import retrofit2.Call;
 import retrofit2.Callback;
 import retrofit2.Response;
 
+import static de.monarchcode.m4lik.burningseries.database.SeriesContract.seriesTable;
+
 public class MainActivity extends AppCompatActivity
         implements NavigationView.OnNavigationItemSelectedListener {
 
     public static String userName;
     public static String userSession;
+
     public static Menu menu;
+
     public String visibleFragment;
+
     MainDBHelper dbHelper;
     SQLiteDatabase database;
+
     NavigationView navigationView = null;
     Toolbar toolbar = null;
 
@@ -65,14 +75,13 @@ public class MainActivity extends AppCompatActivity
         DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
 
 
+
         SharedPreferences sharedPreferences = getSharedPreferences(
                 "de.monarchcode.m4lik.burningseries.LOGIN",
                 Context.MODE_PRIVATE
         );
         userSession = sharedPreferences.getString("session", "");
         userName = sharedPreferences.getString("user", "Bitte Einloggen");
-        Log.d("BS", "Session is: " + userSession);
-        Log.d("BS", "Username is: " + userName);
 
 
         dbHelper = new MainDBHelper(getApplicationContext());
@@ -81,19 +90,10 @@ public class MainActivity extends AppCompatActivity
 
         navigationView = (NavigationView) findViewById(R.id.nav_view);
         navigationView.setNavigationItemSelectedListener(this);
+
         ActionBarDrawerToggle toggle = new ActionBarDrawerToggle(
                 this, drawer, toolbar, R.string.navigation_drawer_open, R.string.navigation_drawer_close);
         toggle.syncState();
-
-        navigationView.getHeaderView(0).setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                if (userSession.equals("")) {
-                    Intent intent = new Intent(getApplicationContext(), LoginActivity.class);
-                    startActivity(intent);
-                }
-            }
-        });
 
         TextView userTextView = (TextView) navigationView.getHeaderView(0).findViewById(R.id.nav_username_text);
         userTextView.setText(userName);
@@ -123,7 +123,7 @@ public class MainActivity extends AppCompatActivity
         inflater.inflate(R.menu.menu_main, menu);
         this.menu = menu;
 
-        fetchFavsAndRefresh("seriesFragment");
+        updateDatabase();
 
         return true;
     }
@@ -136,13 +136,16 @@ public class MainActivity extends AppCompatActivity
                     setFragment("genresFragment");
                     break;
                 case "favsFragment":
-                    fetchFavsAndRefresh("favsFragment");
+                    updateDatabase();
+                    setFragment("favsFragment");
                     break;
                 case "seriesFragment":
-                    fetchFavsAndRefresh("seriesFragment");
+                    updateDatabase();
+                    setFragment("seriesFragment");
                     break;
                 default:
-                    fetchFavsAndRefresh("seriesFragment");
+                    updateDatabase();
+                    setFragment("seriesFragment");
                     break;
             }
         return super.onOptionsItemSelected(item);
@@ -200,6 +203,8 @@ public class MainActivity extends AppCompatActivity
         final API api = new API();
         api.setSession(sharedPreferences.getString("session", ""));
         api.generateToken("logout");
+
+
         APIInterface apii = api.getApiInterface();
         Call<ResponseBody> call = apii.logout(api.getToken(), api.getUserAgent(), api.getSession());
         call.enqueue(new Callback<ResponseBody>() {
@@ -232,7 +237,7 @@ public class MainActivity extends AppCompatActivity
         MenuItem searchItem = MainActivity.getMenu().findItem(R.id.action_search);
 
         switch (fragment) {
-            case "genreFragment":
+            case "genresFragment":
                 searchItem.setVisible(false);
                 transaction.replace(R.id.fragmentContainerMain, new GenresFragment());
                 transaction.commit();
@@ -253,27 +258,96 @@ public class MainActivity extends AppCompatActivity
         }
     }
 
-    private void fetchFavsAndRefresh(final String fragment) {
+    private void updateDatabase() {
+
+        MainDBHelper dbHelper = new MainDBHelper(getApplicationContext());
+        final SQLiteDatabase db = dbHelper.getWritableDatabase();
+
+        db.execSQL(SeriesContract.SQL_TRUNCATE_SERIES_TABLE);
+
+        final ProgressDialog progressDialog = new ProgressDialog(MainActivity.this);
+        progressDialog.setTitle("Serien werden geladen.\nBitte kurz warten...");
+        progressDialog.setCancelable(false);
+        progressDialog.setCanceledOnTouchOutside(false);
+        progressDialog.show();
+
+        API api = new API();
+        APIInterface apiInterface = api.getApiInterface();
+        api.setSession(MainActivity.userSession);
+        api.generateToken("series:genre");
+        Call<GenreMap> call = apiInterface.getSeriesGenreList(api.getToken(), api.getUserAgent(), api.getSession());
+        call.enqueue(new Callback<GenreMap>() {
+            @Override
+            public void onResponse(Call<GenreMap> call, Response<GenreMap> response) {
+
+                GenreMap map = response.body();
+
+                for (Map.Entry<String, GenreObj> entry : map.entrySet()) {
+                    String currentGenre = entry.getKey();
+                    GenreObj go = entry.getValue();
+                    Iterator itr = Arrays.asList(go.getShows()).iterator();
+                    int i = 0;
+                    int all = 0;
+                    while (i < go.getShows().length) {
+                        int j = 1;
+
+                        db.beginTransaction();
+                        while (j <= 50 && itr.hasNext()) {
+                            ShowObj show = (ShowObj) itr.next();
+
+                            ContentValues cv = new ContentValues();
+                            cv.put(seriesTable.COLUMN_NAME_ID, show.getId());
+                            cv.put(seriesTable.COLUMN_NAME_TITLE, show.getName());
+                            cv.put(seriesTable.COLUMN_NAME_GENRE, currentGenre);
+                            cv.put(seriesTable.COLUMN_NAME_DESCR, "");
+                            cv.put(seriesTable.COLUMN_NAME_ISFAV, 0);
+
+                            db.insert(seriesTable.TABLE_NAME, null, cv);
+
+                            j++;
+                            i++;
+                        }
+                        db.setTransactionSuccessful();
+                        db.endTransaction();
+                    }
+                }
+
+                progressDialog.dismiss();
+
+                if (userSession.equals(""))
+                    setFragment("seriesFragment");
+            }
+
+            @Override
+            public void onFailure(Call<GenreMap> call, Throwable t) {
+                Snackbar snackbar = Snackbar.make(findViewById(android.R.id.content),
+                        "Da ist was schief gelaufen...\n" +
+                                "Bitte App neustarten.\n\n" +
+                                "Sollte der Fehler weiterhin bestehen installiere die App erneut", Snackbar.LENGTH_LONG);
+                View snackbarView = snackbar.getView();
+                snackbarView.setBackgroundColor(ContextCompat.getColor(getApplicationContext(), R.color.colorPrimaryDark));
+                snackbar.show();
+
+                getApplicationContext().deleteDatabase(MainDBHelper.DATABASE_NAME);
+            }
+        });
+
 
         if (!userSession.equals("")) {
-            API api = new API();
-            api.setSession(userSession);
             api.generateToken("user/series");
-            APIInterface apiInterface = api.getApiInterface();
-            Call<List<ShowObj>> call = apiInterface.getFavorites(api.getToken(), api.getUserAgent(), api.getSession());
-            call.enqueue(new Callback<List<ShowObj>>() {
+
+            Call<List<ShowObj>> favscall = apiInterface.getFavorites(api.getToken(), api.getUserAgent(), api.getSession());
+            favscall.enqueue(new Callback<List<ShowObj>>() {
                 @Override
                 public void onResponse(Call<List<ShowObj>> call, Response<List<ShowObj>> response) {
 
-                    database.execSQL(SeriesContract.SQL_TRUNCATE_FAVORITES_TABLE);
-
                     for (ShowObj show : response.body()) {
-                        ContentValues values = new ContentValues();
-                        values.put(favoritesTable.COLUMN_NAME_ID, show.getId());
-                        database.insert(favoritesTable.TABLE_NAME, null, values);
+                        ContentValues cv = new ContentValues();
+                        cv.put(seriesTable.COLUMN_NAME_ISFAV, 1);
+                        db.update(seriesTable.TABLE_NAME, cv, seriesTable.COLUMN_NAME_ID + " = ?", new String[]{show.getId().toString()});
                     }
 
-                    setFragment(fragment);
+                    setFragment("seriesFragment");
                 }
 
                 @Override
@@ -286,10 +360,6 @@ public class MainActivity extends AppCompatActivity
                     snackbar.show();
                 }
             });
-
-        } else {
-            setFragment(fragment);
         }
-
     }
 }

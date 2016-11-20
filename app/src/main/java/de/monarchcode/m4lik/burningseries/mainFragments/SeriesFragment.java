@@ -32,8 +32,6 @@ import java.util.Map;
 import de.monarchcode.m4lik.burningseries.MainActivity;
 import de.monarchcode.m4lik.burningseries.R;
 import de.monarchcode.m4lik.burningseries.ShowActivity;
-import de.monarchcode.m4lik.burningseries.api.API;
-import de.monarchcode.m4lik.burningseries.api.APIInterface;
 import de.monarchcode.m4lik.burningseries.database.MainDBHelper;
 import de.monarchcode.m4lik.burningseries.objects.GenreMap;
 import de.monarchcode.m4lik.burningseries.objects.GenreObj;
@@ -43,10 +41,7 @@ import retrofit2.Call;
 import retrofit2.Callback;
 import retrofit2.Response;
 
-import static de.monarchcode.m4lik.burningseries.database.SeriesContract.favoritesTable.COLUMN_NAME_GENRE;
-import static de.monarchcode.m4lik.burningseries.database.SeriesContract.favoritesTable.COLUMN_NAME_ID;
-import static de.monarchcode.m4lik.burningseries.database.SeriesContract.favoritesTable.COLUMN_NAME_TILTE;
-import static de.monarchcode.m4lik.burningseries.database.SeriesContract.favoritesTable.TABLE_NAME;
+import static de.monarchcode.m4lik.burningseries.database.SeriesContract.seriesTable.*;
 
 
 /**
@@ -101,7 +96,7 @@ public class SeriesFragment extends Fragment implements Callback<GenreMap> {
         });
 
 
-        fetchList();
+        fillList();
 
 
         return rootView;
@@ -133,7 +128,7 @@ public class SeriesFragment extends Fragment implements Callback<GenreMap> {
                 if (favs.contains(show.getId())) {
                     ContentValues cv = new ContentValues();
                     cv.put(COLUMN_NAME_GENRE, currentGenre);
-                    cv.put(COLUMN_NAME_TILTE, show.getName());
+                    cv.put(COLUMN_NAME_TITLE, show.getName());
                     db.update(TABLE_NAME, cv, COLUMN_NAME_ID + " = " + show.getId(), null);
                     seriesList.add(new ShowListItem(show.getName(), show.getId(), currentGenre, true));
                 } else
@@ -169,19 +164,52 @@ public class SeriesFragment extends Fragment implements Callback<GenreMap> {
     }
 
 
-    public void fetchList() {
-        if (requestStatus == null || !requestStatus.equals("fetching")) {
-            rootView.findViewById(R.id.avi).setVisibility(View.VISIBLE);
-            Log.d("BS", "Fetching list...");
+    public void fillList() {
 
-            API api = new API();
-            APIInterface apiInterface = api.getApiInterface();
-            api.setSession(MainActivity.userSession);
-            api.generateToken("series:genre");
-            Call<GenreMap> call = apiInterface.getSeriesGenreList(api.getToken(), api.getUserAgent(), api.getSession());
-            requestStatus = "fetching";
-            call.enqueue(this);
+        seriesList.clear();
+
+        MainDBHelper dbHelper = new MainDBHelper(getContext());
+        SQLiteDatabase db = dbHelper.getReadableDatabase();
+
+        // Define a projection that specifies which columns from the database
+        // you will actually use after this query.
+        String[] projection = {
+                COLUMN_NAME_ID,
+                COLUMN_NAME_TITLE,
+                COLUMN_NAME_GENRE,
+                COLUMN_NAME_ISFAV
+        };
+
+        String sortOrder =
+                COLUMN_NAME_TITLE + " ASC";
+
+        Cursor c = db.query(
+                TABLE_NAME,
+                projection,
+                null,
+                null,
+                null,
+                null,
+                sortOrder
+        );
+
+        c.moveToFirst();
+        seriesList.add(new ShowListItem(
+                c.getString(c.getColumnIndex(COLUMN_NAME_TITLE)),
+                c.getInt(c.getColumnIndex(COLUMN_NAME_ID)),
+                c.getString(c.getColumnIndex(COLUMN_NAME_GENRE)),
+                c.getInt(c.getColumnIndex(COLUMN_NAME_ISFAV)) == 1
+        ));
+        while (c.moveToNext()) {
+            seriesList.add(new ShowListItem(
+                    c.getString(c.getColumnIndex(COLUMN_NAME_TITLE)),
+                    c.getInt(c.getColumnIndex(COLUMN_NAME_ID)),
+                    c.getString(c.getColumnIndex(COLUMN_NAME_GENRE)),
+                    c.getInt(c.getColumnIndex(COLUMN_NAME_ISFAV)) == 1
+            ));
         }
+
+        refreshList();
     }
 
 

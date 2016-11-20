@@ -6,24 +6,24 @@ import android.content.Intent;
 import android.content.SharedPreferences;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
-import android.os.AsyncTask;
+import android.net.Uri;
 import android.os.Bundle;
 import android.support.design.widget.FloatingActionButton;
 import android.support.design.widget.Snackbar;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentTransaction;
+import android.support.v4.content.ContextCompat;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
 import android.util.Log;
 import android.view.MenuItem;
 import android.view.View;
-import android.widget.TextView;
+import android.widget.ImageView;
 
-import org.jsoup.Jsoup;
+import com.squareup.picasso.Picasso;
+
 import org.jsoup.nodes.Document;
-
-import java.io.IOException;
 
 import de.monarchcode.m4lik.burningseries.api.API;
 import de.monarchcode.m4lik.burningseries.api.APIInterface;
@@ -39,8 +39,9 @@ import retrofit2.Response;
 
 public class ShowActivity extends AppCompatActivity implements Callback<SeasonObj> {
 
-    public String title;
-    public String description;
+    private String title;
+    private String genre;
+    private String description;
 
     public Integer selectedShow;
     public Integer selectedSeason;
@@ -69,7 +70,18 @@ public class ShowActivity extends AppCompatActivity implements Callback<SeasonOb
         i = getIntent();
 
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
-        toolbar.setTitle(i.getStringExtra("ShowName"));
+        ImageView tbiv = (ImageView) findViewById(R.id.toolbarimage);
+        title = i.getStringExtra("ShowName");
+        genre = i.getStringExtra("ShowGenre");
+        selectedShow = i.getIntExtra("ShowID", 60);
+        Uri imageUri = Uri.parse("https://s.bs.to/img/cover/" + selectedShow + ".jpg");
+        toolbar.setTitle(title);
+
+        Log.v("BS", "Lade Cover.");
+        Picasso.with(getApplicationContext())
+                .load(imageUri)
+                .into(tbiv);
+
         setSupportActionBar(toolbar);
         getSupportActionBar().setDisplayHomeAsUpEnabled(true);
         getSupportActionBar().setDisplayShowHomeEnabled(true);
@@ -79,7 +91,7 @@ public class ShowActivity extends AppCompatActivity implements Callback<SeasonOb
                 Context.MODE_PRIVATE);
         userSession = sharedPreferences.getString("session", "");
 
-        selectedShow = i.getIntExtra("ShowID", 60);
+        System.out.println(selectedShow);
         Log.d("BS", "Checking for Fav");
         MainDBHelper dbHelper = new MainDBHelper(getApplicationContext());
         final SQLiteDatabase db = dbHelper.getWritableDatabase();
@@ -107,7 +119,7 @@ public class ShowActivity extends AppCompatActivity implements Callback<SeasonOb
         final FloatingActionButton fab = (FloatingActionButton) findViewById(R.id.fab);
 
         if (fav)
-            fab.setImageDrawable(getResources().getDrawable(R.drawable.ic_star_white));
+            fab.setImageDrawable(ContextCompat.getDrawable(getApplicationContext(), R.drawable.ic_star_white));
 
         fab.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -115,12 +127,14 @@ public class ShowActivity extends AppCompatActivity implements Callback<SeasonOb
                 if (!fav) {
                     ContentValues cv = new ContentValues();
                     cv.put(favoritesTable.COLUMN_NAME_ID, selectedShow);
+                    cv.put(favoritesTable.COLUMN_NAME_TILTE, title);
+                    cv.put(favoritesTable.COLUMN_NAME_GENRE, genre);
                     db.insert(favoritesTable.TABLE_NAME, null, cv);
-                    fab.setImageDrawable(getResources().getDrawable(R.drawable.ic_star_white));
+                    fab.setImageDrawable(ContextCompat.getDrawable(getApplicationContext(), R.drawable.ic_star_white));
                     fav = !fav;
                 } else {
                     db.delete(favoritesTable.TABLE_NAME, favoritesTable.COLUMN_NAME_ID + " = " + selectedShow, null);
-                    fab.setImageDrawable(getResources().getDrawable(R.drawable.ic_star_border_white));
+                    fab.setImageDrawable(ContextCompat.getDrawable(getApplicationContext(), R.drawable.ic_star_border_white));
                     fav = !fav;
                 }
             }
@@ -131,23 +145,7 @@ public class ShowActivity extends AppCompatActivity implements Callback<SeasonOb
         api.generateToken("series/" + selectedShow + "/1");
         APIInterface apii = api.getApiInterface();
         Call<SeasonObj> call = apii.getSeason(api.getToken(), api.getUserAgent(), selectedShow, 1, api.getSession());
-        //Call<ResponseBody> call = apii.getSeason(api.getToken(), api.getUserAgent(), selectedShow, 1, api.getSession());
         call.enqueue(this);
-        /*call.enqueue(new Callback<ResponseBody>() {
-            @Override
-            public void onResponse(Call<ResponseBody> call, Response<ResponseBody> response) {
-                try {
-                    System.out.println(response.body().string());
-                } catch (IOException e) {
-                    e.printStackTrace();
-                }
-            }
-
-            @Override
-            public void onFailure(Call<ResponseBody> call, Throwable t) {
-
-            }
-        });*/
 
     }
 
@@ -169,8 +167,6 @@ public class ShowActivity extends AppCompatActivity implements Callback<SeasonOb
         SeasonObj show = response.body();
 
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
-        toolbar.setTitle("Test");
-        //toolbar.setTitle(show.getSeries().getSeriesName());
 
         description = show.getSeries().getDescription();
         seasonCount = show.getSeries().getSeasonCount();
@@ -182,62 +178,6 @@ public class ShowActivity extends AppCompatActivity implements Callback<SeasonOb
     public void onFailure(Call<SeasonObj> call, Throwable t) {
 
         Snackbar.make(findViewById(android.R.id.content), "Fehler beim Laden der Seriendetails", Snackbar.LENGTH_SHORT);
-    }
-
-    private class getTitle extends AsyncTask<Void, Void, Void> {
-
-        private String url;
-
-        public getTitle(String url) {
-            this.url = url;
-        }
-
-        @Override
-        protected void onPreExecute() {
-            super.onPreExecute();
-
-            /*progressDialog = new ProgressDialog(EpisodesActivity.this);
-            progressDialog.setMessage("Staffeln werden aufgelistet.\nBitte warten...");
-
-            progressDialog.show();
-            progressDialog.setCancelable(false);
-            progressDialog.setCanceledOnTouchOutside(false);*/
-
-        }
-
-        @Override
-        protected Void doInBackground(Void... params) {
-
-            try {
-
-                webDoc = Jsoup.connect(this.url).get();
-
-                title = webDoc.select("#sp_left h2").first().text();
-
-                /*description = webDoc.select("#sp_left div p").first().text();
-
-                Elements seasons = webDoc.select("#sp_left ul.pages li").not(".button");
-                seasons = seasons.select("a");
-
-                for (Element season : seasons) {
-                    seasonsList.add(new seasonsListItem(season.attr("abs:href"), Integer.parseInt(season.text())));
-                }*/
-
-            } catch (IOException e) {
-                Log.d("JSOUP", "Can't connect:", e);
-            }
-
-            return null;
-        }
-
-        @Override
-        protected void onPostExecute(Void aVoid) {
-            super.onPostExecute(aVoid);
-
-            TextView descriptionTextView = (TextView) findViewById(R.id.descriptionTextView);
-            descriptionTextView.setText(description);
-            setTitle(title);
-        }
     }
 
     @Override
@@ -332,6 +272,7 @@ public class ShowActivity extends AppCompatActivity implements Callback<SeasonOb
      **/
 
     public void switchSeasonsToEpisodes() {
+
         FragmentManager fragmentManager = getSupportFragmentManager();
         FragmentTransaction transaction = fragmentManager.beginTransaction();
         transaction.replace(R.id.fragmentContainerShow, new EpisodesFragment(), "EPISODES");
@@ -341,6 +282,7 @@ public class ShowActivity extends AppCompatActivity implements Callback<SeasonOb
     }
 
     public void switchEpisodesToSeasons() {
+
         FragmentManager fragmentManager = getSupportFragmentManager();
         FragmentTransaction transaction = fragmentManager.beginTransaction();
         transaction.replace(R.id.fragmentContainerShow, new SeasonsFragment(), "SEASONS");

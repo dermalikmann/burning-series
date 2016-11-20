@@ -13,54 +13,45 @@
 
     <RelativeLayout
         android:layout_width="match_parent"
+        android:layout_height="90dp"
         android:background="@drawable/border"
         android:orientation="horizontal"
-        android:padding="5dp"
-        android:layout_height="90dp">
+        android:padding="5dp">
 
-        <!--<ImageView
+        <ImageView
             android:id="@+id/showImageView"
             android:layout_width="80dp"
             android:layout_height="80dp"
             android:layout_alignParentLeft="true"
-            android:layout_alignParentStart="true"/>-->
-
-        <ImageView
-            android:id="@+id/favImageView"
-            android:layout_width="30dp"
-            android:layout_height="30dp"
-            android:layout_alignParentEnd="true"
-            android:layout_alignParentRight="true"
-            android:layout_marginEnd="10dp"
-            android:layout_marginRight="10dp"
-            android:layout_marginTop="25dp"
-            android:src="@drawable/ic_star_border"/>
+            android:layout_alignParentStart="true"/>
 
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="match_parent"
             android:layout_alignLeft="@id/showImageView"
             android:layout_alignStart="@id/showImageView"
-            android:orientation="vertical"
-            android:paddingLeft="10dp"
-            android:paddingTop="20dp">
+            android:layout_marginLeft="85dp"
+            android:layout_marginStart="85dp"
+            android:orientation="vertical">
 
             <TextView
                 android:id="@+id/seriesTitle"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
+                android:layout_marginBottom="10dp"
+                android:layout_marginTop="10dp"
+                android:paddingLeft="5dp"
                 android:text="Series Title"
                 android:textAppearance="?android:attr/textAppearanceMedium"
-                android:textColor="#ff000000"
-                />
+                android:textColor="#ff000000"/>
 
             <TextView
                 android:id="@+id/seriesGenre"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
+                android:paddingLeft="5dp"
                 android:text="Medium Text"
-                android:textAppearance="?android:attr/textAppearanceSmall"
-                android:layout_marginTop="5dp"/>
+                android:textAppearance="?android:attr/textAppearanceSmall"/>
 
         </LinearLayout>
 

@@ -4,7 +4,6 @@ package de.monarchcode.m4lik.burningseries.hoster;
  * Created by Malik on 03.11.2016.
  */
 
-import java.io.IOException;
 import java.net.URL;
 import java.net.URLConnection;
 import java.text.DateFormat;
@@ -122,19 +121,5 @@ public class CookieManager {
 
     public String toString() {
         return this.map.toString();
-    }
-
-    public static void main(String[] strArr) {
-        CookieManager cookieManager = new CookieManager();
-        try {
-            URL url = new URL("http://www.hccp.org/test/cookieTest.jsp");
-            URLConnection openConnection = url.openConnection();
-            openConnection.connect();
-            cookieManager.storeCookies(openConnection);
-            System.out.println(cookieManager);
-            cookieManager.setCookies(url.openConnection());
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
     }
 }

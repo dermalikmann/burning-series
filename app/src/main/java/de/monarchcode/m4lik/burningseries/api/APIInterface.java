@@ -76,6 +76,10 @@ public interface APIInterface {
     Call<List<ShowObj>> getFavorites(@Header("BS-Token") String token,
                                      @Header("User-Agent") String userAgent,
                                      @Query("s") String session);
+    @GET("/api/user/series")
+    Call<ResponseBody> getFavoritesString(@Header("BS-Token") String token,
+                                     @Header("User-Agent") String userAgent,
+                                     @Query("s") String session);
 
     @FormUrlEncoded
     @POST("/api/login")

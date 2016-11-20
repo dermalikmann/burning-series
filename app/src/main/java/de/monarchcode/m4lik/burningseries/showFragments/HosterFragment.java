@@ -1,6 +1,7 @@
 package de.monarchcode.m4lik.burningseries.showFragments;
 
 
+import android.app.ProgressDialog;
 import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
@@ -10,18 +11,17 @@ import android.os.Bundle;
 import android.support.customtabs.CustomTabsIntent;
 import android.support.design.widget.Snackbar;
 import android.support.v4.app.Fragment;
+import android.support.v4.content.ContextCompat;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
+import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.ListView;
 import android.widget.TextView;
-
-import com.github.ndczz.infinityloading.InfinityLoading;
-
-import org.jsoup.nodes.Document;
 
 import java.util.ArrayList;
 
@@ -45,11 +45,11 @@ public class HosterFragment extends Fragment implements Callback<EpisodeObj> {
 
     View rootview;
 
-    Document webDoc;
-
     Integer selectedShow;
     Integer selectedSeason;
     Integer selectedEpisode;
+
+    ProgressDialog progressDialog;
 
     ListView hostersListView;
     ArrayList<HosterListItem> hostersList = new ArrayList<>();
@@ -72,9 +72,6 @@ public class HosterFragment extends Fragment implements Callback<EpisodeObj> {
 
         LinearLayout epicontainer = (LinearLayout) rootview.findViewById(R.id.hostercontainer);
         epicontainer.setVisibility(View.GONE);
-
-        InfinityLoading loading = (InfinityLoading) rootview.findViewById(R.id.loading);
-        loading.setVisibility(View.VISIBLE);
 
         SharedPreferences sharedPreferences = getActivity().getSharedPreferences(
                 "de.monarchcode.m4lik.burningseries.LOGIN",
@@ -102,11 +99,10 @@ public class HosterFragment extends Fragment implements Callback<EpisodeObj> {
         LinearLayout epicontainer = (LinearLayout) rootview.findViewById(R.id.hostercontainer);
         epicontainer.setVisibility(View.VISIBLE);
 
-        InfinityLoading loading = (InfinityLoading) rootview.findViewById(R.id.loading);
-        loading.setVisibility(View.GONE);
-
         for (EpisodeObj.Hoster hoster : episode.getHoster())
-            hostersList.add(new HosterListItem(hoster.getLinkId(), hoster.getHoster(), hoster.getPart()));
+            if (Hoster.compatibleHosters.contains(hoster.getHoster())) hostersList.add(new HosterListItem(hoster.getLinkId(), hoster.getHoster(), hoster.getPart(), true));
+        for (EpisodeObj.Hoster hoster : episode.getHoster())
+            if (!Hoster.compatibleHosters.contains(hoster.getHoster())) hostersList.add(new HosterListItem(hoster.getLinkId(), hoster.getHoster(), hoster.getPart()));
 
         refreshList();
     }
@@ -154,7 +150,7 @@ public class HosterFragment extends Fragment implements Callback<EpisodeObj> {
 
         API api = new API();
         api.setSession(sharedPreferences.getString("session", ""));
-        api.generateToken("watch/");
+        api.generateToken("watch/" + id);
         APIInterface apii = api.getApiInterface();
         Call<VideoObj> call = apii.watch(api.getToken(), api.getUserAgent(), id, api.getSession());
         call.enqueue(new Callback<VideoObj>() {
@@ -181,15 +177,30 @@ public class HosterFragment extends Fragment implements Callback<EpisodeObj> {
         }
 
         @Override
+        protected void onPreExecute() {
+
+            progressDialog = new ProgressDialog(getActivity());
+            progressDialog.setMessage("Hoster wird geöffnet...");
+
+            progressDialog.show();
+            progressDialog.setCancelable(false);
+            progressDialog.setCanceledOnTouchOutside(false);
+            super.onPreExecute();
+        }
+
+        @Override
         protected Void doInBackground(Void... params) {
             Hoster hoster = new Hoster();
             hosterReturn = hoster.get(videoObj.getHoster(), videoObj.getUrl());
-            System.out.println(hosterReturn);
+            Log.v("BS", hosterReturn);
             return null;
         }
 
         @Override
         protected void onPostExecute(Void aVoid) {
+
+            progressDialog.dismiss();
+
             if (hosterReturn == "unkown_hoster") {
                 CustomTabsIntent.Builder builder = new CustomTabsIntent.Builder();
                 CustomTabsIntent customTabsIntent = builder.build();
@@ -223,6 +234,8 @@ public class HosterFragment extends Fragment implements Callback<EpisodeObj> {
             TextView url = (TextView) view.findViewById(R.id.linkId);
             url.setText(current.getLinkId().toString());
 
+            ImageView fav = (ImageView) view.findViewById(R.id.supImgView);
+            fav.setImageDrawable(ContextCompat.getDrawable(getContext(), current.isSupported() ? R.drawable.ic_ondemand_video : R.drawable.ic_public));
 
             return view;
         }

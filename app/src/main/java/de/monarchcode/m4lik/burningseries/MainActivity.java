@@ -10,6 +10,7 @@ import android.support.design.widget.NavigationView;
 import android.support.design.widget.Snackbar;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentTransaction;
+import android.support.v4.content.ContextCompat;
 import android.support.v4.view.GravityCompat;
 import android.support.v4.widget.DrawerLayout;
 import android.support.v7.app.ActionBarDrawerToggle;
@@ -27,6 +28,7 @@ import java.util.List;
 import de.monarchcode.m4lik.burningseries.api.API;
 import de.monarchcode.m4lik.burningseries.api.APIInterface;
 import de.monarchcode.m4lik.burningseries.database.MainDBHelper;
+import de.monarchcode.m4lik.burningseries.database.SeriesContract;
 import de.monarchcode.m4lik.burningseries.database.SeriesContract.favoritesTable;
 import de.monarchcode.m4lik.burningseries.mainFragments.FavsFragment;
 import de.monarchcode.m4lik.burningseries.mainFragments.GenresFragment;
@@ -121,7 +123,7 @@ public class MainActivity extends AppCompatActivity
         inflater.inflate(R.menu.menu_main, menu);
         this.menu = menu;
 
-        setFragment("seriesFragment");
+        fetchFavsAndRefresh("seriesFragment");
 
         return true;
     }
@@ -134,42 +136,13 @@ public class MainActivity extends AppCompatActivity
                     setFragment("genresFragment");
                     break;
                 case "favsFragment":
-                    setFragment("favsFragment");
+                    fetchFavsAndRefresh("favsFragment");
+                    break;
+                case "seriesFragment":
+                    fetchFavsAndRefresh("seriesFragment");
                     break;
                 default:
-                    Log.d("BS", "Click!");
-
-                    Snackbar snackbar = Snackbar.make(findViewById(android.R.id.content), "Noch nicht verfügbar", Snackbar.LENGTH_SHORT);
-                    View snackbarView = snackbar.getView();
-                    snackbarView.setBackgroundColor(getResources().getColor(R.color.colorPrimaryDark));
-                    snackbar.show();
-
-                    if (!userSession.equals("")) {
-                        API api = new API();
-                        api.setSession(userSession);
-                        api.generateToken("user/series");
-                        APIInterface apiInterface = api.getApiInterface();
-                        Call<List<ShowObj>> call = apiInterface.getFavorites(api.getToken(), api.getUserAgent(), api.getSession());
-                        call.enqueue(new Callback<List<ShowObj>>() {
-                            @Override
-                            public void onResponse(Call<List<ShowObj>> call, Response<List<ShowObj>> response) {
-                                for (ShowObj show : response.body()) {
-                                    ContentValues values = new ContentValues();
-                                    values.put(favoritesTable.COLUMN_NAME_ID, show.getId());
-                                    database.insert(favoritesTable.TABLE_NAME, null, values);
-                                }
-
-                                new SeriesFragment().fetchList();
-                            }
-
-                            @Override
-                            public void onFailure(Call<List<ShowObj>> call, Throwable t) {
-                                Log.e("BS", "ZOMG!");
-                            }
-                        });
-                    } else {
-                        new SeriesFragment().fetchList();
-                    }
+                    fetchFavsAndRefresh("seriesFragment");
                     break;
             }
         return super.onOptionsItemSelected(item);
@@ -239,7 +212,7 @@ public class MainActivity extends AppCompatActivity
 
                 Snackbar snackbar = Snackbar.make(findViewById(android.R.id.content), "Ausgeloggt", Snackbar.LENGTH_SHORT);
                 View snackbarView = snackbar.getView();
-                snackbarView.setBackgroundColor(getResources().getColor(R.color.colorPrimaryDark));
+                snackbarView.setBackgroundColor(ContextCompat.getColor(getApplicationContext(), R.color.colorPrimaryDark));
                 snackbar.show();
             }
 
@@ -278,5 +251,45 @@ public class MainActivity extends AppCompatActivity
                 visibleFragment = "seriesFragment";
                 break;
         }
+    }
+
+    private void fetchFavsAndRefresh(final String fragment) {
+
+        if (!userSession.equals("")) {
+            API api = new API();
+            api.setSession(userSession);
+            api.generateToken("user/series");
+            APIInterface apiInterface = api.getApiInterface();
+            Call<List<ShowObj>> call = apiInterface.getFavorites(api.getToken(), api.getUserAgent(), api.getSession());
+            call.enqueue(new Callback<List<ShowObj>>() {
+                @Override
+                public void onResponse(Call<List<ShowObj>> call, Response<List<ShowObj>> response) {
+
+                    database.execSQL(SeriesContract.SQL_TRUNCATE_FAVORITES_TABLE);
+
+                    for (ShowObj show : response.body()) {
+                        ContentValues values = new ContentValues();
+                        values.put(favoritesTable.COLUMN_NAME_ID, show.getId());
+                        database.insert(favoritesTable.TABLE_NAME, null, values);
+                    }
+
+                    setFragment(fragment);
+                }
+
+                @Override
+                public void onFailure(Call<List<ShowObj>> call, Throwable t) {
+                    t.printStackTrace();
+
+                    Snackbar snackbar = Snackbar.make(findViewById(android.R.id.content), "Da ist was schief gelaufen...", Snackbar.LENGTH_SHORT);
+                    View snackbarView = snackbar.getView();
+                    snackbarView.setBackgroundColor(ContextCompat.getColor(getApplicationContext(), R.color.colorPrimaryDark));
+                    snackbar.show();
+                }
+            });
+
+        } else {
+            setFragment(fragment);
+        }
+
     }
 }

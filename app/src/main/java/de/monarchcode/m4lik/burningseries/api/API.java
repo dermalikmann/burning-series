@@ -81,7 +81,7 @@ public class API {
 
     public void generateToken(String uri) {
         if (uri != "login")
-            uri = uri + "?s=" + getSession();
+            uri = uri + "?s=" + (getSession() == null ? "" : getSession());
         Log.d("BSAPI", uri);
         Long ts = Long.valueOf(System.currentTimeMillis() / 1000);
         JSONObject jSONObject = new JSONObject();

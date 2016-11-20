@@ -8,11 +8,13 @@ public class EpisodeListItem {
     private String titleGer;
     private String title;
     private Integer id;
+    private Boolean watched;
 
-    public EpisodeListItem(String titleGer, String title, Integer id) {
+    public EpisodeListItem(String titleGer, String title, Integer id, Boolean watched) {
         this.titleGer = titleGer;
         this.title = title;
         this.id = id;
+        this.watched = watched;
     }
 
     public String getTitleGer() {
@@ -25,5 +27,9 @@ public class EpisodeListItem {
 
     public Integer getId() {
         return id;
+    }
+
+    public Boolean isWatched() {
+        return watched;
     }
 }

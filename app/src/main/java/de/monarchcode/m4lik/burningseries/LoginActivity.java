@@ -48,7 +48,6 @@ public class LoginActivity extends AppCompatActivity implements Callback<Respons
         mEmailSignInButton.setOnClickListener(new OnClickListener() {
             @Override
             public void onClick(View view) {
-                System.out.println(1235456);
                 attemptLogin();
             }
         });
@@ -116,7 +115,6 @@ public class LoginActivity extends AppCompatActivity implements Callback<Respons
         showProgress(false);
         try {
             String json = response.body().string();
-            System.out.println(json);
             if (json.contains("\"error\"")) {
                 userEditText.setError(getString(R.string.error_invalid_credentials));
             } else {

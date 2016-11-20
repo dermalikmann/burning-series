@@ -13,15 +13,22 @@ public final class SeriesContract {
     }
 
     public static abstract class favoritesTable implements BaseColumns {
-        public static final String TABLE_NAME = "favList";
-        public static final String COLUMN_NAME_ID = "seriesId";
+        public static final String TABLE_NAME               = "favList";
+        public static final String COLUMN_NAME_ID           = "seriesId";
+        public static final String COLUMN_NAME_TILTE = "gerTitle";
+        public static final String COLUMN_NAME_GENRE = "engTitle";
     }
 
-    public static final String SQL_CREATE_FAVORITES_TABLE =
+    static final String SQL_CREATE_FAVORITES_TABLE =
             "CREATE TABLE " + favoritesTable.TABLE_NAME + " (" +
-                    favoritesTable._ID + " INTEGER PRIMARY KEY," +
-                    favoritesTable.COLUMN_NAME_ID + " INTEGER" + ")";
+                    favoritesTable._ID + " INTEGER PRIMARY KEY"     + "," +
+                    favoritesTable.COLUMN_NAME_ID + " INTEGER"      + "," +
+                    favoritesTable.COLUMN_NAME_TILTE + " TEXT"  + "," +
+                    favoritesTable.COLUMN_NAME_GENRE + " TEXT"  + ")";
 
-    public static final String SQL_DELETE_FAVORITES_TABLE =
+    static final String SQL_DELETE_FAVORITES_TABLE =
             "DROP TABLE IF EXISTS " + favoritesTable.TABLE_NAME;
+
+    public static final String SQL_TRUNCATE_FAVORITES_TABLE =
+            "DELETE FROM " + favoritesTable.TABLE_NAME;
 }

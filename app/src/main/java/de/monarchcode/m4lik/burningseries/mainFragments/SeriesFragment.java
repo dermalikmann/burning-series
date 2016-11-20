@@ -2,14 +2,14 @@ package de.monarchcode.m4lik.burningseries.mainFragments;
 
 
 import android.app.ProgressDialog;
-import android.content.Context;
+import android.content.ContentValues;
 import android.content.Intent;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.os.Bundle;
-import android.support.annotation.Nullable;
 import android.support.design.widget.Snackbar;
 import android.support.v4.app.Fragment;
+import android.support.v4.content.ContextCompat;
 import android.support.v4.view.MenuItemCompat;
 import android.support.v7.widget.SearchView;
 import android.util.Log;
@@ -43,7 +43,9 @@ import retrofit2.Call;
 import retrofit2.Callback;
 import retrofit2.Response;
 
+import static de.monarchcode.m4lik.burningseries.database.SeriesContract.favoritesTable.COLUMN_NAME_GENRE;
 import static de.monarchcode.m4lik.burningseries.database.SeriesContract.favoritesTable.COLUMN_NAME_ID;
+import static de.monarchcode.m4lik.burningseries.database.SeriesContract.favoritesTable.COLUMN_NAME_TILTE;
 import static de.monarchcode.m4lik.burningseries.database.SeriesContract.favoritesTable.TABLE_NAME;
 
 
@@ -111,14 +113,6 @@ public class SeriesFragment extends Fragment implements Callback<GenreMap> {
         Log.d("BS", "Response recieved.");
         Log.d("BS", "Generating list...");
 
-
-        if (isAdded())
-            System.out.println("ja");
-        else
-            System.out.println("nein");
-
-        System.out.println("Hier: " + getActivity().toString());
-
         MainDBHelper dbHelper = new MainDBHelper(getActivity());
         SQLiteDatabase db = dbHelper.getWritableDatabase();
         Cursor cursor;
@@ -129,22 +123,23 @@ public class SeriesFragment extends Fragment implements Callback<GenreMap> {
         List<Integer> favs = new ArrayList<>();
         while (cursor.moveToNext()) {
             favs.add(cursor.getInt(cursor.getColumnIndex(COLUMN_NAME_ID)));
-            System.out.println(cursor.getInt(cursor.getColumnIndex(COLUMN_NAME_ID)));
         }
 
         seriesList.clear();
         for (Map.Entry<String, GenreObj> entry : response.body().entrySet()) {
-            String currentGenre = entry.getKey().toString();
+            String currentGenre = entry.getKey();
             GenreObj go = entry.getValue();
             for (ShowObj show : go.getShows()) {
-                if (favs.contains(show.getId()))
+                if (favs.contains(show.getId())) {
+                    ContentValues cv = new ContentValues();
+                    cv.put(COLUMN_NAME_GENRE, currentGenre);
+                    cv.put(COLUMN_NAME_TILTE, show.getName());
+                    db.update(TABLE_NAME, cv, COLUMN_NAME_ID + " = " + show.getId(), null);
                     seriesList.add(new ShowListItem(show.getName(), show.getId(), currentGenre, true));
-                else
+                } else
                     seriesList.add(new ShowListItem(show.getName(), show.getId(), currentGenre, false));
             }
         }
-
-        System.out.println("BLA BLA BLA " + seriesList.size());
 
         cursor.close();
         db.close();
@@ -176,6 +171,7 @@ public class SeriesFragment extends Fragment implements Callback<GenreMap> {
 
     public void fetchList() {
         if (requestStatus == null || !requestStatus.equals("fetching")) {
+            rootView.findViewById(R.id.avi).setVisibility(View.VISIBLE);
             Log.d("BS", "Fetching list...");
 
             API api = new API();
@@ -195,11 +191,6 @@ public class SeriesFragment extends Fragment implements Callback<GenreMap> {
 
     private void refreshList(List<ShowListItem> inputList) {
         Log.d("BS", "Refreshing list..");
-
-        if (isAdded())
-            System.out.println("ja");
-        else
-            System.out.println("nein");
 
         if (inputList == null) {
             inputList = seriesList;
@@ -233,7 +224,7 @@ public class SeriesFragment extends Fragment implements Callback<GenreMap> {
         List<ShowListItem> list = new ArrayList<>();
         i = 0;
         for (String[] show : series) {
-            list.add(new ShowListItem(show[0], Integer.parseInt(show[1]), show[2], show[3] == "1"));
+            list.add(new ShowListItem(show[0], Integer.parseInt(show[1]), show[2], show[3].equals("1")));
             i++;
         }
 
@@ -244,9 +235,10 @@ public class SeriesFragment extends Fragment implements Callback<GenreMap> {
             seriesListView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
                 @Override
                 public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
-                    TextView idView = (TextView) view.findViewById(R.id.seriesId);
                     TextView nameView = (TextView) view.findViewById(R.id.seriesTitle);
-                    showSeries(Integer.parseInt(idView.getText().toString()), nameView.getText().toString());
+                    TextView idView = (TextView) view.findViewById(R.id.seriesId);
+                    TextView genreView = (TextView) view.findViewById(R.id.seriesGenre);
+                    showSeries(Integer.parseInt(idView.getText().toString()), nameView.getText().toString(), genreView.getText().toString());
                 }
             });
 
@@ -254,13 +246,20 @@ public class SeriesFragment extends Fragment implements Callback<GenreMap> {
             Log.d("BS", "----------------------------");
         } else {
             seriesListView.setAdapter(null);
+            Snackbar snackbar = Snackbar.make(rootView.findViewById(android.R.id.content), "Fehler beim Laden der Serien.", Snackbar.LENGTH_SHORT);
+            View snackbarView = snackbar.getView();
+            snackbarView.setBackgroundColor(ContextCompat.getColor(getContext(), R.color.colorPrimaryDark));
+            snackbar.show();
         }
+
+        rootView.findViewById(R.id.avi).setVisibility(View.GONE);
     }
 
-    private void showSeries(Integer id, String name) {
+    private void showSeries(Integer id, String name, String genre) {
         Intent i = new Intent(getActivity(), ShowActivity.class);
-        i.putExtra("ShowID", id);
         i.putExtra("ShowName", name);
+        i.putExtra("ShowID", id);
+        i.putExtra("ShowGenre", genre);
         startActivity(i);
     }
 
@@ -268,7 +267,7 @@ public class SeriesFragment extends Fragment implements Callback<GenreMap> {
 
         private List<ShowListItem> list;
 
-        public seriesListAdapter(List<ShowListItem> list) {
+        seriesListAdapter(List<ShowListItem> list) {
             super(getActivity(), R.layout.list_item_series, seriesList);
             this.list = list;
         }
@@ -291,7 +290,7 @@ public class SeriesFragment extends Fragment implements Callback<GenreMap> {
             id.setText(current.getId().toString());
 
             ImageView fav = (ImageView) view.findViewById(R.id.favImageView);
-            fav.setImageDrawable(getResources().getDrawable(current.isFav() ? R.drawable.ic_star : R.drawable.ic_star_border));
+            fav.setImageDrawable(ContextCompat.getDrawable(getContext(), current.isFav() ? R.drawable.ic_star : R.drawable.ic_star_border));
 
             return view;
         }
@@ -300,35 +299,5 @@ public class SeriesFragment extends Fragment implements Callback<GenreMap> {
         public int getCount() {
             return list != null ? list.size() : 0;
         }
-    }
-
-    @Override
-    public void onAttach(Context context) {
-        System.out.println(1);
-        super.onAttach(context);
-    }
-
-    @Override
-    public void onCreate(@Nullable Bundle savedInstanceState) {
-        System.out.println(2);
-        super.onCreate(savedInstanceState);
-    }
-
-    @Override
-    public void onStart() {
-        System.out.println(3);
-        super.onStart();
-    }
-
-    @Override
-    public void onResume() {
-        System.out.println(4);
-        super.onResume();
-    }
-
-    @Override
-    public void onPause() {
-        System.out.println(5);
-        super.onPause();
     }
 }

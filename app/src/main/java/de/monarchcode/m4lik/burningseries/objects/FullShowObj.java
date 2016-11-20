@@ -58,7 +58,7 @@ public class FullShowObj {
         return data;
     }
 
-    private class Data {
+    public class Data {
         private String[] producer;
         private String[] author;
         private String[] genre;

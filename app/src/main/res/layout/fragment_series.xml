@@ -1,15 +1,28 @@
-    <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
-        xmlns:tools="http://schemas.android.com/tools"
-        android:orientation="vertical"
-        android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        tools:context=".mainFragments.SeriesFragment">
+<LinearLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:orientation="vertical"
+    tools:context=".mainFragments.SeriesFragment">
 
-        <ListView
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:id="@+id/seriesListView"
-            android:layout_gravity="center_horizontal"
-            android:divider="@null"
-            android:dividerHeight="0dp" />
-    </LinearLayout>
+    <com.wang.avi.AVLoadingIndicatorView
+        android:id="@+id/avi"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="20dp"
+        android:layout_gravity="center_horizontal"
+        android:visibility="gone"
+        style="@style/AVLoadingIndicatorView"
+        app:indicatorName="BallPulseIndicator"
+        app:indicatorColor="@color/colorPrimaryDark"/>
+
+    <ListView
+        android:id="@+id/seriesListView"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_gravity="center_horizontal"
+        android:divider="@null"
+        android:dividerHeight="0dp"/>
+</LinearLayout>

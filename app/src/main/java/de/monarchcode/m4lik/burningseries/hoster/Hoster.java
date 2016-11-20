@@ -27,18 +27,14 @@ import java.util.Random;
 
 public class Hoster {
 
+    public static final List<String> compatibleHosters = new ArrayList<>();
     private static final String[] userAgents;
-    public static final List<String> compatibleHosters;
-    public static final Map<String, Class<? extends Hoster>> hosters;
     private int userAgentID;
     CookieManager cookieManager;
 
     static {
-        compatibleHosters = new ArrayList();
-        hosters = new HashMap();
-        hosters.put("PowerWatch", PowerWatch.class);
-        //hosters.put("YouWatch", YouWatch.class);
-        compatibleHosters.addAll(hosters.keySet());
+        compatibleHosters.add("PowerWatch");
+        compatibleHosters.add("Vidto");
         userAgents = new String[]{
                 "Mozilla/5.0 (Windows NT 6.3; rv:36.0) Gecko/20100101 Firefox/36.0",
                 "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_10; rv:33.0) Gecko/20100101 Firefox/33.0",
@@ -98,7 +94,7 @@ public class Hoster {
     private String selectUAS() {
         if (userAgentID == -1) {
             userAgentID = new Random().nextInt(userAgents.length);
-            System.out.println("ua: " + userAgents[userAgentID]);
+            Log.d("BSAPI", "ua: " + userAgents[userAgentID]);
         }
         return userAgents[userAgentID];
     }
@@ -109,7 +105,6 @@ public class Hoster {
         httpURLConnection.setRequestMethod("GET");
         httpURLConnection.setRequestProperty("User-Agent", selectUAS());
         for (Map.Entry entry : map.entrySet()) {
-            System.out.println(entry.getKey().toString() + entry.getValue().toString());
             httpURLConnection.setRequestProperty((String) entry.getKey(), (String) entry.getValue());
         }
 
@@ -165,7 +160,7 @@ public class Hoster {
             request.append("=");
             request.append(URLEncoder.encode((String) entry.getValue(), "UTF-8"));
         }
-        System.out.println("ue: " + request.toString());
+        Log.d("BSAPI", "ue: " + request.toString());
         return request.toString();
     }
 
@@ -180,7 +175,7 @@ public class Hoster {
             } else {
                 String connectionString = connectionStringBuilder.toString();
                 inputStream.close();
-                System.out.println("cs: " + connectionString);
+                Log.d("BSAPI", "cs: " + connectionString);
                 return connectionString;
             }
         }

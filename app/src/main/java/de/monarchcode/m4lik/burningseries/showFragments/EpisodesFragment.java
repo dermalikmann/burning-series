@@ -6,16 +6,16 @@ import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.support.design.widget.Snackbar;
 import android.support.v4.app.Fragment;
+import android.support.v4.content.ContextCompat;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
+import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.ListView;
 import android.widget.TextView;
-
-import com.github.ndczz.infinityloading.InfinityLoading;
 
 import org.jsoup.nodes.Document;
 
@@ -65,9 +65,6 @@ public class EpisodesFragment extends Fragment implements Callback<SeasonObj> {
         LinearLayout epicontainer = (LinearLayout) rootview.findViewById(R.id.episodescontainer);
         epicontainer.setVisibility(View.GONE);
 
-        InfinityLoading loading = (InfinityLoading) rootview.findViewById(R.id.loading);
-        loading.setVisibility(View.VISIBLE);
-
         selectedShow = ((ShowActivity) getActivity()).getSelectedShow();
         selectedSeason = ((ShowActivity) getActivity()).getSelectedSeason();
 
@@ -94,16 +91,13 @@ public class EpisodesFragment extends Fragment implements Callback<SeasonObj> {
         SeasonObj season = response.body();
 
         for (SeasonObj.Episode episode : season.getEpisodes()) {
-            episodesList.add(new EpisodeListItem(episode.getGermanTitle(), episode.getEnglishTitle(), episode.getEpisodeID()));
+            episodesList.add(new EpisodeListItem(episode.getGermanTitle(), episode.getEnglishTitle(), episode.getEpisodeID(), episode.isWatched()));
         }
 
         loaded = true;
 
         LinearLayout seasonscontainer = (LinearLayout) rootview.findViewById(R.id.episodescontainer);
         seasonscontainer.setVisibility(View.VISIBLE);
-
-        InfinityLoading loading = (InfinityLoading) rootview.findViewById(R.id.loading);
-        loading.setVisibility(View.GONE);
 
         refreshList();
     }
@@ -161,13 +155,20 @@ public class EpisodesFragment extends Fragment implements Callback<SeasonObj> {
             EpisodeListItem current = episodesList.get(pos);
 
             TextView titleGerView = (TextView) view.findViewById(R.id.episodeTitleGer);
-            titleGerView.setText(current.getTitleGer());
+            titleGerView.setText( (pos + 1) + " " + current.getTitleGer());
+            titleGerView.setTextColor(ContextCompat.getColor(getContext() , current.isWatched()? android.R.color.darker_gray : android.R.color.black));
 
             TextView titleView = (TextView) view.findViewById(R.id.episodeTitle);
             titleView.setText(current.getTitle());
 
             TextView idView = (TextView) view.findViewById(R.id.episodeId);
             idView.setText(current.getId().toString());
+
+            ImageView fav = (ImageView) view.findViewById(R.id.watchedImageView);
+            if (current.isWatched())
+                fav.setImageDrawable(ContextCompat.getDrawable(getContext(), R.drawable.ic_watched));
+            else
+                fav.setImageDrawable(null);
 
             return view;
         }

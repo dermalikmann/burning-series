@@ -3,7 +3,6 @@ package de.monarchcode.m4lik.burningseries.database;
 import android.content.Context;
 import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteOpenHelper;
-import android.util.Log;
 
 /**
  * Created by Malik (M4lik) on 17.08.2016.
@@ -12,7 +11,7 @@ import android.util.Log;
  */
 public class MainDBHelper extends SQLiteOpenHelper {
 
-    public static final int DATABASE_VERSION = 4;
+    public static final int DATABASE_VERSION = 5;
     public static final String DATABASE_NAME = "main.db";
 
 
@@ -21,14 +20,12 @@ public class MainDBHelper extends SQLiteOpenHelper {
     }
 
     public void onCreate(SQLiteDatabase db) {
-        Log.d("BS", "Database created/opened");
         db.execSQL(SeriesContract.SQL_CREATE_SERIES_TABLE);
-        Log.d("BS", "favsTable created/selected");
+        db.execSQL(SeriesContract.SQL_CREATE_GENRES_TABLE);
 
     }
 
     public void onUpgrade(SQLiteDatabase db, int oldVersion, int newVersion) {
-        db.execSQL(SeriesContract.SQL_DELETE_FAVORITES_TABLE);
         onCreate(db);
 
     }

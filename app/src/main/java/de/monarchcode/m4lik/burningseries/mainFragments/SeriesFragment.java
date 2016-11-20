@@ -2,7 +2,6 @@ package de.monarchcode.m4lik.burningseries.mainFragments;
 
 
 import android.app.ProgressDialog;
-import android.content.ContentValues;
 import android.content.Intent;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
@@ -27,27 +26,24 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Comparator;
 import java.util.List;
-import java.util.Map;
 
 import de.monarchcode.m4lik.burningseries.MainActivity;
 import de.monarchcode.m4lik.burningseries.R;
 import de.monarchcode.m4lik.burningseries.ShowActivity;
 import de.monarchcode.m4lik.burningseries.database.MainDBHelper;
-import de.monarchcode.m4lik.burningseries.objects.GenreMap;
-import de.monarchcode.m4lik.burningseries.objects.GenreObj;
 import de.monarchcode.m4lik.burningseries.objects.ShowListItem;
-import de.monarchcode.m4lik.burningseries.objects.ShowObj;
-import retrofit2.Call;
-import retrofit2.Callback;
-import retrofit2.Response;
 
-import static de.monarchcode.m4lik.burningseries.database.SeriesContract.seriesTable.*;
+import static de.monarchcode.m4lik.burningseries.database.SeriesContract.seriesTable.COLUMN_NAME_GENRE;
+import static de.monarchcode.m4lik.burningseries.database.SeriesContract.seriesTable.COLUMN_NAME_ID;
+import static de.monarchcode.m4lik.burningseries.database.SeriesContract.seriesTable.COLUMN_NAME_ISFAV;
+import static de.monarchcode.m4lik.burningseries.database.SeriesContract.seriesTable.COLUMN_NAME_TITLE;
+import static de.monarchcode.m4lik.burningseries.database.SeriesContract.seriesTable.TABLE_NAME;
 
 
 /**
  * A simple {@link Fragment} subclass.
  */
-public class SeriesFragment extends Fragment implements Callback<GenreMap> {
+public class SeriesFragment extends Fragment {
 
     View rootView;
 
@@ -63,19 +59,11 @@ public class SeriesFragment extends Fragment implements Callback<GenreMap> {
         // Required empty public constructor
     }
 
-
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
         rootView = inflater.inflate(R.layout.fragment_series, container, false);
         seriesListView = (ListView) rootView.findViewById(R.id.seriesListView);
-
-
-        progressDialog = new ProgressDialog(getActivity());
-        progressDialog.setMessage("Serienliste wird erstellt.\nBitte warten...");
-        //progressDialog.show();
-        progressDialog.setCancelable(false);
-        progressDialog.setCanceledOnTouchOutside(false);
 
 
         MenuItem searchItem = MainActivity.getMenu().findItem(R.id.action_search);
@@ -102,55 +90,6 @@ public class SeriesFragment extends Fragment implements Callback<GenreMap> {
         return rootView;
     }
 
-
-    @Override
-    public void onResponse(Call<GenreMap> call, Response<GenreMap> response) {
-        Log.d("BS", "Response recieved.");
-        Log.d("BS", "Generating list...");
-
-        MainDBHelper dbHelper = new MainDBHelper(getActivity());
-        SQLiteDatabase db = dbHelper.getWritableDatabase();
-        Cursor cursor;
-
-        String[] projection = {COLUMN_NAME_ID};
-        cursor = db.query(TABLE_NAME, projection, null, null, null, null, null);
-
-        List<Integer> favs = new ArrayList<>();
-        while (cursor.moveToNext()) {
-            favs.add(cursor.getInt(cursor.getColumnIndex(COLUMN_NAME_ID)));
-        }
-
-        seriesList.clear();
-        for (Map.Entry<String, GenreObj> entry : response.body().entrySet()) {
-            String currentGenre = entry.getKey();
-            GenreObj go = entry.getValue();
-            for (ShowObj show : go.getShows()) {
-                if (favs.contains(show.getId())) {
-                    ContentValues cv = new ContentValues();
-                    cv.put(COLUMN_NAME_GENRE, currentGenre);
-                    cv.put(COLUMN_NAME_TITLE, show.getName());
-                    db.update(TABLE_NAME, cv, COLUMN_NAME_ID + " = " + show.getId(), null);
-                    seriesList.add(new ShowListItem(show.getName(), show.getId(), currentGenre, true));
-                } else
-                    seriesList.add(new ShowListItem(show.getName(), show.getId(), currentGenre, false));
-            }
-        }
-
-        cursor.close();
-        db.close();
-
-        requestStatus = "fetched";
-
-        refreshList();
-    }
-
-    @Override
-    public void onFailure(Call<GenreMap> call, Throwable t) {
-        t.printStackTrace();
-        Snackbar.make(rootView, "Verbindungsfehler.", Snackbar.LENGTH_SHORT);
-    }
-
-
     public void filterList(String query) {
 
         List<ShowListItem> filteredList = new ArrayList<>();
@@ -163,7 +102,6 @@ public class SeriesFragment extends Fragment implements Callback<GenreMap> {
         refreshList(filteredList);
     }
 
-
     public void fillList() {
 
         seriesList.clear();
@@ -171,8 +109,6 @@ public class SeriesFragment extends Fragment implements Callback<GenreMap> {
         MainDBHelper dbHelper = new MainDBHelper(getContext());
         SQLiteDatabase db = dbHelper.getReadableDatabase();
 
-        // Define a projection that specifies which columns from the database
-        // you will actually use after this query.
         String[] projection = {
                 COLUMN_NAME_ID,
                 COLUMN_NAME_TITLE,
@@ -193,13 +129,6 @@ public class SeriesFragment extends Fragment implements Callback<GenreMap> {
                 sortOrder
         );
 
-        c.moveToFirst();
-        seriesList.add(new ShowListItem(
-                c.getString(c.getColumnIndex(COLUMN_NAME_TITLE)),
-                c.getInt(c.getColumnIndex(COLUMN_NAME_ID)),
-                c.getString(c.getColumnIndex(COLUMN_NAME_GENRE)),
-                c.getInt(c.getColumnIndex(COLUMN_NAME_ISFAV)) == 1
-        ));
         while (c.moveToNext()) {
             seriesList.add(new ShowListItem(
                     c.getString(c.getColumnIndex(COLUMN_NAME_TITLE)),
@@ -211,7 +140,6 @@ public class SeriesFragment extends Fragment implements Callback<GenreMap> {
 
         refreshList();
     }
-
 
     public void refreshList() {
         refreshList(null);

@@ -5,6 +5,7 @@ import android.content.ContentValues;
 import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
+import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.os.Bundle;
 import android.support.design.widget.NavigationView;
@@ -58,6 +59,8 @@ public class MainActivity extends AppCompatActivity
     public String visibleFragment;
     public Boolean seriesList = false;
 
+    Boolean loaded = false;
+
     MainDBHelper dbHelper;
     SQLiteDatabase database;
 
@@ -85,7 +88,6 @@ public class MainActivity extends AppCompatActivity
 
         dbHelper = new MainDBHelper(getApplicationContext());
         database = dbHelper.getWritableDatabase();
-
 
         navigationView = (NavigationView) findViewById(R.id.nav_view);
         navigationView.setNavigationItemSelectedListener(this);
@@ -133,7 +135,23 @@ public class MainActivity extends AppCompatActivity
         inflater.inflate(R.menu.menu_main, menu);
         this.menu = menu;
 
-        updateDatabase();
+        MainDBHelper dbhelper = new MainDBHelper(getApplicationContext());
+        SQLiteDatabase db  = dbhelper.getReadableDatabase();
+
+        Cursor c = db.query(
+                seriesTable.TABLE_NAME,
+                new String[]{seriesTable.COLUMN_NAME_ID},
+                null,
+                null,
+                null,
+                null,
+                null
+        );
+
+        if (c.getCount() == 0)
+            updateDatabase();
+        else
+            setFragment("seriesFragment");
 
         return true;
     }

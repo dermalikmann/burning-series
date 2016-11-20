@@ -12,7 +12,7 @@ import android.util.Log;
  */
 public class MainDBHelper extends SQLiteOpenHelper {
 
-    public static final int DATABASE_VERSION = 3;
+    public static final int DATABASE_VERSION = 4;
     public static final String DATABASE_NAME = "main.db";
 
 
@@ -22,7 +22,7 @@ public class MainDBHelper extends SQLiteOpenHelper {
 
     public void onCreate(SQLiteDatabase db) {
         Log.d("BS", "Database created/opened");
-        db.execSQL(SeriesContract.SQL_CREATE_FAVORITES_TABLE);
+        db.execSQL(SeriesContract.SQL_CREATE_SERIES_TABLE);
         Log.d("BS", "favsTable created/selected");
 
     }

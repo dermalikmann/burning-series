@@ -28,7 +28,6 @@ import org.jsoup.nodes.Document;
 import de.monarchcode.m4lik.burningseries.api.API;
 import de.monarchcode.m4lik.burningseries.api.APIInterface;
 import de.monarchcode.m4lik.burningseries.database.MainDBHelper;
-import de.monarchcode.m4lik.burningseries.database.SeriesContract.favoritesTable;
 import de.monarchcode.m4lik.burningseries.objects.SeasonObj;
 import de.monarchcode.m4lik.burningseries.showFragments.EpisodesFragment;
 import de.monarchcode.m4lik.burningseries.showFragments.HosterFragment;
@@ -36,6 +35,8 @@ import de.monarchcode.m4lik.burningseries.showFragments.SeasonsFragment;
 import retrofit2.Call;
 import retrofit2.Callback;
 import retrofit2.Response;
+
+import static de.monarchcode.m4lik.burningseries.database.SeriesContract.seriesTable;
 
 public class ShowActivity extends AppCompatActivity implements Callback<SeasonObj> {
 
@@ -97,14 +98,15 @@ public class ShowActivity extends AppCompatActivity implements Callback<SeasonOb
         final SQLiteDatabase db = dbHelper.getWritableDatabase();
 
         String[] projection = {
-                favoritesTable.COLUMN_NAME_ID
+                seriesTable.COLUMN_NAME_ID
         };
 
-        String selection = favoritesTable.COLUMN_NAME_ID + " = ?";
-        String[] selectionArgs = {selectedShow.toString()};
+        String selection = seriesTable.COLUMN_NAME_ID + " = ? AND "
+                         + seriesTable.COLUMN_NAME_ISFAV + " = ?";
+        String[] selectionArgs = {selectedShow.toString(), "1"};
 
         Cursor c = db.query(
-                favoritesTable.TABLE_NAME,
+                seriesTable.TABLE_NAME,
                 projection,
                 selection,
                 selectionArgs,
@@ -126,14 +128,14 @@ public class ShowActivity extends AppCompatActivity implements Callback<SeasonOb
             public void onClick(View view) {
                 if (!fav) {
                     ContentValues cv = new ContentValues();
-                    cv.put(favoritesTable.COLUMN_NAME_ID, selectedShow);
-                    cv.put(favoritesTable.COLUMN_NAME_TILTE, title);
-                    cv.put(favoritesTable.COLUMN_NAME_GENRE, genre);
-                    db.insert(favoritesTable.TABLE_NAME, null, cv);
+                    cv.put(seriesTable.COLUMN_NAME_ISFAV, 1);
+                    db.update(seriesTable.TABLE_NAME, cv, seriesTable.COLUMN_NAME_ID + " = ?", new String[]{selectedShow.toString()});
                     fab.setImageDrawable(ContextCompat.getDrawable(getApplicationContext(), R.drawable.ic_star_white));
                     fav = !fav;
                 } else {
-                    db.delete(favoritesTable.TABLE_NAME, favoritesTable.COLUMN_NAME_ID + " = " + selectedShow, null);
+                    ContentValues cv = new ContentValues();
+                    cv.put(seriesTable.COLUMN_NAME_ISFAV, 0);
+                    db.update(seriesTable.TABLE_NAME, cv, seriesTable.COLUMN_NAME_ID + " = ?", new String[]{selectedShow.toString()});
                     fab.setImageDrawable(ContextCompat.getDrawable(getApplicationContext(), R.drawable.ic_star_border_white));
                     fav = !fav;
                 }

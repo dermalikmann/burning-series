@@ -31,7 +31,6 @@ import java.util.Map;
 import de.monarchcode.m4lik.burningseries.api.API;
 import de.monarchcode.m4lik.burningseries.api.APIInterface;
 import de.monarchcode.m4lik.burningseries.database.MainDBHelper;
-import de.monarchcode.m4lik.burningseries.database.SeriesContract;
 import de.monarchcode.m4lik.burningseries.mainFragments.FavsFragment;
 import de.monarchcode.m4lik.burningseries.mainFragments.GenresFragment;
 import de.monarchcode.m4lik.burningseries.mainFragments.SeriesFragment;
@@ -43,6 +42,9 @@ import retrofit2.Call;
 import retrofit2.Callback;
 import retrofit2.Response;
 
+import static de.monarchcode.m4lik.burningseries.database.SeriesContract.SQL_TRUNCATE_GENRES_TABLE;
+import static de.monarchcode.m4lik.burningseries.database.SeriesContract.SQL_TRUNCATE_SERIES_TABLE;
+import static de.monarchcode.m4lik.burningseries.database.SeriesContract.genresTable;
 import static de.monarchcode.m4lik.burningseries.database.SeriesContract.seriesTable;
 
 public class MainActivity extends AppCompatActivity
@@ -54,16 +56,13 @@ public class MainActivity extends AppCompatActivity
     public static Menu menu;
 
     public String visibleFragment;
+    public Boolean seriesList = false;
 
     MainDBHelper dbHelper;
     SQLiteDatabase database;
 
     NavigationView navigationView = null;
     Toolbar toolbar = null;
-
-    public static Menu getMenu() {
-        return menu;
-    }
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -109,12 +108,23 @@ public class MainActivity extends AppCompatActivity
 
     @Override
     public void onBackPressed() {
-        DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
-        if (!drawer.isDrawerOpen(GravityCompat.START)) {
-            drawer.openDrawer(GravityCompat.START);
-        } else {
-            super.onBackPressed();
+        Boolean dosuper = true;
+
+        if (seriesList) {
+            setFragment("genresFragment");
+            seriesList = false;
+            dosuper = false;
         }
+
+        DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
+        if (!drawer.isDrawerOpen(GravityCompat.START) && dosuper) {
+            drawer.openDrawer(GravityCompat.START);
+            dosuper = false;
+        }
+
+        if (dosuper)
+            super.onBackPressed();
+
     }
 
     @Override
@@ -132,7 +142,8 @@ public class MainActivity extends AppCompatActivity
     public boolean onOptionsItemSelected(MenuItem item) {
         if (item.getItemId() == R.id.action_refresh)
             switch (visibleFragment) {
-                case "genreFragment":
+                case "genresFragment":
+                    updateDatabase();
                     setFragment("genresFragment");
                     break;
                 case "favsFragment":
@@ -154,7 +165,6 @@ public class MainActivity extends AppCompatActivity
     @SuppressWarnings("StatementWithEmptyBody")
     @Override
     public boolean onNavigationItemSelected(MenuItem item) {
-        // Handle navigation view item clicks here.
 
         Intent intent;
 
@@ -164,9 +174,9 @@ public class MainActivity extends AppCompatActivity
                 setFragment("seriesFragment");
                 break;
 
-            /*case R.id.nav_genres:
+            case R.id.nav_genres:
                 setFragment("genresFragment");
-                break;*/
+                break;
 
             case R.id.nav_favs:
                 setFragment("favsFragment");
@@ -263,7 +273,7 @@ public class MainActivity extends AppCompatActivity
         MainDBHelper dbHelper = new MainDBHelper(getApplicationContext());
         final SQLiteDatabase db = dbHelper.getWritableDatabase();
 
-        db.execSQL(SeriesContract.SQL_TRUNCATE_SERIES_TABLE);
+        db.execSQL(SQL_TRUNCATE_SERIES_TABLE);
 
         final ProgressDialog progressDialog = new ProgressDialog(MainActivity.this);
         progressDialog.setTitle("Serien werden geladen.\nBitte kurz warten...");
@@ -282,9 +292,16 @@ public class MainActivity extends AppCompatActivity
 
                 GenreMap map = response.body();
 
+                db.execSQL(SQL_TRUNCATE_GENRES_TABLE);
+
+                int genreID = 0;
                 for (Map.Entry<String, GenreObj> entry : map.entrySet()) {
                     String currentGenre = entry.getKey();
                     GenreObj go = entry.getValue();
+                    ContentValues values = new ContentValues();
+                    values.put(genresTable.COLUMN_NAME_GENRE, currentGenre);
+                    values.put(genresTable.COLUMN_NAME_ID, genreID);
+                    db.insert(genresTable.TABLE_NAME, null, values);
                     Iterator itr = Arrays.asList(go.getShows()).iterator();
                     int i = 0;
                     int all = 0;
@@ -310,6 +327,7 @@ public class MainActivity extends AppCompatActivity
                         db.setTransactionSuccessful();
                         db.endTransaction();
                     }
+                    genreID++;
                 }
 
                 progressDialog.dismiss();
@@ -361,5 +379,9 @@ public class MainActivity extends AppCompatActivity
                 }
             });
         }
+    }
+
+    public static Menu getMenu() {
+        return menu;
     }
 }

@@ -1,23 +1,33 @@
 package de.monarchcode.m4lik.burningseries.mainFragments;
 
 import android.app.ProgressDialog;
+import android.content.Intent;
+import android.database.Cursor;
+import android.database.sqlite.SQLiteDatabase;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
-import android.support.v4.view.MenuItemCompat;
-import android.support.v7.widget.SearchView;
+import android.support.v4.content.ContextCompat;
 import android.view.LayoutInflater;
-import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.AdapterView;
+import android.widget.ArrayAdapter;
+import android.widget.ImageView;
 import android.widget.ListView;
+import android.widget.TextView;
 
 import java.util.ArrayList;
 import java.util.List;
 
 import de.monarchcode.m4lik.burningseries.MainActivity;
 import de.monarchcode.m4lik.burningseries.R;
+import de.monarchcode.m4lik.burningseries.ShowActivity;
+import de.monarchcode.m4lik.burningseries.database.MainDBHelper;
 import de.monarchcode.m4lik.burningseries.objects.GenreListItem;
 import de.monarchcode.m4lik.burningseries.objects.ShowListItem;
+
+import static de.monarchcode.m4lik.burningseries.database.SeriesContract.genresTable;
+import static de.monarchcode.m4lik.burningseries.database.SeriesContract.seriesTable;
 
 /**
  * A simple {@link Fragment} subclass.
@@ -42,74 +52,57 @@ public class GenresFragment extends Fragment {
                              Bundle savedInstanceState) {
         View rootView = inflater.inflate(R.layout.fragment_genres, container, false);
         genresListView = (ListView) rootView.findViewById(R.id.genresListView);
-        progressDialog = new ProgressDialog(getActivity());
-        progressDialog.setMessage("Genrenliste wird erstellt.\nBitte warten...");
-
-        //progressDialog.show();
-        //progressDialog.setCancelable(false);
-        //progressDialog.setCanceledOnTouchOutside(false);
 
 
-        //new getGenres().execute();
+        MainDBHelper dbHelper = new MainDBHelper(getContext());
+        SQLiteDatabase db = dbHelper.getReadableDatabase();
+
+        String[] projection = {
+                genresTable.COLUMN_NAME_ID,
+                genresTable.COLUMN_NAME_GENRE
+        };
+
+        String sortOrder =
+                genresTable.COLUMN_NAME_GENRE + " ASC";
+
+        Cursor c = db.query(
+                genresTable.TABLE_NAME,
+                projection,
+                null,
+                null,
+                null,
+                null,
+                sortOrder
+        );
+
+        while (c.moveToNext()) {
+            genresList.add(new GenreListItem(
+                    c.getInt(c.getColumnIndex(genresTable.COLUMN_NAME_ID)),
+                    c.getString(c.getColumnIndex(genresTable.COLUMN_NAME_GENRE))
+            ));
+        }
+        c.close();
+
+        populateGenreList();
 
         return rootView;
     }
 
-    /*class getGenres extends AsyncTask<Void, Void, Void> {
-
-        //private String genresTitle;
-        //private String genresGenre;
-
-        private String allGenresURL = "https://bs.to/serie-genre";
-
-        private Document webDoc;
-
-        public getGenres() {
-
-        }
-
-        @Override
-        protected Void doInBackground(Void... params) {
-
-            try {
-                webDoc = Jsoup.connect(allGenresURL).get();
-
-                for (Element genre : webDoc.select("div.genre")) {
-                    String curGenre = genre.select("span").first().text();
-                    genresList.add(new listItemGenre(curGenre));
-
-                }
-
-            } catch (IOException e) {
-                Log.d("JSOUP", "Can't connect:", e);
-            }
-
-            return null;
-        }
-
-        @Override
-        protected void onPostExecute(Void aVoid) {
-            super.onPostExecute(aVoid);
-
-            populateListGenres();
-            progressDialog.dismiss();
-        }
-    }
-
-    private void populateListGenres() {
-        ArrayAdapter<listItemGenre> adapter = new genresListAdapter();
+    private void populateGenreList() {
+        ArrayAdapter<GenreListItem> adapter = new genresListAdapter();
         genresListView.setAdapter(adapter);
 
         genresListView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             @Override
-            public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
-                TextView lableView = (TextView) view.findViewById(R.id.genreLable);
-                new getSeries(lableView.getText().toString()).execute();
+            public void onItemClick(AdapterView<?> adapterView, View view, int i, long l) {
+                TextView txtView = (TextView) view.findViewById(R.id.genreLable);
+                populateSeriesList(txtView.getText().toString());
+                ((MainActivity) getActivity()).seriesList = true;
             }
         });
     }
 
-    class genresListAdapter extends ArrayAdapter<listItemGenre> {
+    class genresListAdapter extends ArrayAdapter<GenreListItem> {
 
         public genresListAdapter() {
             super(getActivity(), R.layout.list_item_genres, genresList);
@@ -121,93 +114,92 @@ public class GenresFragment extends Fragment {
                 view = getActivity().getLayoutInflater().inflate(R.layout.list_item_genres, parent, false);
             }
 
-            listItemGenre current = genresList.get(pos);
+            GenreListItem current = genresList.get(pos);
 
             TextView lable = (TextView) view.findViewById(R.id.genreLable);
             lable.setText(current.getLable());
 
             return view;
         }
-    }*/
-
-
-    /** Show Matching Sereis **/
-
-
-    /*class getSeries extends AsyncTask<Void, Void, Void> {
-
-        //private String seriesTitle;
-        //private String seriesGenre;
-
-        private String allSeriesURL = "https://bs.to/serie-genre";
-
-        private Document webDoc;
-
-        private String genreLable;
-
-        public getSeries(String genreLable) {
-            this.genreLable = genreLable;
-        }
-
-        @Override
-        protected Void doInBackground(Void... params) {
-
-            try {
-                webDoc = Jsoup.connect(allSeriesURL).get();
-
-                for (Element genre : webDoc.select("div.genre")) {
-                    String curGenre = genre.select("span").first().text();
-                    if (curGenre.equals(genreLable)) {
-                        for (Element serie : genre.select("ul li a")) {
-                            String title = serie.text();
-                            String url = serie.attr("abs:href");
-
-                            seriesList.add(new listItemSeries(title, url, curGenre));
-                        }
-                    }
-                }
-
-            } catch (IOException e) {
-                Log.d("JSOUP", "Can't connect:", e);
-            }
-
-            return null;
-        }
-
-        @Override
-        protected void onPostExecute(Void aVoid) {
-            super.onPostExecute(aVoid);
-
-            populateListSeries();
-            progressDialog.dismiss();
-        }
     }
 
 
+/**
+ * Show Matching Series
+ **/
 
-    private void populateListSeries() {
-        ArrayAdapter<listItemSeries> adapter = new seriesListAdapter();
+    private void populateSeriesList(String genre) {
+
+
+        MainDBHelper dbHelper = new MainDBHelper(getContext());
+        SQLiteDatabase db = dbHelper.getReadableDatabase();
+
+        String[] projection = {
+                seriesTable.COLUMN_NAME_TITLE,
+                seriesTable.COLUMN_NAME_ID,
+                seriesTable.COLUMN_NAME_GENRE,
+                seriesTable.COLUMN_NAME_ISFAV
+        };
+
+        String selection = seriesTable.COLUMN_NAME_GENRE + " = ?";
+        String[] selectionArgs = {genre};
+
+        String sortOrder =
+                seriesTable.COLUMN_NAME_GENRE + " ASC";
+
+        Cursor c = db.query(
+                seriesTable.TABLE_NAME,
+                projection,
+                selection,
+                selectionArgs,
+                null,
+                null,
+                sortOrder
+        );
+
+        if (c.getCount() > 0)
+            while (c.moveToNext()) {
+                seriesList.add(new ShowListItem(
+                        c.getString(c.getColumnIndex(seriesTable.COLUMN_NAME_TITLE)),
+                        c.getInt(c.getColumnIndex(seriesTable.COLUMN_NAME_ID)),
+                        c.getString(c.getColumnIndex(seriesTable.COLUMN_NAME_GENRE)),
+                        c.getInt(c.getColumnIndex(seriesTable.COLUMN_NAME_ISFAV)) == 1
+                ));
+            }
+
+        c.close();
+
+        ArrayAdapter<ShowListItem> adapter = new seriesListAdapter(seriesList);
         genresListView.setAdapter(adapter);
 
         genresListView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             @Override
             public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
-                TextView urlView = (TextView) view.findViewById(R.id.seriesId);
-                showSeries(urlView.getText().toString());
+                TextView nameView = (TextView) view.findViewById(R.id.seriesTitle);
+                TextView idView = (TextView) view.findViewById(R.id.seriesId);
+                TextView genreView = (TextView) view.findViewById(R.id.seriesGenre);
+                showSeries(Integer.parseInt(idView.getText().toString()),
+                        nameView.getText().toString(),
+                        genreView.getText().toString());
             }
         });
     }
 
-    private void showSeries(String url) {
+    private void showSeries(Integer id, String name, String genre) {
         Intent i = new Intent(getActivity(), ShowActivity.class);
-        i.putExtra("URL", url);
+        i.putExtra("ShowName", name);
+        i.putExtra("ShowID", id);
+        i.putExtra("ShowGenre", genre);
         startActivity(i);
     }
 
-    class seriesListAdapter extends ArrayAdapter<listItemSeries> {
+    class seriesListAdapter extends ArrayAdapter<ShowListItem> {
 
-        public seriesListAdapter() {
+        private List<ShowListItem> list;
+
+        seriesListAdapter(List<ShowListItem> list) {
             super(getActivity(), R.layout.list_item_series, seriesList);
+            this.list = list;
         }
 
         @Override
@@ -216,7 +208,7 @@ public class GenresFragment extends Fragment {
                 view = getActivity().getLayoutInflater().inflate(R.layout.list_item_series, parent, false);
             }
 
-            listItemSeries current = seriesList.get(pos);
+            ShowListItem current = list.get(pos);
 
             TextView title = (TextView) view.findViewById(R.id.seriesTitle);
             title.setText(current.getTitle());
@@ -225,10 +217,20 @@ public class GenresFragment extends Fragment {
             genre.setText(current.getGenre());
 
             TextView id = (TextView) view.findViewById(R.id.seriesId);
-            id.setText(current.getId());
+            id.setText(current.getId().toString());
+
+            ImageView fav = (ImageView) view.findViewById(R.id.favImageView);
+            fav.setImageDrawable(ContextCompat.getDrawable(getContext(), current.isFav() ? R.drawable.ic_star : R.drawable.ic_star_border));
 
             return view;
         }
-    }*/
+
+        @Override
+        public int getCount() {
+            return list != null ? list.size() : 0;
+        }
+    }
+
+
 }
 

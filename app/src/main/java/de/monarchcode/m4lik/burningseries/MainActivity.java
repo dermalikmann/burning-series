@@ -164,9 +164,9 @@ public class MainActivity extends AppCompatActivity
                 setFragment("seriesFragment");
                 break;
 
-            case R.id.nav_genres:
+            /*case R.id.nav_genres:
                 setFragment("genresFragment");
-                break;
+                break;*/
 
             case R.id.nav_favs:
                 setFragment("favsFragment");

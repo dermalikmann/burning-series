@@ -23,12 +23,11 @@ import de.monarchcode.m4lik.burningseries.MainActivity;
 import de.monarchcode.m4lik.burningseries.R;
 import de.monarchcode.m4lik.burningseries.ShowActivity;
 import de.monarchcode.m4lik.burningseries.database.MainDBHelper;
+import de.monarchcode.m4lik.burningseries.database.SeriesContract;
 import de.monarchcode.m4lik.burningseries.objects.ShowListItem;
 
-import static de.monarchcode.m4lik.burningseries.database.SeriesContract.favoritesTable.COLUMN_NAME_GENRE;
-import static de.monarchcode.m4lik.burningseries.database.SeriesContract.favoritesTable.COLUMN_NAME_ID;
-import static de.monarchcode.m4lik.burningseries.database.SeriesContract.favoritesTable.COLUMN_NAME_TILTE;
-import static de.monarchcode.m4lik.burningseries.database.SeriesContract.favoritesTable.TABLE_NAME;
+import static de.monarchcode.m4lik.burningseries.database.SeriesContract.seriesTable.COLUMN_NAME_ISFAV;
+import static de.monarchcode.m4lik.burningseries.database.SeriesContract.seriesTable.COLUMN_NAME_TITLE;
 
 
 /**
@@ -54,20 +53,50 @@ public class FavsFragment extends Fragment {
 
         ListView favsListView = (ListView) rootView.findViewById(R.id.favsListView);
 
-        MainDBHelper dbHelper = new MainDBHelper(getActivity());
-        SQLiteDatabase db = dbHelper.getWritableDatabase();
-        Cursor cursor;
+        favs.clear();
 
-        String[] projection = {COLUMN_NAME_TILTE, COLUMN_NAME_ID, COLUMN_NAME_GENRE};
-        cursor = db.query(TABLE_NAME, projection, null, null, null, null, COLUMN_NAME_TILTE + " ASC");
+        MainDBHelper dbHelper = new MainDBHelper(getContext());
+        SQLiteDatabase db = dbHelper.getReadableDatabase();
 
-        while (cursor.moveToNext()) {
+        // Define a projection that specifies which columns from the database
+        // you will actually use after this query.
+        String[] projection = {
+                SeriesContract.seriesTable.COLUMN_NAME_ID,
+                COLUMN_NAME_TITLE,
+                SeriesContract.seriesTable.COLUMN_NAME_GENRE,
+                COLUMN_NAME_ISFAV
+        };
+
+        String sortOrder =
+                COLUMN_NAME_TITLE + " ASC";
+
+        Cursor c = db.query(
+                SeriesContract.seriesTable.TABLE_NAME,
+                projection,
+                SeriesContract.seriesTable.COLUMN_NAME_ISFAV + " = ?",
+                new String[]{"1"},
+                null,
+                null,
+                sortOrder
+        );
+
+        c.moveToFirst();
+        favs.add(new ShowListItem(
+                c.getString(c.getColumnIndex(COLUMN_NAME_TITLE)),
+                c.getInt(c.getColumnIndex(SeriesContract.seriesTable.COLUMN_NAME_ID)),
+                c.getString(c.getColumnIndex(SeriesContract.seriesTable.COLUMN_NAME_GENRE)),
+                c.getInt(c.getColumnIndex(COLUMN_NAME_ISFAV)) == 1
+        ));
+        while (c.moveToNext()) {
             favs.add(new ShowListItem(
-                    cursor.getString(cursor.getColumnIndex(COLUMN_NAME_TILTE)),
-                    cursor.getInt(cursor.getColumnIndex(COLUMN_NAME_ID)),
-                    cursor.getString(cursor.getColumnIndex(COLUMN_NAME_GENRE)),
-                    true));
+                    c.getString(c.getColumnIndex(COLUMN_NAME_TITLE)),
+                    c.getInt(c.getColumnIndex(SeriesContract.seriesTable.COLUMN_NAME_ID)),
+                    c.getString(c.getColumnIndex(SeriesContract.seriesTable.COLUMN_NAME_GENRE)),
+                    c.getInt(c.getColumnIndex(COLUMN_NAME_ISFAV)) == 1
+            ));
         }
+
+        c.close();
 
         ArrayAdapter<ShowListItem> adapter = new seriesListAdapter(favs);
         favsListView.setAdapter(adapter);

@@ -61,6 +61,9 @@ public class MainActivity extends AppCompatActivity
 
     Boolean loaded = false;
 
+    Boolean seriesDone;
+    Boolean favsDone;
+
     MainDBHelper dbHelper;
     SQLiteDatabase database;
 
@@ -149,7 +152,7 @@ public class MainActivity extends AppCompatActivity
         );
 
         if (c.getCount() == 0)
-            updateDatabase();
+            updateDatabase("seriesFragment");
         else
             setFragment("seriesFragment");
 
@@ -158,25 +161,24 @@ public class MainActivity extends AppCompatActivity
 
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
-        if (item.getItemId() == R.id.action_refresh)
+        if (item.getItemId() == R.id.action_refresh) {
+            seriesDone = false;
+            favsDone = false;
             switch (visibleFragment) {
                 case "genresFragment":
-                    updateDatabase();
-                    setFragment("genresFragment");
+                    updateDatabase("genresFragment");
                     break;
                 case "favsFragment":
-                    updateDatabase();
-                    setFragment("favsFragment");
+                    updateDatabase("favsFragment");
                     break;
                 case "seriesFragment":
-                    updateDatabase();
-                    setFragment("seriesFragment");
+                    updateDatabase("seriesFragment");
                     break;
                 default:
-                    updateDatabase();
-                    setFragment("seriesFragment");
+                    updateDatabase("seriesFragment");
                     break;
             }
+        }
         return super.onOptionsItemSelected(item);
     }
 
@@ -286,7 +288,7 @@ public class MainActivity extends AppCompatActivity
         }
     }
 
-    private void updateDatabase() {
+    private void updateDatabase(final String fragment) {
 
         MainDBHelper dbHelper = new MainDBHelper(getApplicationContext());
         final SQLiteDatabase db = dbHelper.getWritableDatabase();
@@ -350,8 +352,8 @@ public class MainActivity extends AppCompatActivity
 
                 progressDialog.dismiss();
 
-                if (userSession.equals(""))
-                    setFragment("seriesFragment");
+                seriesDone = true;
+                setFragmentDelayed(fragment);
             }
 
             @Override
@@ -383,7 +385,8 @@ public class MainActivity extends AppCompatActivity
                         db.update(seriesTable.TABLE_NAME, cv, seriesTable.COLUMN_NAME_ID + " = ?", new String[]{show.getId().toString()});
                     }
 
-                    setFragment("seriesFragment");
+                    favsDone = true;
+                    setFragmentDelayed(fragment);
                 }
 
                 @Override
@@ -397,6 +400,15 @@ public class MainActivity extends AppCompatActivity
                 }
             });
         }
+    }
+
+    public void setFragmentDelayed(String fragment) {
+        if (!userSession.equals("")) {
+            if (favsDone && seriesDone)
+                setFragment(fragment);
+        } else
+            if (seriesDone)
+                setFragment(fragment);
     }
 
     public static Menu getMenu() {

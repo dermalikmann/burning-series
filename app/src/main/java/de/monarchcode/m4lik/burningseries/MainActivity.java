@@ -5,6 +5,7 @@ import android.content.ContentValues;
 import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
+import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.os.Bundle;
 import android.support.design.widget.NavigationView;
@@ -58,6 +59,11 @@ public class MainActivity extends AppCompatActivity
     public String visibleFragment;
     public Boolean seriesList = false;
 
+    Boolean loaded = false;
+
+    Boolean seriesDone;
+    Boolean favsDone;
+
     MainDBHelper dbHelper;
     SQLiteDatabase database;
 
@@ -85,7 +91,6 @@ public class MainActivity extends AppCompatActivity
 
         dbHelper = new MainDBHelper(getApplicationContext());
         database = dbHelper.getWritableDatabase();
-
 
         navigationView = (NavigationView) findViewById(R.id.nav_view);
         navigationView.setNavigationItemSelectedListener(this);
@@ -133,32 +138,47 @@ public class MainActivity extends AppCompatActivity
         inflater.inflate(R.menu.menu_main, menu);
         this.menu = menu;
 
-        updateDatabase();
+        MainDBHelper dbhelper = new MainDBHelper(getApplicationContext());
+        SQLiteDatabase db  = dbhelper.getReadableDatabase();
+
+        Cursor c = db.query(
+                seriesTable.TABLE_NAME,
+                new String[]{seriesTable.COLUMN_NAME_ID},
+                null,
+                null,
+                null,
+                null,
+                null
+        );
+
+        if (c.getCount() == 0)
+            updateDatabase("seriesFragment");
+        else
+            setFragment("seriesFragment");
 
         return true;
     }
 
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
-        if (item.getItemId() == R.id.action_refresh)
+        if (item.getItemId() == R.id.action_refresh) {
+            seriesDone = false;
+            favsDone = false;
             switch (visibleFragment) {
                 case "genresFragment":
-                    updateDatabase();
-                    setFragment("genresFragment");
+                    updateDatabase("genresFragment");
                     break;
                 case "favsFragment":
-                    updateDatabase();
-                    setFragment("favsFragment");
+                    updateDatabase("favsFragment");
                     break;
                 case "seriesFragment":
-                    updateDatabase();
-                    setFragment("seriesFragment");
+                    updateDatabase("seriesFragment");
                     break;
                 default:
-                    updateDatabase();
-                    setFragment("seriesFragment");
+                    updateDatabase("seriesFragment");
                     break;
             }
+        }
         return super.onOptionsItemSelected(item);
     }
 
@@ -268,7 +288,7 @@ public class MainActivity extends AppCompatActivity
         }
     }
 
-    private void updateDatabase() {
+    private void updateDatabase(final String fragment) {
 
         MainDBHelper dbHelper = new MainDBHelper(getApplicationContext());
         final SQLiteDatabase db = dbHelper.getWritableDatabase();
@@ -332,8 +352,8 @@ public class MainActivity extends AppCompatActivity
 
                 progressDialog.dismiss();
 
-                if (userSession.equals(""))
-                    setFragment("seriesFragment");
+                seriesDone = true;
+                setFragmentDelayed(fragment);
             }
 
             @Override
@@ -365,7 +385,8 @@ public class MainActivity extends AppCompatActivity
                         db.update(seriesTable.TABLE_NAME, cv, seriesTable.COLUMN_NAME_ID + " = ?", new String[]{show.getId().toString()});
                     }
 
-                    setFragment("seriesFragment");
+                    favsDone = true;
+                    setFragmentDelayed(fragment);
                 }
 
                 @Override
@@ -379,6 +400,15 @@ public class MainActivity extends AppCompatActivity
                 }
             });
         }
+    }
+
+    public void setFragmentDelayed(String fragment) {
+        if (!userSession.equals("")) {
+            if (favsDone && seriesDone)
+                setFragment(fragment);
+        } else
+            if (seriesDone)
+                setFragment(fragment);
     }
 
     public static Menu getMenu() {

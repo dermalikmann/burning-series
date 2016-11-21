@@ -80,13 +80,6 @@ public class FavsFragment extends Fragment {
                 sortOrder
         );
 
-        c.moveToFirst();
-        favs.add(new ShowListItem(
-                c.getString(c.getColumnIndex(COLUMN_NAME_TITLE)),
-                c.getInt(c.getColumnIndex(SeriesContract.seriesTable.COLUMN_NAME_ID)),
-                c.getString(c.getColumnIndex(SeriesContract.seriesTable.COLUMN_NAME_GENRE)),
-                c.getInt(c.getColumnIndex(COLUMN_NAME_ISFAV)) == 1
-        ));
         while (c.moveToNext()) {
             favs.add(new ShowListItem(
                     c.getString(c.getColumnIndex(COLUMN_NAME_TITLE)),

@@ -10,10 +10,10 @@
                     android:id="@+id/nav_series"
                     android:icon="@drawable/ic_view_module"
                     android:title="@string/allSeries" />
-               <!-- <item
+               <item
                     android:id="@+id/nav_genres"
                     android:icon="@drawable/ic_view_list"
-                    android:title="@string/genres" />-->
+                    android:title="@string/genres" />
                 <item
                     android:id="@+id/nav_favs"
                     android:icon="@drawable/ic_star"

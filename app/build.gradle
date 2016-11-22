@@ -8,8 +8,8 @@ android {
         applicationId "de.monarchcode.m4lik.burningseries"
         minSdkVersion 15
         targetSdkVersion 24
-        versionCode 24
-        versionName "0.9.3.1"
+        versionCode 26
+        versionName "v0.9.4"
         vectorDrawables.useSupportLibrary = true
     }
     buildTypes {
@@ -35,7 +35,7 @@ dependencies {
     compile 'com.android.support:support-v4:25.0.1'
     compile 'com.android.support.constraint:constraint-layout:1.0.0-alpha8'
 
-    compile 'com.devbrackets.android:exomedia:3.0.5'
+    compile 'com.devbrackets.android:exomedia:3.1.0'
 
     compile 'com.google.android.gms:play-services-gcm:9.8.0'
     compile 'com.google.code.gson:gson:2.7'

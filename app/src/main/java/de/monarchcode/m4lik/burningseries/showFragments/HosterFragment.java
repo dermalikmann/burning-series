@@ -25,6 +25,7 @@ import android.widget.TextView;
 
 import java.util.ArrayList;
 
+import de.monarchcode.m4lik.burningseries.BufferedVideoPlayerActivity;
 import de.monarchcode.m4lik.burningseries.R;
 import de.monarchcode.m4lik.burningseries.ShowActivity;
 import de.monarchcode.m4lik.burningseries.api.API;
@@ -33,7 +34,6 @@ import de.monarchcode.m4lik.burningseries.hoster.Hoster;
 import de.monarchcode.m4lik.burningseries.objects.EpisodeObj;
 import de.monarchcode.m4lik.burningseries.objects.HosterListItem;
 import de.monarchcode.m4lik.burningseries.objects.VideoObj;
-import de.monarchcode.m4lik.burningseries.simpleVideoPlayer;
 import retrofit2.Call;
 import retrofit2.Callback;
 import retrofit2.Response;
@@ -206,7 +206,7 @@ public class HosterFragment extends Fragment implements Callback<EpisodeObj> {
                 CustomTabsIntent customTabsIntent = builder.build();
                 customTabsIntent.launchUrl(getActivity(), Uri.parse(videoObj.getFullUrl()));
             } else {
-                Intent intent = new Intent(getContext(), simpleVideoPlayer.class);
+                Intent intent = new Intent(getContext(), BufferedVideoPlayerActivity.class);
                 intent.putExtra("burning-series.videoURL", hosterReturn);
                 startActivity(intent);
             }

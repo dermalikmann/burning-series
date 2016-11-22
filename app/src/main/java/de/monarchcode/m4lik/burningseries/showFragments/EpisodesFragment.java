@@ -76,7 +76,7 @@ public class EpisodesFragment extends Fragment implements Callback<SeasonObj> {
         API api = new API();
         api.setSession(sharedPreferences.getString("session", ""));
         api.generateToken("series/" + selectedShow + "/" + selectedSeason);
-        APIInterface apii = api.getApiInterface();
+        APIInterface apii = api.getInterface();
         Call<SeasonObj> call = apii.getSeason(api.getToken(), api.getUserAgent(), selectedShow, selectedSeason, api.getSession());
         call.enqueue(this);
 

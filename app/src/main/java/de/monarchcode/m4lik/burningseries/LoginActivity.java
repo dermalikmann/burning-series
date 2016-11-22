@@ -101,7 +101,7 @@ public class LoginActivity extends AppCompatActivity implements Callback<Respons
                 API api = new API();
                 api.setSession("");
                 api.generateToken("login");
-                APIInterface apii = api.getApiInterface();
+                APIInterface apii = api.getInterface();
                 Call<ResponseBody> call = apii.login(api.getToken(), api.getUserAgent(), user, password);
                 call.enqueue(this);
             } catch (Exception e) {

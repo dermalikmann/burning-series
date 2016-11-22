@@ -6,7 +6,6 @@ import android.content.Intent;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.os.Bundle;
-import android.support.design.widget.Snackbar;
 import android.support.v4.app.Fragment;
 import android.support.v4.content.ContextCompat;
 import android.support.v4.view.MenuItemCompat;
@@ -23,8 +22,6 @@ import android.widget.ListView;
 import android.widget.TextView;
 
 import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Comparator;
 import java.util.List;
 
 import de.monarchcode.m4lik.burningseries.MainActivity;
@@ -148,67 +145,28 @@ public class SeriesFragment extends Fragment {
     private void refreshList(List<ShowListItem> inputList) {
         Log.d("BS", "Refreshing list..");
 
+        seriesListView.setVisibility(View.GONE);
+        rootView.findViewById(R.id.avi).setVisibility(View.VISIBLE);
+
         if (inputList == null) {
             inputList = seriesList;
         }
+        
+        ArrayAdapter<ShowListItem> adapter = new seriesListAdapter(inputList);
+        seriesListView.setAdapter(adapter);
 
-        if (inputList.size() == 0)
-            Log.w("BS", "List is empty");
-        else
-            Log.d("BS", "List containts " + inputList.size() + " elements");
-
-        String[][] series = new String[inputList.size()][4];
-
-        int i = 0;
-        for (ShowListItem show : inputList) {
-            series[i][0] = show.getTitle();
-            series[i][1] = show.getId().toString();
-            series[i][2] = show.getGenre();
-            series[i][3] = show.isFav() ? "1" : "0";
-            i++;
-        }
-
-        Arrays.sort(series, new Comparator<String[]>() {
+        seriesListView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             @Override
-            public int compare(final String[] entry1, final String[] entry2) {
-                final String show1 = entry1[0];
-                final String show2 = entry2[0];
-                return show1.compareTo(show2);
+            public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
+                TextView nameView = (TextView) view.findViewById(R.id.seriesTitle);
+                TextView idView = (TextView) view.findViewById(R.id.seriesId);
+                TextView genreView = (TextView) view.findViewById(R.id.seriesGenre);
+                showSeries(Integer.parseInt(idView.getText().toString()), nameView.getText().toString(), genreView.getText().toString());
             }
         });
 
-        List<ShowListItem> list = new ArrayList<>();
-        i = 0;
-        for (String[] show : series) {
-            list.add(new ShowListItem(show[0], Integer.parseInt(show[1]), show[2], show[3].equals("1")));
-            i++;
-        }
-
-        if (inputList.size() >= 1) {
-            ArrayAdapter<ShowListItem> adapter = new seriesListAdapter(inputList);
-            seriesListView.setAdapter(adapter);
-
-            seriesListView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
-                @Override
-                public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
-                    TextView nameView = (TextView) view.findViewById(R.id.seriesTitle);
-                    TextView idView = (TextView) view.findViewById(R.id.seriesId);
-                    TextView genreView = (TextView) view.findViewById(R.id.seriesGenre);
-                    showSeries(Integer.parseInt(idView.getText().toString()), nameView.getText().toString(), genreView.getText().toString());
-                }
-            });
-
-            Log.d("BS", "Everything done.");
-            Log.d("BS", "----------------------------");
-        } else {
-            seriesListView.setAdapter(null);
-            Snackbar snackbar = Snackbar.make(rootView.findViewById(android.R.id.content), "Fehler beim Laden der Serien.", Snackbar.LENGTH_SHORT);
-            View snackbarView = snackbar.getView();
-            snackbarView.setBackgroundColor(ContextCompat.getColor(getContext(), R.color.colorPrimaryDark));
-            snackbar.show();
-        }
-
         rootView.findViewById(R.id.avi).setVisibility(View.GONE);
+        seriesListView.setVisibility(View.VISIBLE);
     }
 
     private void showSeries(Integer id, String name, String genre) {

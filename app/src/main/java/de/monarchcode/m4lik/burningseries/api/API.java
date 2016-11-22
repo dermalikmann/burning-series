@@ -54,7 +54,7 @@ public class API {
         return token;
     }
 
-    public APIInterface getApiInterface() {
+    public APIInterface getInterface() {
         return apiInterface;
     }
 

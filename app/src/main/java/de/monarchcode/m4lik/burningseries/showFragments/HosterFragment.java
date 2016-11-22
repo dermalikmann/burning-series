@@ -81,7 +81,7 @@ public class HosterFragment extends Fragment implements Callback<EpisodeObj> {
         API api = new API();
         api.setSession(sharedPreferences.getString("session", ""));
         api.generateToken("series/" + selectedShow + "/" + selectedSeason + "/" + selectedEpisode);
-        APIInterface apii = api.getApiInterface();
+        APIInterface apii = api.getInterface();
         Call<EpisodeObj> call = apii.getEpisode(api.getToken(), api.getUserAgent(), selectedShow, selectedSeason, selectedEpisode, api.getSession());
         call.enqueue(this);
 
@@ -151,7 +151,7 @@ public class HosterFragment extends Fragment implements Callback<EpisodeObj> {
         API api = new API();
         api.setSession(sharedPreferences.getString("session", ""));
         api.generateToken("watch/" + id);
-        APIInterface apii = api.getApiInterface();
+        APIInterface apii = api.getInterface();
         Call<VideoObj> call = apii.watch(api.getToken(), api.getUserAgent(), id, api.getSession());
         call.enqueue(new Callback<VideoObj>() {
             @Override

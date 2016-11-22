@@ -37,9 +37,9 @@ public interface APIInterface {
 
     @GET("/api/series:genre")
     Call<ResponseBody> getSeriesJSONString(@Header("BS-Token") String token,
-                                      //Call<ResponseBody> getSeriesGenreList(@Header("BS-Token") String token,
-                                      @Header("User-Agent") String userAgent,
-                                      @Query("s") String session);
+                                           //Call<ResponseBody> getSeriesGenreList(@Header("BS-Token") String token,
+                                           @Header("User-Agent") String userAgent,
+                                           @Query("s") String session);
 
     @GET("/api/series/{id}/{season}")
     Call<SeasonObj> getSeason(@Header("BS-Token") String token,
@@ -76,10 +76,17 @@ public interface APIInterface {
     Call<List<ShowObj>> getFavorites(@Header("BS-Token") String token,
                                      @Header("User-Agent") String userAgent,
                                      @Query("s") String session);
+
+    @GET("/api/user/series/set/{ids}")
+    Call<ResponseBody> setFavorites(@Header("BS-Token") String token,
+                                    @Header("User-Agent") String userAgent,
+                                    @Path("ids") String ids,
+                                    @Query("s") String session);
+
     @GET("/api/user/series")
     Call<ResponseBody> getFavoritesString(@Header("BS-Token") String token,
-                                     @Header("User-Agent") String userAgent,
-                                     @Query("s") String session);
+                                          @Header("User-Agent") String userAgent,
+                                          @Query("s") String session);
 
     @FormUrlEncoded
     @POST("/api/login")

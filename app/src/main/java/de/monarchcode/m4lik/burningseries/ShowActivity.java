@@ -32,6 +32,7 @@ import de.monarchcode.m4lik.burningseries.objects.SeasonObj;
 import de.monarchcode.m4lik.burningseries.showFragments.EpisodesFragment;
 import de.monarchcode.m4lik.burningseries.showFragments.HosterFragment;
 import de.monarchcode.m4lik.burningseries.showFragments.SeasonsFragment;
+import okhttp3.ResponseBody;
 import retrofit2.Call;
 import retrofit2.Callback;
 import retrofit2.Response;
@@ -41,7 +42,6 @@ import static de.monarchcode.m4lik.burningseries.database.SeriesContract.seriesT
 public class ShowActivity extends AppCompatActivity implements Callback<SeasonObj> {
 
     private String title;
-    private String genre;
     private String description;
 
     public Integer selectedShow;
@@ -56,6 +56,7 @@ public class ShowActivity extends AppCompatActivity implements Callback<SeasonOb
     public Boolean fav = false;
 
     public View fragmentView;
+    FloatingActionButton fab;
 
     String userSession;
 
@@ -73,7 +74,6 @@ public class ShowActivity extends AppCompatActivity implements Callback<SeasonOb
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
         ImageView tbiv = (ImageView) findViewById(R.id.toolbarimage);
         title = i.getStringExtra("ShowName");
-        genre = i.getStringExtra("ShowGenre");
         selectedShow = i.getIntExtra("ShowID", 60);
         Uri imageUri = Uri.parse("https://s.bs.to/img/cover/" + selectedShow + ".jpg");
         toolbar.setTitle(title);
@@ -94,16 +94,16 @@ public class ShowActivity extends AppCompatActivity implements Callback<SeasonOb
 
         System.out.println(selectedShow);
         Log.d("BS", "Checking for Fav");
-        MainDBHelper dbHelper = new MainDBHelper(getApplicationContext());
+        final MainDBHelper dbHelper = new MainDBHelper(getApplicationContext());
         final SQLiteDatabase db = dbHelper.getWritableDatabase();
 
-        String[] projection = {
+        final String[] projection = {
                 seriesTable.COLUMN_NAME_ID
         };
 
-        String selection = seriesTable.COLUMN_NAME_ID + " = ? AND "
+        final String selection = seriesTable.COLUMN_NAME_ID + " = ? AND "
                          + seriesTable.COLUMN_NAME_ISFAV + " = ?";
-        String[] selectionArgs = {selectedShow.toString(), "1"};
+        final String[] selectionArgs = {selectedShow.toString(), "1"};
 
         Cursor c = db.query(
                 seriesTable.TABLE_NAME,
@@ -118,7 +118,10 @@ public class ShowActivity extends AppCompatActivity implements Callback<SeasonOb
         if (c.getCount() == 1)
             fav = true;
 
-        final FloatingActionButton fab = (FloatingActionButton) findViewById(R.id.fab);
+        c.close();
+        db.close();
+
+        fab = (FloatingActionButton) findViewById(R.id.fab);
 
         if (fav)
             fab.setImageDrawable(ContextCompat.getDrawable(getApplicationContext(), R.drawable.ic_star_white));
@@ -127,16 +130,10 @@ public class ShowActivity extends AppCompatActivity implements Callback<SeasonOb
             @Override
             public void onClick(View view) {
                 if (!fav) {
-                    ContentValues cv = new ContentValues();
-                    cv.put(seriesTable.COLUMN_NAME_ISFAV, 1);
-                    db.update(seriesTable.TABLE_NAME, cv, seriesTable.COLUMN_NAME_ID + " = ?", new String[]{selectedShow.toString()});
-                    fab.setImageDrawable(ContextCompat.getDrawable(getApplicationContext(), R.drawable.ic_star_white));
+                    addToFavorites();
                     fav = !fav;
                 } else {
-                    ContentValues cv = new ContentValues();
-                    cv.put(seriesTable.COLUMN_NAME_ISFAV, 0);
-                    db.update(seriesTable.TABLE_NAME, cv, seriesTable.COLUMN_NAME_ID + " = ?", new String[]{selectedShow.toString()});
-                    fab.setImageDrawable(ContextCompat.getDrawable(getApplicationContext(), R.drawable.ic_star_border_white));
+                    removeFromFavorites();
                     fav = !fav;
                 }
             }
@@ -145,7 +142,7 @@ public class ShowActivity extends AppCompatActivity implements Callback<SeasonOb
         API api = new API();
         api.setSession(userSession);
         api.generateToken("series/" + selectedShow + "/1");
-        APIInterface apii = api.getApiInterface();
+        APIInterface apii = api.getInterface();
         Call<SeasonObj> call = apii.getSeason(api.getToken(), api.getUserAgent(), selectedShow, 1, api.getSession());
         call.enqueue(this);
 
@@ -312,4 +309,125 @@ public class ShowActivity extends AppCompatActivity implements Callback<SeasonOb
         setVisibleFragment("episodes");
     }
 
+    private void addToFavorites() {
+
+        MainDBHelper dbHelper = new MainDBHelper(getApplicationContext());
+        SQLiteDatabase db = dbHelper.getWritableDatabase();
+
+        ContentValues cv = new ContentValues();
+        cv.put(seriesTable.COLUMN_NAME_ISFAV, 1);
+        db.update(seriesTable.TABLE_NAME, cv, seriesTable.COLUMN_NAME_ID + " = ?", new String[]{selectedShow.toString()});
+        fab.setImageDrawable(ContextCompat.getDrawable(getApplicationContext(), R.drawable.ic_star_white));
+
+        String[] projection = {
+                seriesTable.COLUMN_NAME_ID
+        };
+
+        String selection = seriesTable.COLUMN_NAME_ID + " = ? AND "
+                + seriesTable.COLUMN_NAME_ISFAV + " = ?";
+        String[] selectionArgs = {selectedShow.toString(), "1"};
+
+        Cursor c = db.query(
+                seriesTable.TABLE_NAME,
+                projection,
+                selection,
+                selectionArgs,
+                null,
+                null,
+                null
+        );
+
+        String favs = "";
+        if (c.getCount() > 0) {
+            while (c.moveToNext()) {
+                favs += c.getInt(c.getColumnIndex(seriesTable.COLUMN_NAME_ID)) + ",";
+            }
+
+            if (favs != null && favs.length() > 0) {
+                favs = favs.substring(0, favs.length() - 1);
+            }
+        }
+
+
+        API api = new API();
+        APIInterface apiInterface = api.getInterface();
+        api.setSession(userSession);
+        api.generateToken("user/series/set/" + favs);
+        Call<ResponseBody> call = apiInterface.setFavorites(api.getToken(), api.getUserAgent(), favs, api.getSession());
+        call.enqueue(new Callback<ResponseBody>() {
+            @Override
+            public void onResponse(Call<ResponseBody> call, Response<ResponseBody> response) {
+                Snackbar snackbar = Snackbar.make(findViewById(android.R.id.content), "Zu Favoriten hinzugefügt", 500);
+                View snackbarView = snackbar.getView();
+                snackbarView.setBackgroundColor(ContextCompat.getColor(getApplicationContext(), R.color.colorPrimaryDark));
+                snackbar.show();
+            }
+
+            @Override
+            public void onFailure(Call<ResponseBody> call, Throwable t) {
+
+            }
+        });
+    }
+
+    private void removeFromFavorites() {
+
+        MainDBHelper dbHelper = new MainDBHelper(getApplicationContext());
+        SQLiteDatabase db = dbHelper.getWritableDatabase();
+
+        ContentValues cv = new ContentValues();
+        cv.put(seriesTable.COLUMN_NAME_ISFAV, 0);
+        db.update(seriesTable.TABLE_NAME, cv, seriesTable.COLUMN_NAME_ID + " = ?", new String[]{selectedShow.toString()});
+        fab.setImageDrawable(ContextCompat.getDrawable(getApplicationContext(), R.drawable.ic_star_border_white));
+
+        String[] projection = {
+                seriesTable.COLUMN_NAME_ID
+        };
+
+        String selection = seriesTable.COLUMN_NAME_ID + " = ? AND "
+                + seriesTable.COLUMN_NAME_ISFAV + " = ?";
+        String[] selectionArgs = {selectedShow.toString(), "1"};
+
+        Cursor c = db.query(
+                seriesTable.TABLE_NAME,
+                projection,
+                selection,
+                selectionArgs,
+                null,
+                null,
+                null
+        );
+
+        String favs = "";
+        if (c.getCount() > 0) {
+            while (c.moveToNext()) {
+                favs += c.getInt(c.getColumnIndex(seriesTable.COLUMN_NAME_ID)) + ",";
+            }
+
+            if (favs != null && favs.length() > 0) {
+                favs = favs.substring(0, favs.length() - 1);
+            }
+        }
+
+
+        API api = new API();
+        APIInterface apiInterface = api.getInterface();
+        api.setSession(userSession);
+        api.generateToken("user/series/set/" + favs);
+        Call<ResponseBody> call = apiInterface.setFavorites(api.getToken(), api.getUserAgent(), favs, api.getSession());
+        call.enqueue(new Callback<ResponseBody>() {
+            @Override
+            public void onResponse(Call<ResponseBody> call, Response<ResponseBody> response) {
+                Snackbar snackbar = Snackbar.make(findViewById(android.R.id.content), "Von Favoriten entfernt", 500);
+                View snackbarView = snackbar.getView();
+                snackbarView.setBackgroundColor(ContextCompat.getColor(getApplicationContext(), R.color.colorPrimaryDark));
+                snackbar.show();
+            }
+
+            @Override
+            public void onFailure(Call<ResponseBody> call, Throwable t) {
+
+            }
+        });
+    }
 }

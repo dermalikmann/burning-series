@@ -79,7 +79,8 @@ public class MainActivity extends AppCompatActivity
 
         DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
 
-
+        favsDone = false;
+        seriesDone = false;
 
         SharedPreferences sharedPreferences = getSharedPreferences(
                 "de.monarchcode.m4lik.burningseries.LOGIN",

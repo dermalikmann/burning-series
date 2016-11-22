@@ -16,10 +16,12 @@ public class simpleVideoPlayer extends Activity /*implements SurfaceHolder.Callb
     private SurfaceHolder vidHolder;
     private SurfaceView vidSurface;
 
+    private int position = 0;
 
     Intent intent;
 
     String videoURL;
+    String header;
 
     VideoView videoView;
 
@@ -35,11 +37,18 @@ public class simpleVideoPlayer extends Activity /*implements SurfaceHolder.Callb
         intent = getIntent();
 
         videoURL = intent.getStringExtra("burning-series.videoURL");
+        //header = intent.getStringExtra("burning-series.videoURL.header");
 
         Uri uri = Uri.parse(videoURL);
 
         videoView = (VideoView) findViewById(R.id.videoView);
-        videoView.setVideoURI(uri);
+        //if (header.equals(""))
+            videoView.setVideoURI(uri);
+        /*else {
+            Map<String, String> map = new HashMap<>();
+            map.put("Referer", header);
+            videoView.setVideoURI(uri,map);
+        }*/
 
         MediaController vidControl = new MediaController(this);
         vidControl.setAnchorView(videoView);
@@ -49,38 +58,18 @@ public class simpleVideoPlayer extends Activity /*implements SurfaceHolder.Callb
 
     }
 
-    /*public oldVideoPlayer() {
-        super();
+    @Override
+    protected void onPause() {
+        videoView.pause();
+        position = videoView.getCurrentPosition();
+        super.onPause();
     }
 
     @Override
-    public void surfaceCreated(SurfaceHolder holder) {
-        try {
-            mediaPlayer = new MediaPlayer();
-            mediaPlayer.setDisplay(vidHolder);
-            mediaPlayer.setDataSource(videoURL);
-            mediaPlayer.prepare();
-            mediaPlayer.setOnPreparedListener(this);
-            mediaPlayer.setAudioStreamType(AudioManager.STREAM_MUSIC);
+    protected void onResume() {
+        videoView.seekTo(position);
+        videoView.start();
+        videoView.pause();
+        super.onResume();
     }
-    catch(Exception e){
-        e.printStackTrace();
-    }
-
-    }
-
-    @Override
-    public void surfaceChanged(SurfaceHolder holder, int format, int width, int height) {
-
-    }
-
-    @Override
-    public void surfaceDestroyed(SurfaceHolder holder) {
-
-    }
-
-    @Override
-    public void onPrepared(MediaPlayer mp) {
-        mediaPlayer.start();
-    }*/
 }

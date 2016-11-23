@@ -143,30 +143,32 @@ public class SeriesFragment extends Fragment {
     }
 
     private void refreshList(List<ShowListItem> inputList) {
-        Log.d("BS", "Refreshing list..");
 
         seriesListView.setVisibility(View.GONE);
-        rootView.findViewById(R.id.avi).setVisibility(View.VISIBLE);
+        rootView.findViewById(R.id.nothing_found).setVisibility(View.VISIBLE);
 
         if (inputList == null) {
             inputList = seriesList;
         }
-        
-        ArrayAdapter<ShowListItem> adapter = new seriesListAdapter(inputList);
-        seriesListView.setAdapter(adapter);
 
-        seriesListView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
-            @Override
-            public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
-                TextView nameView = (TextView) view.findViewById(R.id.seriesTitle);
-                TextView idView = (TextView) view.findViewById(R.id.seriesId);
-                TextView genreView = (TextView) view.findViewById(R.id.seriesGenre);
-                showSeries(Integer.parseInt(idView.getText().toString()), nameView.getText().toString(), genreView.getText().toString());
-            }
-        });
+        if (!inputList.isEmpty()) {
 
-        rootView.findViewById(R.id.avi).setVisibility(View.GONE);
-        seriesListView.setVisibility(View.VISIBLE);
+            ArrayAdapter<ShowListItem> adapter = new seriesListAdapter(inputList);
+            seriesListView.setAdapter(adapter);
+
+            seriesListView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+                @Override
+                public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
+                    TextView nameView = (TextView) view.findViewById(R.id.seriesTitle);
+                    TextView idView = (TextView) view.findViewById(R.id.seriesId);
+                    TextView genreView = (TextView) view.findViewById(R.id.seriesGenre);
+                    showSeries(Integer.parseInt(idView.getText().toString()), nameView.getText().toString(), genreView.getText().toString());
+                }
+            });
+
+            rootView.findViewById(R.id.nothing_found).setVisibility(View.GONE);
+            seriesListView.setVisibility(View.VISIBLE);
+        }
     }
 
     private void showSeries(Integer id, String name, String genre) {

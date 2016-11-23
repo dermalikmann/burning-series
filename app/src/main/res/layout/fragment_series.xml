@@ -18,6 +18,16 @@
         app:indicatorName="LineScaleIndicator"
         app:indicatorColor="@color/colorPrimaryDark"/>
 
+    <TextView
+        android:text="TextView"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:id="@+id/textView3"
+        android:gravity="center_horizontal"
+        android:layout_marginTop="30dp"
+        android:textAppearance="@style/Material.Medium"
+        android:textSize="25sp" />
+
     <ListView
         android:id="@+id/seriesListView"
         android:layout_width="match_parent"
@@ -25,4 +35,5 @@
         android:layout_gravity="center_horizontal"
         android:divider="@null"
         android:dividerHeight="0dp"/>
+
 </LinearLayout>

@@ -206,11 +206,17 @@ public class MainActivity extends AppCompatActivity
                 break;
 
             case R.id.nav_share:
+                Snackbar ssnackbar = Snackbar.make(findViewById(android.R.id.content),"Noch in Arbeit.\nAber trotzdem schön dass du helfen willst :)", Snackbar.LENGTH_LONG);
+                View ssnackbarView = ssnackbar.getView();
+                ssnackbarView.setBackgroundColor(ContextCompat.getColor(getApplicationContext(), R.color.colorPrimaryDark));
+                ssnackbar.show();
                 break;
 
             case R.id.nav_settings:
-                /*intent = new Intent(this, SettingsActivity.class);
-                startActivity(intent);*/
+                Snackbar nsnackbar = Snackbar.make(findViewById(android.R.id.content),"Noch in Arbeit", Snackbar.LENGTH_LONG);
+                View nsnackbarView = nsnackbar.getView();
+                nsnackbarView.setBackgroundColor(ContextCompat.getColor(getApplicationContext(), R.color.colorPrimaryDark));
+                nsnackbar.show();
                 break;
         }
 

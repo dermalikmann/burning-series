@@ -1,8 +1,6 @@
 package de.monarchcode.m4lik.burningseries.hoster;
 
 
-import android.util.Log;
-
 import java.io.BufferedInputStream;
 import java.io.BufferedReader;
 import java.io.BufferedWriter;
@@ -22,7 +20,8 @@ import java.util.Map;
 import java.util.Random;
 
 /**
- * Created by Malik on 03.11.2016.
+ * Created by Malik on 03.11.2016
+ * @author Malik Mann
  */
 
 public class Hoster {
@@ -30,7 +29,6 @@ public class Hoster {
     public static final List<String> compatibleHosters = new ArrayList<>();
     private static final String[] userAgents;
     private int userAgentID;
-    CookieManager cookieManager;
 
     static {
         compatibleHosters.add("PowerWatch");
@@ -75,7 +73,6 @@ public class Hoster {
 
     public Hoster() {
         userAgentID = -1;
-        cookieManager = new CookieManager();
     }
 
     public String get(String hoster, String videoID) {
@@ -94,13 +91,12 @@ public class Hoster {
     private String selectUAS() {
         if (userAgentID == -1) {
             userAgentID = new Random().nextInt(userAgents.length);
-            Log.d("BSAPI", "ua: " + userAgents[userAgentID]);
         }
         return userAgents[userAgentID];
     }
 
 
-    protected String GetRequestString(String url, Map<String, String> map) throws MalformedURLException, IOException {
+    String GetRequestString(String url, Map<String, String> map) throws MalformedURLException, IOException {
         HttpURLConnection httpURLConnection = (HttpURLConnection) new URL(url).openConnection();
         httpURLConnection.setRequestMethod("GET");
         httpURLConnection.setRequestProperty("User-Agent", selectUAS());
@@ -108,19 +104,17 @@ public class Hoster {
             httpURLConnection.setRequestProperty((String) entry.getKey(), (String) entry.getValue());
         }
 
-        cookieManager.setCookies(httpURLConnection);
-
         httpURLConnection.connect();
-
-        cookieManager.storeCookies(httpURLConnection);
         return getConnectionString(httpURLConnection);
     }
 
-    protected String GetRequestString(String str) throws IOException {
+
+    String GetRequestString(String str) throws IOException {
         return GetRequestString(str, new HashMap(0));
     }
 
-    protected String PostRequestString(String url, Map<String, String> dataArgs, Map<String, String> refererArgs) throws IOException {
+
+    String PostRequestString(String url, Map<String, String> dataArgs, Map<String, String> refererArgs) throws IOException {
         HttpURLConnection httpURLConnection = (HttpURLConnection) new URL(url).openConnection();
         httpURLConnection.setRequestMethod("POST");
         httpURLConnection.setRequestProperty("Content-Type", "application/x-www-form-urlencoded");
@@ -129,9 +123,6 @@ public class Hoster {
         for (Map.Entry entry : refererArgs.entrySet()) {
             httpURLConnection.setRequestProperty((String) entry.getKey(), (String) entry.getValue());
         }
-        //this.cookieManager.setCookies(httpURLConnection);
-
-        Log.d("bs", httpURLConnection.getRequestProperties().toString());
 
         httpURLConnection.setDoInput(true);
         httpURLConnection.setDoOutput(true);
@@ -144,7 +135,6 @@ public class Hoster {
 
         outputStream.close();
         httpURLConnection.connect();
-        //this.cookieManager.storeCookies(httpURLConnection);
         return getConnectionString(httpURLConnection);
     }
 
@@ -160,7 +150,6 @@ public class Hoster {
             request.append("=");
             request.append(URLEncoder.encode((String) entry.getValue(), "UTF-8"));
         }
-        Log.d("BSAPI", "ue: " + request.toString());
         return request.toString();
     }
 
@@ -175,7 +164,6 @@ public class Hoster {
             } else {
                 String connectionString = connectionStringBuilder.toString();
                 inputStream.close();
-                Log.d("BSAPI", "cs: " + connectionString);
                 return connectionString;
             }
         }

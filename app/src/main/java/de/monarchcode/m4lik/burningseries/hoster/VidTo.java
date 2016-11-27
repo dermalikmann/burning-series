@@ -26,22 +26,23 @@ public class VidTo extends Hoster {
 
     public String get(String videoID) {
         String fullURL = "http://vidto.me/" + videoID;
-        Log.d("BS", "Fetching video URL with id " + videoID + "...");
-        Log.d("BS", "Updating database...");
         try {
             String GetReq = GetRequestString(fullURL);
             if (GetReq.equals("SOCKET_TIMEOUT")) {
-                return "Oh damnit. Took too long...";
+                //Oh damnit. Took too long...
+                return "1";
             }
-            if (GetReq.contains("File was removed") || GetReq.contains("File Not Found") || GetReq.contains("AndStream404Error")) {
-                return "The Skies are clear. Unusal.";
+            if (GetReq.contains("File was removed") || GetReq.contains("File Not Found")) {
+                //The Skies are clear. Unusual.
+                return "2";
             }
             CharSequence GetRequest = GetRequestString(fullURL);
             Map dataArgs = new HashMap(7);
             Matcher filenameMatcher = filenamePattern.matcher(GetRequest);
             Matcher hashMatcher = hashPattern.matcher(GetRequest);
             if (!filenameMatcher.find() || !hashMatcher.find()) {
-                return "Skies are clear. Unusal.";
+                //"Skies are clear. Unusual.
+                return "2";
             }
             dataArgs.put("op", "download1");
             dataArgs.put("usr_login", "");
@@ -74,18 +75,20 @@ public class VidTo extends Hoster {
                     String quality = p.split("hd_default:\"")[1].split("\"")[0];
                     return p.split("label:\"" + quality + "\",file:\"")[1].split("\"")[0];
                 } catch (Exception e) {
-                    Log.e("BS", "Error wile finding video URL");
-                    return "We ain't found shit, Sir!";
+                    Log.e("BS", "Error while finding video URL");
+                    //We ain't found shit, Sir!
+                    return "3";
                 }
             } catch (Exception e) {
                 e.printStackTrace();
-                Log.e("BS", "Error wile fetching video URL");
-                return "We ain't found shit, Sir!x2";
+                Log.e("BS", "Error while fetching video URL");
+                return "4";
             }
         } catch (Exception e) {
             e.printStackTrace();
-            Log.e("BS", "Error wile getting video page");
-            return "Whoops... The thing broke.";
+            Log.e("BS", "Error while getting video page");
+            //Whoops... The thing broke.
+            return "5";
         }
     }
 }

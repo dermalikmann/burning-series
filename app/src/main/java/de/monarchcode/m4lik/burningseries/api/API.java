@@ -25,7 +25,7 @@ public class API {
     private String baseURL;
     private String userAgent;
     private String pubKey;
-    private String verify;
+    private String privKey;
 
     private static final char[] hexArray;
 
@@ -41,7 +41,7 @@ public class API {
         baseURL = "https://bs.to/";
         userAgent = "bs.android";
         pubKey = "PgfLa3cGNY5nDN3isibzuGsomSWspjAs";
-        verify = "FSOGiKFVdaJmJH1axROzqcS8s8jhV3UT";
+        privKey = "FSOGiKFVdaJmJH1axROzqcS8s8jhV3UT";
 
         buildRetrofit();
     }
@@ -101,7 +101,7 @@ public class API {
 
     private String doHMAC(Long l, String str) {
         try {
-            Key secretKeySpec = new SecretKeySpec(verify.getBytes("UTF-8"), "HmacSHA256");
+            Key secretKeySpec = new SecretKeySpec(privKey.getBytes("UTF-8"), "HmacSHA256");
             Mac instance = Mac.getInstance("HmacSHA256");
             instance.init(secretKeySpec);
             return encryption(instance.doFinal((l.toString() + "/" + str).getBytes("ASCII")));

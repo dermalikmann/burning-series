@@ -71,9 +71,14 @@ public class API {
     }
 
     private void buildRetrofit() {
+        OkHttpClient client = new OkHttpClient.Builder()
+                .addInterceptor(new ResponseInterceptor())
+                .build();
+
         Retrofit retrofit = new Retrofit.Builder()
                 .baseUrl(baseURL)
                 .addConverterFactory(GsonConverterFactory.create())
+                .client(client)
                 .build();
 
         apiInterface = retrofit.create(APIInterface.class);

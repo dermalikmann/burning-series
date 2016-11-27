@@ -8,6 +8,7 @@ import android.content.SharedPreferences;
 import android.net.Uri;
 import android.os.AsyncTask;
 import android.os.Bundle;
+import android.support.annotation.NonNull;
 import android.support.customtabs.CustomTabsIntent;
 import android.support.design.widget.Snackbar;
 import android.support.v4.app.Fragment;
@@ -110,6 +111,11 @@ public class HosterFragment extends Fragment implements Callback<EpisodeObj> {
     @Override
     public void onFailure(Call<EpisodeObj> call, Throwable t) {
         Snackbar.make(rootview, "Fehler beim laden der Hoster", Snackbar.LENGTH_SHORT);
+
+        Snackbar snackbar = Snackbar.make(rootview.findViewById(android.R.id.content), "Fehler beim laden der Hoster.", Snackbar.LENGTH_SHORT);
+        View snackbarView = snackbar.getView();
+        snackbarView.setBackgroundColor(ContextCompat.getColor(getContext(), R.color.colorPrimaryDark));
+        snackbar.show();
     }
 
     private void refreshList() {
@@ -141,7 +147,6 @@ public class HosterFragment extends Fragment implements Callback<EpisodeObj> {
     }
 
     private void showVideo(Integer id) {
-        ((ShowActivity) getActivity()).setSelectedHoster(id);
 
         SharedPreferences sharedPreferences = getActivity().getSharedPreferences(
                 "de.monarchcode.m4lik.burningseries.LOGIN",
@@ -172,7 +177,7 @@ public class HosterFragment extends Fragment implements Callback<EpisodeObj> {
 
         private VideoObj videoObj;
 
-        public getVideo(VideoObj videoObj) {
+        getVideo(VideoObj videoObj) {
             this.videoObj = videoObj;
         }
 
@@ -201,7 +206,43 @@ public class HosterFragment extends Fragment implements Callback<EpisodeObj> {
 
             progressDialog.dismiss();
 
-            if (hosterReturn == "unkown_hoster") {
+            Snackbar snackbar;
+            View snackbarView;
+
+            switch (hosterReturn) {
+                case "1":
+                    snackbar = Snackbar.make(rootview.findViewById(android.R.id.content), "Hoster hat nicht geantwortet.", Snackbar.LENGTH_SHORT);
+                    snackbarView = snackbar.getView();
+                    snackbarView.setBackgroundColor(ContextCompat.getColor(getContext(), R.color.colorPrimaryDark));
+                    snackbar.show();
+                    return;
+                case "2":
+                    snackbar = Snackbar.make(rootview.findViewById(android.R.id.content), "Video wurde wahrscheinlich gelöscht.", Snackbar.LENGTH_SHORT);
+                    snackbarView = snackbar.getView();
+                    snackbarView.setBackgroundColor(ContextCompat.getColor(getContext(), R.color.colorPrimaryDark));
+                    snackbar.show();
+                    return;
+                case "3":
+                    snackbar = Snackbar.make(rootview.findViewById(android.R.id.content), "Fehler beim auflösen der Video URL.", Snackbar.LENGTH_SHORT);
+                    snackbarView = snackbar.getView();
+                    snackbarView.setBackgroundColor(ContextCompat.getColor(getContext(), R.color.colorPrimaryDark));
+                    snackbar.show();
+                    return;
+                case "4":
+                    snackbar = Snackbar.make(rootview.findViewById(android.R.id.content), "Hoster hat nicht geantwortet.", Snackbar.LENGTH_SHORT);
+                    snackbarView = snackbar.getView();
+                    snackbarView.setBackgroundColor(ContextCompat.getColor(getContext(), R.color.colorPrimaryDark));
+                    snackbar.show();
+                    return;
+                case "5":
+                    snackbar = Snackbar.make(rootview.findViewById(android.R.id.content), "Da ist etwas ganz schief gelaufen. Fehler bitte melden.", Snackbar.LENGTH_SHORT);
+                    snackbarView = snackbar.getView();
+                    snackbarView.setBackgroundColor(ContextCompat.getColor(getContext(), R.color.colorPrimaryDark));
+                    snackbar.show();
+                    return;
+            }
+
+            if (hosterReturn.equals("unkown_hoster")) {
                 CustomTabsIntent.Builder builder = new CustomTabsIntent.Builder();
                 CustomTabsIntent customTabsIntent = builder.build();
                 customTabsIntent.launchUrl(getActivity(), Uri.parse(videoObj.getFullUrl()));
@@ -216,12 +257,13 @@ public class HosterFragment extends Fragment implements Callback<EpisodeObj> {
 
     class hostersListAdapter extends ArrayAdapter<HosterListItem> {
 
-        public hostersListAdapter() {
+        hostersListAdapter() {
             super(getActivity(), R.layout.list_item_hoster, hostersList);
         }
 
         @Override
-        public View getView(int pos, View view, ViewGroup parent) {
+        @NonNull
+        public View getView(int pos, View view, @NonNull ViewGroup parent) {
             if (view == null) {
                 view = getActivity().getLayoutInflater().inflate(R.layout.list_item_hoster, parent, false);
             }

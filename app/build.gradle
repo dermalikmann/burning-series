@@ -2,14 +2,14 @@ apply plugin: 'com.android.application'
 
 android {
     compileSdkVersion 25
-    buildToolsVersion "25.0.0"
+    buildToolsVersion "25.0.1"
 
     defaultConfig {
         applicationId "de.monarchcode.m4lik.burningseries"
-        minSdkVersion 15
+        minSdkVersion 19
         targetSdkVersion 24
         versionCode 27
-        versionName "v0.9.5"
+        versionName "v0.9.9"
         vectorDrawables.useSupportLibrary = true
     }
     buildTypes {
@@ -37,7 +37,7 @@ dependencies {
 
     compile 'com.devbrackets.android:exomedia:3.1.0'
 
-    compile 'com.google.android.gms:play-services-gcm:9.8.0'
+    compile 'com.google.android.gms:play-services-gcm:10.0.0'
     compile 'com.google.code.gson:gson:2.7'
     compile 'com.google.firebase:firebase-auth:9.8.0'
     compile 'com.google.firebase:firebase-core:9.8.0'

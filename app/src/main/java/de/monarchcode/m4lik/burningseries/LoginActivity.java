@@ -4,6 +4,7 @@ import android.animation.Animator;
 import android.animation.AnimatorListenerAdapter;
 import android.annotation.TargetApi;
 import android.content.Context;
+import android.content.Intent;
 import android.content.SharedPreferences;
 import android.os.Build;
 import android.os.Bundle;
@@ -18,6 +19,7 @@ import java.io.IOException;
 
 import de.monarchcode.m4lik.burningseries.api.API;
 import de.monarchcode.m4lik.burningseries.api.APIInterface;
+import de.monarchcode.m4lik.burningseries.database.MainDBHelper;
 import okhttp3.ResponseBody;
 import retrofit2.Call;
 import retrofit2.Callback;
@@ -134,9 +136,15 @@ public class LoginActivity extends AppCompatActivity implements Callback<Respons
                 editor.putString("user", user);
                 editor.commit();
 
+                Context context = getApplicationContext();
+
+                getApplicationContext().deleteDatabase(MainDBHelper.DATABASE_NAME);
+
+                Intent intent = new Intent(this, MainActivity.class);
+                intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP | Intent.FLAG_ACTIVITY_NEW_TASK);
+                startActivity(intent);
                 finish();
             }
-            //Snackbar.make(findViewById(android.R.id.content), "Yay.", Snackbar.LENGTH_SHORT).show();
         } catch (IOException e) {
             e.printStackTrace();
         }
@@ -145,7 +153,6 @@ public class LoginActivity extends AppCompatActivity implements Callback<Respons
     @Override
     public void onFailure(Call<ResponseBody> call, Throwable t) {
         showProgress(false);
-        //Snackbar.make(findViewById(android.R.id.content), "Verbindungsfehler.", Snackbar.LENGTH_SHORT).show();
     }
 
     /**

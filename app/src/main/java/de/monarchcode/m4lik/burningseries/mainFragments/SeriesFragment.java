@@ -1,16 +1,16 @@
 package de.monarchcode.m4lik.burningseries.mainFragments;
 
 
-import android.app.ProgressDialog;
+import android.content.ContentValues;
 import android.content.Intent;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.os.Bundle;
+import android.support.design.widget.Snackbar;
 import android.support.v4.app.Fragment;
 import android.support.v4.content.ContextCompat;
 import android.support.v4.view.MenuItemCompat;
 import android.support.v7.widget.SearchView;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.MenuItem;
 import android.view.View;
@@ -27,9 +27,17 @@ import java.util.List;
 import de.monarchcode.m4lik.burningseries.MainActivity;
 import de.monarchcode.m4lik.burningseries.R;
 import de.monarchcode.m4lik.burningseries.ShowActivity;
+import de.monarchcode.m4lik.burningseries.api.API;
+import de.monarchcode.m4lik.burningseries.api.APIInterface;
 import de.monarchcode.m4lik.burningseries.database.MainDBHelper;
+import de.monarchcode.m4lik.burningseries.database.SeriesContract;
 import de.monarchcode.m4lik.burningseries.objects.ShowListItem;
+import okhttp3.ResponseBody;
+import retrofit2.Call;
+import retrofit2.Callback;
+import retrofit2.Response;
 
+import static de.monarchcode.m4lik.burningseries.MainActivity.userSession;
 import static de.monarchcode.m4lik.burningseries.database.SeriesContract.seriesTable.COLUMN_NAME_GENRE;
 import static de.monarchcode.m4lik.burningseries.database.SeriesContract.seriesTable.COLUMN_NAME_ID;
 import static de.monarchcode.m4lik.burningseries.database.SeriesContract.seriesTable.COLUMN_NAME_ISFAV;
@@ -44,12 +52,8 @@ public class SeriesFragment extends Fragment {
 
     View rootView;
 
-    ListView seriesListView;
+    ListView getSeriesListView;
     List<ShowListItem> seriesList = new ArrayList<>();
-
-    ProgressDialog progressDialog;
-
-    String requestStatus;
 
 
     public SeriesFragment() {
@@ -60,8 +64,7 @@ public class SeriesFragment extends Fragment {
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
         rootView = inflater.inflate(R.layout.fragment_series, container, false);
-        seriesListView = (ListView) rootView.findViewById(R.id.seriesListView);
-
+        getSeriesListView = (ListView) rootView.findViewById(R.id.seriesListView);
 
         MenuItem searchItem = MainActivity.getMenu().findItem(R.id.action_search);
         searchItem.setVisible(true);
@@ -82,6 +85,7 @@ public class SeriesFragment extends Fragment {
 
 
         fillList();
+        showList();
 
 
         return rootView;
@@ -96,7 +100,7 @@ public class SeriesFragment extends Fragment {
                 filteredList.add(single);
         }
 
-        refreshList(filteredList);
+        showList(filteredList);
     }
 
     public void fillList() {
@@ -135,16 +139,17 @@ public class SeriesFragment extends Fragment {
             ));
         }
 
-        refreshList();
+        c.close();
+        db.close();
     }
 
-    public void refreshList() {
-        refreshList(null);
+    public void showList() {
+        showList(null);
     }
 
-    private void refreshList(List<ShowListItem> inputList) {
+    private void showList(List<ShowListItem> inputList) {
 
-        seriesListView.setVisibility(View.GONE);
+        getSeriesListView.setVisibility(View.GONE);
         rootView.findViewById(R.id.nothing_found).setVisibility(View.VISIBLE);
 
         if (inputList == null) {
@@ -154,9 +159,60 @@ public class SeriesFragment extends Fragment {
         if (!inputList.isEmpty()) {
 
             ArrayAdapter<ShowListItem> adapter = new seriesListAdapter(inputList);
-            seriesListView.setAdapter(adapter);
+            getSeriesListView.setAdapter(adapter);
 
-            seriesListView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+            getSeriesListView.setOnItemLongClickListener(new AdapterView.OnItemLongClickListener() {
+                @Override
+                public boolean onItemLongClick(AdapterView<?> adapterView, View view, int position, long id) {
+
+                    if (!userSession.equals("")) {
+
+                        SQLiteDatabase db = new MainDBHelper(getContext()).getReadableDatabase();
+
+                        String[] projection = new String[]{
+                                SeriesContract.seriesTable.COLUMN_NAME_ISFAV
+                        };
+
+                        Integer selectID = Integer.parseInt(((TextView) view.findViewById(R.id.seriesId)).getText().toString());
+
+
+                        Cursor c = db.query(
+                                SeriesContract.seriesTable.TABLE_NAME,
+                                projection,
+                                SeriesContract.seriesTable.COLUMN_NAME_ID + " = ?",
+                                new String[]{selectID.toString()},
+                                null,
+                                null,
+                                null
+                        );
+
+                        c.moveToFirst();
+                        Boolean isFav = c.getInt(c.getColumnIndex(SeriesContract.seriesTable.COLUMN_NAME_ISFAV)) == 1;
+
+                        ImageView fav = (ImageView) view.findViewById(R.id.favImageView);
+                        fav.setImageDrawable(ContextCompat.getDrawable(getContext(),
+                                !isFav ? R.drawable.ic_star : R.drawable.ic_star_border)
+                        );
+
+                        if (isFav)
+                            removeFromFavorites(selectID);
+                        else
+                            addToFavorites(selectID);
+
+                        c.close();
+                        db.close();
+
+                    } else {
+                        Snackbar snackbar = Snackbar.make(rootView.findViewById(android.R.id.content), "Die Favoriten sind nur verfügbar wenn du angemeldet bist.", 500);
+                        View snackbarView = snackbar.getView();
+                        snackbarView.setBackgroundColor(ContextCompat.getColor(getContext(), R.color.colorPrimaryDark));
+                        snackbar.show();
+                    }
+                    return true;
+                }
+            });
+
+            getSeriesListView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
                 @Override
                 public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
                     TextView nameView = (TextView) view.findViewById(R.id.seriesTitle);
@@ -167,7 +223,7 @@ public class SeriesFragment extends Fragment {
             });
 
             rootView.findViewById(R.id.nothing_found).setVisibility(View.GONE);
-            seriesListView.setVisibility(View.VISIBLE);
+            getSeriesListView.setVisibility(View.VISIBLE);
         }
     }
 
@@ -215,5 +271,113 @@ public class SeriesFragment extends Fragment {
         public int getCount() {
             return list != null ? list.size() : 0;
         }
+    }
+
+    private void addToFavorites(Integer id) {
+
+        MainDBHelper dbHelper = new MainDBHelper(getContext());
+        SQLiteDatabase db = dbHelper.getWritableDatabase();
+
+        ContentValues cv = new ContentValues();
+        cv.put(SeriesContract.seriesTable.COLUMN_NAME_ISFAV, 1);
+        db.update(SeriesContract.seriesTable.TABLE_NAME, cv, SeriesContract.seriesTable.COLUMN_NAME_ID + " = " + id, null);
+
+
+        String[] projection = {
+                SeriesContract.seriesTable.COLUMN_NAME_ID
+        };
+
+        String selection = SeriesContract.seriesTable.COLUMN_NAME_ISFAV + " = ?";
+        String[] selectionArgs = {"1"};
+
+        Cursor c = db.query(
+                SeriesContract.seriesTable.TABLE_NAME,
+                projection,
+                selection,
+                selectionArgs,
+                null,
+                null,
+                null
+        );
+
+        String favs = "";
+        while (c.moveToNext())
+            favs += c.getInt(c.getColumnIndex(SeriesContract.seriesTable.COLUMN_NAME_ID)) + ",";
+        favs = favs.substring(0, favs.length() - 1);
+
+        c.close();
+        db.close();
+
+
+        API api = new API();
+        APIInterface apiInterface = api.getInterface();
+        api.setSession(userSession);
+        api.generateToken("user/series/set/" + favs);
+        Call<ResponseBody> call = apiInterface.setFavorites(api.getToken(), api.getUserAgent(), favs, api.getSession());
+        call.enqueue(new Callback<ResponseBody>() {
+            @Override
+            public void onResponse(Call<ResponseBody> call, Response<ResponseBody> response) {
+
+            }
+
+            @Override
+            public void onFailure(Call<ResponseBody> call, Throwable t) {
+
+            }
+        });
+
+    }
+
+    private void removeFromFavorites(Integer id) {
+
+        MainDBHelper dbHelper = new MainDBHelper(getContext());
+        SQLiteDatabase db = dbHelper.getWritableDatabase();
+
+        ContentValues cv = new ContentValues();
+        cv.put(SeriesContract.seriesTable.COLUMN_NAME_ISFAV, 0);
+        db.update(SeriesContract.seriesTable.TABLE_NAME, cv, SeriesContract.seriesTable.COLUMN_NAME_ID + " = " + id, null);
+
+        String[] projection = {
+                SeriesContract.seriesTable.COLUMN_NAME_ID
+        };
+
+        String selection = SeriesContract.seriesTable.COLUMN_NAME_ISFAV + " = ?";
+        String[] selectionArgs = {"1"};
+
+        Cursor c = db.query(
+                SeriesContract.seriesTable.TABLE_NAME,
+                projection,
+                selection,
+                selectionArgs,
+                null,
+                null,
+                null
+        );
+
+        String favs = "";
+        while (c.moveToNext())
+            favs += c.getInt(c.getColumnIndex(SeriesContract.seriesTable.COLUMN_NAME_ID)) + ",";
+        if (!favs.equals(""))
+            favs = favs.substring(0, favs.length() - 1);
+
+        c.close();
+        db.close();
+
+
+        API api = new API();
+        APIInterface apiInterface = api.getInterface();
+        api.setSession(userSession);
+        api.generateToken("user/series/set/" + favs);
+        Call<ResponseBody> call = apiInterface.setFavorites(api.getToken(), api.getUserAgent(), favs, api.getSession());
+        call.enqueue(new Callback<ResponseBody>() {
+            @Override
+            public void onResponse(Call<ResponseBody> call, Response<ResponseBody> response) {
+            }
+
+            @Override
+            public void onFailure(Call<ResponseBody> call, Throwable t) {
+
+            }
+        });
     }
 }

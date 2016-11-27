@@ -1,7 +1,6 @@
 package de.monarchcode.m4lik.burningseries.api;
 
 import android.util.Base64;
-import android.util.Log;
 
 import org.json.JSONObject;
 
@@ -10,6 +9,7 @@ import java.security.Key;
 import javax.crypto.Mac;
 import javax.crypto.spec.SecretKeySpec;
 
+import okhttp3.OkHttpClient;
 import retrofit2.Retrofit;
 import retrofit2.converter.gson.GsonConverterFactory;
 
@@ -66,24 +66,28 @@ public class API {
         this.session = session;
     }
 
-    public void setToken(String token) {
+     private void setToken(String token) {
         this.token = token;
     }
 
-    public void buildRetrofit() {
+    private void buildRetrofit() {
+        OkHttpClient client = new OkHttpClient.Builder()
+                .addInterceptor(new ResponseInterceptor())
+                .build();
+
         Retrofit retrofit = new Retrofit.Builder()
                 .baseUrl(baseURL)
                 .addConverterFactory(GsonConverterFactory.create())
+                .client(client)
                 .build();
 
         apiInterface = retrofit.create(APIInterface.class);
     }
 
     public void generateToken(String uri) {
-        if (uri != "login")
+        if (!uri.equals("login"))
             uri = uri + "?s=" + (getSession() == null ? "" : getSession());
-        Log.d("BSAPI", uri);
-        Long ts = Long.valueOf(System.currentTimeMillis() / 1000);
+        Long ts = System.currentTimeMillis() / 1000;
         JSONObject jSONObject = new JSONObject();
         try {
             jSONObject.put("public_key", pubKey);

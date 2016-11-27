@@ -11,8 +11,6 @@ import android.widget.LinearLayout;
 import android.widget.ListView;
 import android.widget.TextView;
 
-import org.jsoup.nodes.Document;
-
 import java.util.ArrayList;
 
 import de.monarchcode.m4lik.burningseries.R;
@@ -21,8 +19,6 @@ import de.monarchcode.m4lik.burningseries.objects.SeasonListItem;
 
 public class SeasonsFragment extends Fragment {
 
-    Document webDoc;
-
     View rootview;
 
     ListView seasonsListView;
@@ -30,9 +26,7 @@ public class SeasonsFragment extends Fragment {
 
     Boolean loaded = false;
 
-    public SeasonsFragment() {
-        //Required empty constructor
-    }
+    public SeasonsFragment() {}
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
@@ -108,7 +102,7 @@ public class SeasonsFragment extends Fragment {
             SeasonListItem current = seasonsList.get(pos);
 
             TextView label = (TextView) view.findViewById(R.id.seasonLabel);
-            label.setText("Staffel " + current.getSeasonId());
+            label.setText(getString(R.string.season) + current.getSeasonId());
 
             TextView urlText = (TextView) view.findViewById(R.id.seasonId);
             urlText.setText(current.getSeasonId().toString());

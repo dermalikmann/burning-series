@@ -9,7 +9,8 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 /**
- * Created by Malik on 03.11.2016.
+ * Created by Malik on 03.11.2016
+ * @author Malik Mann
  */
 
 public class YouWatch extends Hoster {

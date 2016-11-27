@@ -29,9 +29,9 @@ public class SeasonObj {
         private String german;
         private String english;
         private Integer epi;
-        private boolean watched;
+        private Integer watched;
 
-        public Episode(String german, String english, Integer epi, boolean watched) {
+        public Episode(String german, String english, Integer epi, Integer watched) {
             this.german = german;
             this.english = english;
             this.epi = epi;
@@ -50,7 +50,7 @@ public class SeasonObj {
             return epi;
         }
 
-        public boolean isWatched() {
+        public Integer isWatched() {
             return watched;
         }
     }

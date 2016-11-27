@@ -9,6 +9,7 @@ import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.os.AsyncTask;
 import android.os.Bundle;
+import android.support.annotation.NonNull;
 import android.support.design.widget.NavigationView;
 import android.support.design.widget.Snackbar;
 import android.support.v4.app.FragmentManager;
@@ -79,8 +80,7 @@ public class MainActivity extends AppCompatActivity
 
         SharedPreferences sharedPreferences = getSharedPreferences(
                 "de.monarchcode.m4lik.burningseries.LOGIN",
-                Context.MODE_PRIVATE
-        );
+                Context.MODE_PRIVATE);
         userSession = sharedPreferences.getString("session", "");
         userName = sharedPreferences.getString("user", "Bitte Einloggen");
 
@@ -109,22 +109,20 @@ public class MainActivity extends AppCompatActivity
 
     @Override
     public void onBackPressed() {
-        Boolean dosuper = true;
 
         if (seriesList) {
             setFragment("genresFragment");
             seriesList = false;
-            dosuper = false;
+            return;
         }
 
         DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
-        if (!drawer.isDrawerOpen(GravityCompat.START) && dosuper) {
+        if (!drawer.isDrawerOpen(GravityCompat.START)) {
             drawer.openDrawer(GravityCompat.START);
-            dosuper = false;
+            return;
         }
 
-        if (dosuper)
-            super.onBackPressed();
+        super.onBackPressed();
 
     }
 
@@ -134,8 +132,8 @@ public class MainActivity extends AppCompatActivity
         inflater.inflate(R.menu.menu_main, menu);
         this.menu = menu;
 
-        MainDBHelper dbhelper = new MainDBHelper(getApplicationContext());
-        SQLiteDatabase db  = dbhelper.getReadableDatabase();
+        MainDBHelper dbHelper = new MainDBHelper(getApplicationContext());
+        SQLiteDatabase db = dbHelper.getReadableDatabase();
 
         Cursor c = db.query(
                 seriesTable.TABLE_NAME,
@@ -148,9 +146,11 @@ public class MainActivity extends AppCompatActivity
         );
 
         if (c.getCount() == 0)
-            fetchSeries("seriesFragment");
+            fetchSeries();
         else
             setFragment("seriesFragment");
+
+        c.close();
 
         return true;
     }
@@ -160,16 +160,16 @@ public class MainActivity extends AppCompatActivity
         if (item.getItemId() == R.id.action_refresh) {
             switch (visibleFragment) {
                 case "genresFragment":
-                    fetchSeries("genresFragment");
+                    fetchSeries();
                     break;
                 case "favsFragment":
-                    fetchSeries("favsFragment");
+                    fetchSeries();
                     break;
                 case "seriesFragment":
-                    fetchSeries("seriesFragment");
+                    fetchSeries();
                     break;
                 default:
-                    fetchSeries("seriesFragment");
+                    fetchSeries();
                     break;
             }
         }
@@ -178,7 +178,7 @@ public class MainActivity extends AppCompatActivity
 
     @SuppressWarnings("StatementWithEmptyBody")
     @Override
-    public boolean onNavigationItemSelected(MenuItem item) {
+    public boolean onNavigationItemSelected(@NonNull MenuItem item) {
 
         Intent intent;
 
@@ -206,11 +206,17 @@ public class MainActivity extends AppCompatActivity
                 break;
 
             case R.id.nav_share:
+                Snackbar ssnackbar = Snackbar.make(findViewById(android.R.id.content), "Noch in Arbeit.\nAber trotzdem schön dass du helfen willst :)", Snackbar.LENGTH_LONG);
+                View ssnackbarView = ssnackbar.getView();
+                ssnackbarView.setBackgroundColor(ContextCompat.getColor(getApplicationContext(), R.color.colorPrimaryDark));
+                ssnackbar.show();
                 break;
 
             case R.id.nav_settings:
-                /*intent = new Intent(this, SettingsActivity.class);
-                startActivity(intent);*/
+                Snackbar nsnackbar = Snackbar.make(findViewById(android.R.id.content), "Noch in Arbeit", Snackbar.LENGTH_LONG);
+                View nsnackbarView = nsnackbar.getView();
+                nsnackbarView.setBackgroundColor(ContextCompat.getColor(getApplicationContext(), R.color.colorPrimaryDark));
+                nsnackbar.show();
                 break;
         }
 
@@ -243,6 +249,11 @@ public class MainActivity extends AppCompatActivity
                 View snackbarView = snackbar.getView();
                 snackbarView.setBackgroundColor(ContextCompat.getColor(getApplicationContext(), R.color.colorPrimaryDark));
                 snackbar.show();
+
+                Intent intent = new Intent(getApplicationContext(), MainActivity.class);
+                intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP | Intent.FLAG_ACTIVITY_NEW_TASK);
+                startActivity(intent);
+                finish();
             }
 
             @Override
@@ -258,7 +269,10 @@ public class MainActivity extends AppCompatActivity
         FragmentManager fragmentManager = getSupportFragmentManager();
         FragmentTransaction transaction = fragmentManager.beginTransaction();
 
-        MenuItem searchItem = MainActivity.getMenu().findItem(R.id.action_search);
+        MenuItem searchItem = getMenu().findItem(R.id.action_search);
+
+        if (fragment == null)
+            fragment = "seriesFragment";
 
         switch (fragment) {
             case "genresFragment":
@@ -282,7 +296,7 @@ public class MainActivity extends AppCompatActivity
         }
     }
 
-    private void fetchSeries(final String fragment) {
+    private void fetchSeries() {
 
         MainDBHelper dbHelper = new MainDBHelper(getApplicationContext());
         SQLiteDatabase db = dbHelper.getWritableDatabase();
@@ -306,15 +320,23 @@ public class MainActivity extends AppCompatActivity
         call.enqueue(new Callback<GenreMap>() {
             @Override
             public void onResponse(Call<GenreMap> call, Response<GenreMap> response) {
-                new seriesDatanaseUpdate(response.body()).execute();
+                new seriesDatabaseUpdate(response.body()).execute();
             }
 
             @Override
             public void onFailure(Call<GenreMap> call, Throwable t) {
-                Snackbar snackbar = Snackbar.make(findViewById(android.R.id.content),
+
+                progressDialog.dismiss();
+
+                t.printStackTrace();
+
+                Snackbar snackbar = Snackbar.make(
+                        findViewById(android.R.id.content),
                         "Da ist was schief gelaufen...\n" +
-                                "Bitte App neustarten.\n\n" +
-                                "Sollte der Fehler weiterhin bestehen installiere die App erneut", Snackbar.LENGTH_LONG);
+                                "Bitte Serien neuladen.",
+                        Snackbar.LENGTH_LONG
+                );
+
                 View snackbarView = snackbar.getView();
                 snackbarView.setBackgroundColor(ContextCompat.getColor(getApplicationContext(), R.color.colorPrimaryDark));
                 snackbar.show();
@@ -342,6 +364,8 @@ public class MainActivity extends AppCompatActivity
             public void onFailure(Call<List<ShowObj>> call, Throwable t) {
                 t.printStackTrace();
 
+                progressDialog.dismiss();
+
                 Snackbar snackbar = Snackbar.make(findViewById(android.R.id.content), "Da ist was schief gelaufen...", Snackbar.LENGTH_SHORT);
                 View snackbarView = snackbar.getView();
                 snackbarView.setBackgroundColor(ContextCompat.getColor(getApplicationContext(), R.color.colorPrimaryDark));
@@ -350,11 +374,15 @@ public class MainActivity extends AppCompatActivity
         });
     }
 
-    class seriesDatanaseUpdate extends AsyncTask<Void, Void, Void> {
+    public static Menu getMenu() {
+        return menu;
+    }
+
+    class seriesDatabaseUpdate extends AsyncTask<Void, Void, Void> {
 
         GenreMap genreMap;
 
-        public seriesDatanaseUpdate(GenreMap genreMap) {
+        seriesDatabaseUpdate(GenreMap genreMap) {
             this.genreMap = genreMap;
         }
 
@@ -375,7 +403,6 @@ public class MainActivity extends AppCompatActivity
                 db.insert(genresTable.TABLE_NAME, null, values);
                 Iterator itr = Arrays.asList(go.getShows()).iterator();
                 int i = 0;
-                int all = 0;
                 while (i < go.getShows().length) {
                     int j = 1;
 
@@ -421,7 +448,7 @@ public class MainActivity extends AppCompatActivity
 
         List<ShowObj> list;
 
-        public favoritesDatanaseUpdate(List<ShowObj> list) {
+        favoritesDatanaseUpdate(List<ShowObj> list) {
             this.list = list;
         }
 
@@ -455,9 +482,5 @@ public class MainActivity extends AppCompatActivity
 
             super.onPostExecute(aVoid);
         }
-    }
-
-    public static Menu getMenu() {
-        return menu;
     }
 }

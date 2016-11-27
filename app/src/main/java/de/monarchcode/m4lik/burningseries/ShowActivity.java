@@ -21,13 +21,12 @@ import android.view.MenuItem;
 import android.view.View;
 import android.widget.ImageView;
 
-import com.squareup.picasso.Picasso;
-
-import org.jsoup.nodes.Document;
+import com.bumptech.glide.Glide;
 
 import de.monarchcode.m4lik.burningseries.api.API;
 import de.monarchcode.m4lik.burningseries.api.APIInterface;
 import de.monarchcode.m4lik.burningseries.database.MainDBHelper;
+import de.monarchcode.m4lik.burningseries.database.SeriesContract;
 import de.monarchcode.m4lik.burningseries.objects.SeasonObj;
 import de.monarchcode.m4lik.burningseries.showFragments.EpisodesFragment;
 import de.monarchcode.m4lik.burningseries.showFragments.HosterFragment;
@@ -47,7 +46,6 @@ public class ShowActivity extends AppCompatActivity implements Callback<SeasonOb
     public Integer selectedShow;
     public Integer selectedSeason;
     public Integer selectedEpisode;
-    public Integer selectedHoster;
 
     private String visibleFragment;
 
@@ -59,8 +57,6 @@ public class ShowActivity extends AppCompatActivity implements Callback<SeasonOb
     FloatingActionButton fab;
 
     String userSession;
-
-    Document webDoc;
 
     Intent i;
 
@@ -79,7 +75,7 @@ public class ShowActivity extends AppCompatActivity implements Callback<SeasonOb
         toolbar.setTitle(title);
 
         Log.v("BS", "Lade Cover.");
-        Picasso.with(getApplicationContext())
+        Glide.with(getApplicationContext())
                 .load(imageUri)
                 .into(tbiv);
 
@@ -92,8 +88,6 @@ public class ShowActivity extends AppCompatActivity implements Callback<SeasonOb
                 Context.MODE_PRIVATE);
         userSession = sharedPreferences.getString("session", "");
 
-        System.out.println(selectedShow);
-        Log.d("BS", "Checking for Fav");
         final MainDBHelper dbHelper = new MainDBHelper(getApplicationContext());
         final SQLiteDatabase db = dbHelper.getWritableDatabase();
 
@@ -165,8 +159,6 @@ public class ShowActivity extends AppCompatActivity implements Callback<SeasonOb
     public void onResponse(Call<SeasonObj> call, Response<SeasonObj> response) {
         SeasonObj show = response.body();
 
-        Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
-
         description = show.getSeries().getDescription();
         seasonCount = show.getSeries().getSeasonCount();
 
@@ -209,7 +201,6 @@ public class ShowActivity extends AppCompatActivity implements Callback<SeasonOb
         selectedShow = null;
         selectedEpisode = null;
         selectedSeason = null;
-        selectedHoster = null;
 
         super.onDestroy();
     }
@@ -234,16 +225,8 @@ public class ShowActivity extends AppCompatActivity implements Callback<SeasonOb
         return selectedEpisode;
     }
 
-    public Integer getSelectedHoster() {
-        return selectedHoster;
-    }
-
     public Integer getSeasonCount() {
         return seasonCount;
-    }
-
-    public void setSelectedHoster(Integer selectedHoster) {
-        this.selectedHoster = selectedHoster;
     }
 
     public void setSelectedEpisode(Integer selectedEpisode) {
@@ -252,10 +235,6 @@ public class ShowActivity extends AppCompatActivity implements Callback<SeasonOb
 
     public void setSelectedSeason(Integer selectedSeason) {
         this.selectedSeason = selectedSeason;
-    }
-
-    public void setSelectedShow(Integer selectedShow) {
-        this.selectedShow = selectedShow;
     }
 
     public void setVisibleFragment(String visibleFragment) {
@@ -315,20 +294,19 @@ public class ShowActivity extends AppCompatActivity implements Callback<SeasonOb
         SQLiteDatabase db = dbHelper.getWritableDatabase();
 
         ContentValues cv = new ContentValues();
-        cv.put(seriesTable.COLUMN_NAME_ISFAV, 1);
-        db.update(seriesTable.TABLE_NAME, cv, seriesTable.COLUMN_NAME_ID + " = ?", new String[]{selectedShow.toString()});
-        fab.setImageDrawable(ContextCompat.getDrawable(getApplicationContext(), R.drawable.ic_star_white));
+        cv.put(SeriesContract.seriesTable.COLUMN_NAME_ISFAV, 1);
+        db.update(SeriesContract.seriesTable.TABLE_NAME, cv, SeriesContract.seriesTable.COLUMN_NAME_ID + " = " + selectedShow, null);
+
 
         String[] projection = {
-                seriesTable.COLUMN_NAME_ID
+                SeriesContract.seriesTable.COLUMN_NAME_ID
         };
 
-        String selection = seriesTable.COLUMN_NAME_ID + " = ? AND "
-                + seriesTable.COLUMN_NAME_ISFAV + " = ?";
-        String[] selectionArgs = {selectedShow.toString(), "1"};
+        String selection = SeriesContract.seriesTable.COLUMN_NAME_ISFAV + " = ?";
+        String[] selectionArgs = {"1"};
 
         Cursor c = db.query(
-                seriesTable.TABLE_NAME,
+                SeriesContract.seriesTable.TABLE_NAME,
                 projection,
                 selection,
                 selectionArgs,
@@ -338,15 +316,12 @@ public class ShowActivity extends AppCompatActivity implements Callback<SeasonOb
         );
 
         String favs = "";
-        if (c.getCount() > 0) {
-            while (c.moveToNext()) {
-                favs += c.getInt(c.getColumnIndex(seriesTable.COLUMN_NAME_ID)) + ",";
-            }
+        while (c.moveToNext())
+            favs += c.getInt(c.getColumnIndex(SeriesContract.seriesTable.COLUMN_NAME_ID)) + ",";
+        favs = favs.substring(0, favs.length() - 1);
 
-            if (favs != null && favs.length() > 0) {
-                favs = favs.substring(0, favs.length() - 1);
-            }
-        }
+        c.close();
+        db.close();
 
 
         API api = new API();
@@ -357,10 +332,7 @@ public class ShowActivity extends AppCompatActivity implements Callback<SeasonOb
         call.enqueue(new Callback<ResponseBody>() {
             @Override
             public void onResponse(Call<ResponseBody> call, Response<ResponseBody> response) {
-                Snackbar snackbar = Snackbar.make(findViewById(android.R.id.content), "Zu Favoriten hinzugefügt", 500);
-                View snackbarView = snackbar.getView();
-                snackbarView.setBackgroundColor(ContextCompat.getColor(getApplicationContext(), R.color.colorPrimaryDark));
-                snackbar.show();
+
             }
 
             @Override
@@ -368,6 +340,7 @@ public class ShowActivity extends AppCompatActivity implements Callback<SeasonOb
 
             }
         });
+
     }
 
     private void removeFromFavorites() {
@@ -376,20 +349,18 @@ public class ShowActivity extends AppCompatActivity implements Callback<SeasonOb
         SQLiteDatabase db = dbHelper.getWritableDatabase();
 
         ContentValues cv = new ContentValues();
-        cv.put(seriesTable.COLUMN_NAME_ISFAV, 0);
-        db.update(seriesTable.TABLE_NAME, cv, seriesTable.COLUMN_NAME_ID + " = ?", new String[]{selectedShow.toString()});
-        fab.setImageDrawable(ContextCompat.getDrawable(getApplicationContext(), R.drawable.ic_star_border_white));
+        cv.put(SeriesContract.seriesTable.COLUMN_NAME_ISFAV, 0);
+        db.update(SeriesContract.seriesTable.TABLE_NAME, cv, SeriesContract.seriesTable.COLUMN_NAME_ID + " = " + selectedShow, null);
 
         String[] projection = {
-                seriesTable.COLUMN_NAME_ID
+                SeriesContract.seriesTable.COLUMN_NAME_ID
         };
 
-        String selection = seriesTable.COLUMN_NAME_ID + " = ? AND "
-                + seriesTable.COLUMN_NAME_ISFAV + " = ?";
-        String[] selectionArgs = {selectedShow.toString(), "1"};
+        String selection = SeriesContract.seriesTable.COLUMN_NAME_ISFAV + " = ?";
+        String[] selectionArgs = {"1"};
 
         Cursor c = db.query(
-                seriesTable.TABLE_NAME,
+                SeriesContract.seriesTable.TABLE_NAME,
                 projection,
                 selection,
                 selectionArgs,
@@ -399,15 +370,13 @@ public class ShowActivity extends AppCompatActivity implements Callback<SeasonOb
         );
 
         String favs = "";
-        if (c.getCount() > 0) {
-            while (c.moveToNext()) {
-                favs += c.getInt(c.getColumnIndex(seriesTable.COLUMN_NAME_ID)) + ",";
-            }
+        while (c.moveToNext())
+            favs += c.getInt(c.getColumnIndex(SeriesContract.seriesTable.COLUMN_NAME_ID)) + ",";
+        if (!favs.equals(""))
+            favs = favs.substring(0, favs.length() - 1);
 
-            if (favs != null && favs.length() > 0) {
-                favs = favs.substring(0, favs.length() - 1);
-            }
-        }
+        c.close();
+        db.close();
 
 
         API api = new API();
@@ -418,10 +387,6 @@ public class ShowActivity extends AppCompatActivity implements Callback<SeasonOb
         call.enqueue(new Callback<ResponseBody>() {
             @Override
             public void onResponse(Call<ResponseBody> call, Response<ResponseBody> response) {
-                Snackbar snackbar = Snackbar.make(findViewById(android.R.id.content), "Von Favoriten entfernt", 500);
-                View snackbarView = snackbar.getView();
-                snackbarView.setBackgroundColor(ContextCompat.getColor(getApplicationContext(), R.color.colorPrimaryDark));
-                snackbar.show();
             }
 
             @Override

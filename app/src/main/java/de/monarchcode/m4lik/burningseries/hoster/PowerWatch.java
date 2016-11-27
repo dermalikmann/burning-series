@@ -1,6 +1,7 @@
 package de.monarchcode.m4lik.burningseries.hoster;
 
 import android.os.SystemClock;
+import android.util.Log;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -22,11 +23,16 @@ public class PowerWatch extends Hoster {
         String fullURL = "http://powerwatch.pw/" + videoID;
         try {
             CharSequence GetRequest = GetRequestString(fullURL);
+            if (GetRequest.equals("SOCKET_TIMEOUT")) {
+                //Oh damnit. Took too long...
+                return "1";
+            }
             Map dataArgs = new HashMap(7);
             Matcher matcher = filenamePattern.matcher(GetRequest);
             Matcher matcher2 = hashPattern.matcher(GetRequest);
             if (!matcher.find() || !matcher2.find()) {
-                return "Skies are clear. Unusal.";
+                //The Skies are clear. Unusual.
+                return "2";
             }
             dataArgs.put("fname", matcher.group(1));
             dataArgs.put("hash", matcher2.group(1));
@@ -43,13 +49,19 @@ public class PowerWatch extends Hoster {
                 if (matcher3.find()) {
                     return matcher3.group(1);
                 }
-                return "We ain't found shit Sir!";
+                Log.e("BS", "Error while finding video URL");
+                //We ain't found shit, Sir!
+                return "3";
             } catch (Exception e) {
-                return "We ain't found shit Sir!x2";
+                e.printStackTrace();
+                Log.e("BS", "Error while fetching video URL");
+                return "4";
             }
         } catch (Exception e) {
             e.printStackTrace();
-            return "Whoops... The thing broke.";
+            Log.e("BS", "Error while getting video page");
+            //Whoops... The thing broke.
+            return "5";
         }
     }
 }

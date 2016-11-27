@@ -18,32 +18,32 @@ import retrofit2.http.Path;
 import retrofit2.http.Query;
 
 /**
- * Created by Malik on 01.10.2016.
+ * Created by Malik
+ * Interface for the API
+ * @author Malik Mann
  */
 
 public interface APIInterface {
 
     @GET("/api/series")
     Call<List<ShowObj>> getSeriesAlphaList(@Header("BS-Token") String token,
-                                           //Call<ResponseBody> getSeriesAlphaList(@Header("BS-Token") String token,
                                            @Header("User-Agent") String userAgent,
                                            @Query("s") String session);
 
     @GET("/api/series:genre")
     Call<GenreMap> getSeriesGenreList(@Header("BS-Token") String token,
-                                      //Call<ResponseBody> getSeriesGenreList(@Header("BS-Token") String token,
                                       @Header("User-Agent") String userAgent,
                                       @Query("s") String session);
 
-    @GET("/api/series:genre")
-    Call<ResponseBody> getSeriesJSONString(@Header("BS-Token") String token,
-                                           //Call<ResponseBody> getSeriesGenreList(@Header("BS-Token") String token,
-                                           @Header("User-Agent") String userAgent,
-                                           @Query("s") String session);
-
     @GET("/api/series/{id}/{season}")
     Call<SeasonObj> getSeason(@Header("BS-Token") String token,
-                              //Call<ResponseBody> getSeason(@Header("BS-Token") String token,
+                              @Header("User-Agent") String userAgent,
+                              @Path("id") Integer id,
+                              @Path("season") Integer season,
+                              @Query("s") String session);
+
+    @GET("/api/series/{id}/{season}")
+    Call<ResponseBody> getSeasonString(@Header("BS-Token") String token,
                               @Header("User-Agent") String userAgent,
                               @Path("id") Integer id,
                               @Path("season") Integer season,
@@ -51,7 +51,6 @@ public interface APIInterface {
 
     @GET("/api/series/{id}/{season}/{episode}")
     Call<EpisodeObj> getEpisode(@Header("BS-Token") String token,
-                                //Call<ResponseBody> getEpisode(@Header("BS-Token") String token,
                                 @Header("User-Agent") String userAgent,
                                 @Path("id") Integer id,
                                 @Path("season") Integer season,
@@ -60,14 +59,12 @@ public interface APIInterface {
 
     @GET("/api/watch/{id}")
     Call<VideoObj> watch(@Header("BS-Token") String token,
-                         //Call<ResponseBody> watch(@Header("BS-Token") String token,
                          @Header("User-Agent") String userAgent,
                          @Path("id") Integer id,
                          @Query("s") String session);
 
     @GET("/api/unwatch/{id}")
     Call<VideoObj> unwatch(@Header("BS-Token") String token,
-                           //Call<ResponseBody> unwatch(@Header("BS-Token") String token,
                            @Header("User-Agent") String userAgent,
                            @Path("id") Integer id,
                            @Query("s") String session);
@@ -82,11 +79,6 @@ public interface APIInterface {
                                     @Header("User-Agent") String userAgent,
                                     @Path("ids") String ids,
                                     @Query("s") String session);
-
-    @GET("/api/user/series")
-    Call<ResponseBody> getFavoritesString(@Header("BS-Token") String token,
-                                          @Header("User-Agent") String userAgent,
-                                          @Query("s") String session);
 
     @FormUrlEncoded
     @POST("/api/login")

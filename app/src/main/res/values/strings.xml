@@ -1,8 +1,8 @@
 <resources>
     <string name="app_name">BurningSeries</string>
 
-    <string name="navigation_drawer_open">Open navigation drawer</string>
-    <string name="navigation_drawer_close">Close navigation drawer</string>
+    <string name="navigation_drawer_open">Öffne Navigation Drawer</string>
+    <string name="navigation_drawer_close">Schließe Navigation Drawer</string>
 
     <string name="allSeries">Alle Serien</string>
     <string name="genres">Genres</string>
@@ -11,6 +11,8 @@
     <string name="share">Teilen</string>
     <string name="series">Serien</string>
 
+    <string name="logout">Logout</string>
+    <string name="login">Login</string>
 
     <string name="action_search">Suche in Serien ...</string>
     <string name="action_refresh">Neuladen</string>
@@ -30,5 +32,6 @@
     <string name="title_activity_scrolling">ScroActivity</string>
     <string name="settings">Einstellungen</string>
     <string name="title_activity_video_player">VideoPlayer</string>
-    <string name="title_activity_login">Log in</string>
+    <string name="title_activity_login">Login</string>
+    <string name="season">"Staffel "</string>
 </resources>

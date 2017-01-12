@@ -12,7 +12,8 @@ import okhttp3.Response;
 import okhttp3.ResponseBody;
 
 /**
- * Created by Malik on 25.11.2016
+ * Interceptor class for API calls.
+ * If the app is in debug mode, all calls are printed to the console
  * @author Malik Mann
  */
 

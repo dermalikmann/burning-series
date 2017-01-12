@@ -125,9 +125,11 @@ public class ShowActivity extends AppCompatActivity implements Callback<SeasonOb
             public void onClick(View view) {
                 if (!fav) {
                     addToFavorites();
+                    fab.setImageDrawable(ContextCompat.getDrawable(getApplicationContext(), R.drawable.ic_star_white));
                     fav = !fav;
                 } else {
                     removeFromFavorites();
+                    fab.setImageDrawable(ContextCompat.getDrawable(getApplicationContext(), R.drawable.ic_star_border_white));
                     fav = !fav;
                 }
             }

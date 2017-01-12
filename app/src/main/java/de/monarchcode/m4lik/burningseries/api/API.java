@@ -14,8 +14,8 @@ import retrofit2.Retrofit;
 import retrofit2.converter.gson.GsonConverterFactory;
 
 /**
- * Created by Malik (M4lik) on 29.09.2016.
- * @author M4lik, mm.malik.mann@gmail.com
+ * Object class for the API. Used to authorize and starting the API calls.
+ * @author Malik Mann
  */
 
 public class API {
@@ -46,6 +46,81 @@ public class API {
         buildRetrofit();
     }
 
+    /**
+     * Creates instance of an Retrofit object.
+     * Additionally implements an interceptor via an OkHTTPClient.
+     */
+    private void buildRetrofit() {
+        OkHttpClient client = new OkHttpClient.Builder()
+                .addInterceptor(new ResponseInterceptor())
+                .build();
+
+        Retrofit retrofit = new Retrofit.Builder()
+                .baseUrl(baseURL)
+                .addConverterFactory(GsonConverterFactory.create())
+                .client(client)
+                .build();
+
+        apiInterface = retrofit.create(APIInterface.class);
+    }
+
+    /**
+     * Generates a valid token for the current API request.
+     * URI has to be without session.
+     * @param uri
+     */
+    public void generateToken(String uri) {
+        if (!uri.equals("login"))
+            uri = uri + "?s=" + (getSession() == null ? "" : getSession());
+        Long ts = System.currentTimeMillis() / 1000;
+        JSONObject jSONObject = new JSONObject();
+        try {
+            jSONObject.put("public_key", pubKey);
+            jSONObject.put("timestamp", ts.intValue());
+            jSONObject.put("hmac", doHMAC(ts, uri));
+            setToken(Base64.encodeToString(jSONObject.toString().getBytes("UTF-8"), 2));
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+    }
+
+    /**
+     * Creates the Hmac Key for the token and encrypts it
+     * @param timestamp
+     * @param uri
+     * @return encryptedHmacString
+     */
+    private String doHMAC(Long timestamp, String uri) {
+        try {
+            Key secretKeySpec = new SecretKeySpec(verify.getBytes("UTF-8"), "HmacSHA256");
+            Mac instance = Mac.getInstance("HmacSHA256");
+            instance.init(secretKeySpec);
+            return encryption(instance.doFinal((timestamp.toString() + "/" + uri).getBytes("ASCII")));
+        } catch (Exception e) {
+            e.printStackTrace();
+            return "";
+        }
+    }
+
+    /**
+     * Block encryption via an byte array
+     * @param byteArray
+     * @return encryptedString
+     */
+    private static String encryption(byte[] byteArray) {
+        char[] cArr = new char[(byteArray.length * 2)];
+        for (int i = 0; i < byteArray.length; i++) {
+            int i2 = byteArray[i] & 255;
+            cArr[i * 2] = hexArray[i2 >>> 4];
+            cArr[(i * 2) + 1] = hexArray[i2 & 15];
+        }
+        return new String(cArr);
+    }
+
+    /**
+     * Getter & Setter
+     */
+
     public String getSession() {
         return session;
     }
@@ -66,58 +141,7 @@ public class API {
         this.session = session;
     }
 
-     private void setToken(String token) {
+    private void setToken(String token) {
         this.token = token;
-    }
-
-    private void buildRetrofit() {
-        OkHttpClient client = new OkHttpClient.Builder()
-                .addInterceptor(new ResponseInterceptor())
-                .build();
-
-        Retrofit retrofit = new Retrofit.Builder()
-                .baseUrl(baseURL)
-                .addConverterFactory(GsonConverterFactory.create())
-                .client(client)
-                .build();
-
-        apiInterface = retrofit.create(APIInterface.class);
-    }
-
-    public void generateToken(String uri) {
-        if (!uri.equals("login"))
-            uri = uri + "?s=" + (getSession() == null ? "" : getSession());
-        Long ts = System.currentTimeMillis() / 1000;
-        JSONObject jSONObject = new JSONObject();
-        try {
-            jSONObject.put("public_key", pubKey);
-            jSONObject.put("timestamp", ts.intValue());
-            jSONObject.put("hmac", doHMAC(ts, uri));
-            setToken(Base64.encodeToString(jSONObject.toString().getBytes("UTF-8"), 2));
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
-    }
-
-    private String doHMAC(Long l, String str) {
-        try {
-            Key secretKeySpec = new SecretKeySpec(verify.getBytes("UTF-8"), "HmacSHA256");
-            Mac instance = Mac.getInstance("HmacSHA256");
-            instance.init(secretKeySpec);
-            return encryption(instance.doFinal((l.toString() + "/" + str).getBytes("ASCII")));
-        } catch (Exception e) {
-            e.printStackTrace();
-            return "";
-        }
-    }
-
-    private static String encryption(byte[] bArr) {
-        char[] cArr = new char[(bArr.length * 2)];
-        for (int i = 0; i < bArr.length; i++) {
-            int i2 = bArr[i] & 255;
-            cArr[i * 2] = hexArray[i2 >>> 4];
-            cArr[(i * 2) + 1] = hexArray[i2 & 15];
-        }
-        return new String(cArr);
     }
 }

@@ -1,5 +1,6 @@
 <resources>
     <string name="app_name">BurningSeries</string>
+    <string name="app_id">de.monarchcode.m4lik.burningseries</string>
 
     <string name="navigation_drawer_open">Öffne Navigation Drawer</string>
     <string name="navigation_drawer_close">Schließe Navigation Drawer</string>
@@ -29,9 +30,18 @@
     <string name="placeholder_login">Bitte einloggen</string>
 
     <string name="title_activity_full_screen_video_player">FullScreenVideoPlayer</string>
-    <string name="title_activity_scrolling">ScroActivity</string>
     <string name="settings">Einstellungen</string>
+    <string name="season">"Staffel "</string>
+
+    <!-- Activity labels -->
+    <string name="title_activity_scrolling">ScrollingActivity</string>
     <string name="title_activity_video_player">VideoPlayer</string>
     <string name="title_activity_login">Login</string>
-    <string name="season">"Staffel "</string>
+    <string name="title_activity_settings">Settings</string>
+
+    <!-- Preferences -->
+    <string name="preference_bs_test">Test1</string>
+    <string name="preference_bs_test_key">Test2</string>
+    <string name="preference_bs_test_default">Test3</string>
+
 </resources>

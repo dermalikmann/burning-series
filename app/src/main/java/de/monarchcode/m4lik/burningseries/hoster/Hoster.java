@@ -20,7 +20,7 @@ import java.util.Map;
 import java.util.Random;
 
 /**
- * Created by Malik on 03.11.2016
+ * Class to manage the implemented hoster.
  * @author Malik Mann
  */
 

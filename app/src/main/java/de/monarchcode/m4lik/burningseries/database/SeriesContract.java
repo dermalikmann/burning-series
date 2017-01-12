@@ -3,9 +3,9 @@ package de.monarchcode.m4lik.burningseries.database;
 import android.provider.BaseColumns;
 
 /**
- * Created by Malik (M4lik) on 17.08.2016.
- *
- * @author M4lik, mm.malik.mann@gmail.com
+ * Contract class for the main database.
+ * Defines tables and operations on these tables.
+ * @author Malik Mann
  */
 public final class SeriesContract {
 

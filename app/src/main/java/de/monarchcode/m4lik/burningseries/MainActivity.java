@@ -50,6 +50,12 @@ import static de.monarchcode.m4lik.burningseries.database.SeriesContract.SQL_TRU
 import static de.monarchcode.m4lik.burningseries.database.SeriesContract.genresTable;
 import static de.monarchcode.m4lik.burningseries.database.SeriesContract.seriesTable;
 
+/**
+ * MainActivity class
+ *
+ * @author Malik Mann
+ */
+
 public class MainActivity extends AppCompatActivity
         implements NavigationView.OnNavigationItemSelectedListener {
 
@@ -68,6 +74,10 @@ public class MainActivity extends AppCompatActivity
 
     NavigationView navigationView = null;
     Toolbar toolbar = null;
+
+    public static Menu getMenu() {
+        return menu;
+    }
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -213,10 +223,8 @@ public class MainActivity extends AppCompatActivity
                 break;
 
             case R.id.nav_settings:
-                Snackbar nsnackbar = Snackbar.make(findViewById(android.R.id.content), "Noch in Arbeit", Snackbar.LENGTH_LONG);
-                View nsnackbarView = nsnackbar.getView();
-                nsnackbarView.setBackgroundColor(ContextCompat.getColor(getApplicationContext(), R.color.colorPrimaryDark));
-                nsnackbar.show();
+                intent = new Intent(this, SettingsActivity.class);
+                startActivity(intent);
                 break;
         }
 
@@ -374,10 +382,6 @@ public class MainActivity extends AppCompatActivity
         });
     }
 
-    public static Menu getMenu() {
-        return menu;
-    }
-
     class seriesDatabaseUpdate extends AsyncTask<Void, Void, Void> {
 
         GenreMap genreMap;
@@ -483,4 +487,6 @@ public class MainActivity extends AppCompatActivity
             super.onPostExecute(aVoid);
         }
     }
+
+
 }

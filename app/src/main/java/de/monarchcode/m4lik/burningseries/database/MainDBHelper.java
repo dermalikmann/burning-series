@@ -5,8 +5,8 @@ import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteOpenHelper;
 
 /**
- * Created by Malik (M4lik) on 17.08.2016.
- *
+ * The main database helper class.
+ * Needed to create/open the main database;
  * @author M4lik, mm.malik.mann@gmail.com
  */
 public class MainDBHelper extends SQLiteOpenHelper {

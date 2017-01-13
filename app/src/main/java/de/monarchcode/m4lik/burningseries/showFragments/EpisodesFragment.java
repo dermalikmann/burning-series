@@ -1,9 +1,9 @@
 package de.monarchcode.m4lik.burningseries.showFragments;
 
 
-import android.content.Context;
 import android.content.SharedPreferences;
 import android.os.Bundle;
+import android.preference.PreferenceManager;
 import android.support.design.widget.Snackbar;
 import android.support.v4.app.Fragment;
 import android.support.v4.content.ContextCompat;
@@ -65,12 +65,9 @@ public class EpisodesFragment extends Fragment implements Callback<SeasonObj> {
         selectedShow = ((ShowActivity) getActivity()).getSelectedShow();
         selectedSeason = ((ShowActivity) getActivity()).getSelectedSeason();
 
-        SharedPreferences sharedPreferences = getActivity().getSharedPreferences(
-                "de.monarchcode.m4lik.burningseries.LOGIN",
-                Context.MODE_PRIVATE
-        );
+        SharedPreferences sharedPreferences = PreferenceManager.getDefaultSharedPreferences(getContext());
 
-        userSession = sharedPreferences.getString("session", "");
+        userSession = sharedPreferences.getString("pref_session", "");
 
         API api = new API();
         api.setSession(userSession);

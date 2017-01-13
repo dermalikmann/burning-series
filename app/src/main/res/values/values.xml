@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+
+    <string name="pref_theme_default" translatable="false">BLUE</string>
+    <string name="theme_blue" translatable="false">Blau</string>
+    <string name="theme_orange" translatable="false">Orange</string>
+    <string name="theme_green" translatable="false">Grün</string>
+
+    <string-array name="pref_theme">
+        <item>@string/theme_blue</item>
+        <item>@string/theme_orange</item>
+        <item>@string/theme_green</item>
+    </string-array>
+
+    <string-array name="pref_theme_values">
+        <item>BLUE</item>
+        <item>ORANGE</item>
+        <item>GREEN</item>
+    </string-array>
+</resources>

@@ -1,13 +1,13 @@
 package de.monarchcode.m4lik.burningseries;
 
 import android.content.ContentValues;
-import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.net.Uri;
 import android.os.Bundle;
+import android.preference.PreferenceManager;
 import android.support.design.widget.FloatingActionButton;
 import android.support.design.widget.Snackbar;
 import android.support.v4.app.Fragment;
@@ -83,10 +83,8 @@ public class ShowActivity extends AppCompatActivity implements Callback<SeasonOb
         getSupportActionBar().setDisplayHomeAsUpEnabled(true);
         getSupportActionBar().setDisplayShowHomeEnabled(true);
 
-        SharedPreferences sharedPreferences = getApplicationContext().getSharedPreferences(
-                "de.monarchcode.m4lik.burningseries.LOGIN",
-                Context.MODE_PRIVATE);
-        userSession = sharedPreferences.getString("session", "");
+        SharedPreferences sharedPreferences = PreferenceManager.getDefaultSharedPreferences(this);
+        userSession = sharedPreferences.getString("pref_session", "");
 
         final MainDBHelper dbHelper = new MainDBHelper(getApplicationContext());
         final SQLiteDatabase db = dbHelper.getWritableDatabase();

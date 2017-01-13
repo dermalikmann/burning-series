@@ -2,11 +2,71 @@
 <PreferenceScreen xmlns:android="http://schemas.android.com/apk/res/android">
 
     <PreferenceCategory
+        android:title="@string/pref_cat_theme">
+
+        <ListPreference
+            android:defaultValue="@string/pref_theme_default"
+            android:enabled="false"
+            android:entries="@array/pref_theme"
+            android:entryValues="@array/pref_theme_values"
+            android:key="pref_theme"
+            android:summary="@string/pref_set_wip_summary"
+            android:title="@string/pref_theme"/>
+
+    </PreferenceCategory>
+
+    <PreferenceCategory
         android:key="prefcat_settings"
         android:persistent="false"
-        android:title="titten">
+        android:title="@string/pref_cat_settings">
 
-        <!-- TODO: Add settings -->
+        <PreferenceScreen
+            android:key="prefcat_behaviour"
+            android:persistent="true"
+            android:summary="@string/pref_cat_behaviour_summary"
+            android:title="@string/pref_cat_behaviour">
+
+            <intent
+                android:action="preference://prefcat_behaviour"
+                android:targetClass="de.monarchcode.m4lik.burningseries.SettingsActivity"
+                android:targetPackage="@string/app_id"/>
+
+        </PreferenceScreen>
+
+    </PreferenceCategory>
+
+    <PreferenceCategory
+        android:title="Verschiedenes">
+
+        <Preference
+            android:key="pref_pseudo_changelog"
+            android:title="@string/pref_pseudo_changelog"
+            android:summary="@string/pref_set_wip_summary"
+            android:enabled="false"/>
+
+        <Preference
+            android:key="pref_pseudo_recommend"
+            android:title="@string/pref_pseudo_website"
+            android:summary="@string/pref_pseudo_website_summary"/>
+
+    </PreferenceCategory>
+
+    <PreferenceCategory
+        android:title="Info">
+
+        <EditTextPreference
+            android:enabled="false"
+            android:key="pref_user"
+            android:defaultValue=""
+            android:title="@string/pref_pseudo_user"
+            android:summary="@string/not_logged_in"/>
+
+        <EditTextPreference
+            android:enabled="false"
+            android:key="pref_session"
+            android:defaultValue=""
+            android:title="@string/pref_peudo_session"
+            android:summary=" "/>
 
     </PreferenceCategory>
 

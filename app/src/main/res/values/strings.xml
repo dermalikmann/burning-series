@@ -84,5 +84,8 @@
     <string name="pref_theme">Theme auswählen</string>
     <string name="pref_theme_summary">Hier kannst du das generelle Farbschema der App auswählen, falls die das Standard-Blau nicht so gefällt.</string>
 
+    <string name="pref_alarm_on_mobile_data">Warnen bei mobilen Daten</string>
+    <string name="pref_alarm_on_mobile_data_summary_on">Warne mich vor jedem Video falls ich mobile Daten benutze.</string>
+    <string name="pref_alarm_on_mobile_data_summary_off">Warne mich nicht falls ich mobile Daten benutze.\n </string>
 
 </resources>

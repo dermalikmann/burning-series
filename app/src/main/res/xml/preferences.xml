@@ -31,6 +31,19 @@
                 android:targetClass="de.monarchcode.m4lik.burningseries.SettingsActivity"
                 android:targetPackage="@string/app_id"/>
 
+            <PreferenceCategory
+                android:key="prefcat_behaviour_datausage"
+                android:title="@string/pref_cat_behaviour_datausage">
+
+                <CheckBoxPreference
+                    android:defaultValue="true"
+                    android:key="pref_alarm_on_mobile_data"
+                    android:summaryOff="@string/pref_alarm_on_mobile_data_summary_off"
+                    android:summaryOn="@string/pref_alarm_on_mobile_data_summary_on"
+                    android:title="@string/pref_alarm_on_mobile_data"/>
+
+            </PreferenceCategory>
+
         </PreferenceScreen>
 
     </PreferenceCategory>

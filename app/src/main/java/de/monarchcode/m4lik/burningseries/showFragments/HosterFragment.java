@@ -139,9 +139,30 @@ public class HosterFragment extends Fragment implements Callback<EpisodeObj> {
 
         hostersListView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             @Override
-            public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
-                TextView idView = (TextView) view.findViewById(R.id.linkId);
-                showVideo(Integer.parseInt(idView.getText().toString()));
+            public void onItemClick(AdapterView<?> parent, final View view, int position, long id) {
+
+                if (PreferenceManager.getDefaultSharedPreferences(getContext()).getBoolean("pref_alarm_on_mobile_data", true) &&
+                        AndroidUtility.isOnMobile(getContext())) {
+
+                    AlertDialog.Builder builder = new AlertDialog.Builder(getContext());
+                    builder.setTitle("Mobile Daten");
+                    builder.setMessage("Achtung! Du bist über mobile Daten im Internet. Willst du Fortfahren?");
+
+                    builder.setPositiveButton("Weiter", new DialogInterface.OnClickListener() {
+                        @Override
+                        public void onClick(DialogInterface dialogInterface, int i) {
+                            TextView idView = (TextView) view.findViewById(R.id.linkId);
+                            showVideo(Integer.parseInt(idView.getText().toString()));
+                        }
+                    });
+
+                    builder.setNegativeButton("Abbrechen", null);
+
+                    builder.show();
+                } else {
+                    TextView idView = (TextView) view.findViewById(R.id.linkId);
+                    showVideo(Integer.parseInt(idView.getText().toString()));
+                }
             }
         });
     }

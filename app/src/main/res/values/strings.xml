@@ -2,6 +2,8 @@
     <string name="app_name">BurningSeries</string>
     <string name="app_id">de.monarchcode.m4lik.burningseries</string>
 
+    <!-- Navigation Drawer -->
+
     <string name="navigation_drawer_open">Öffne Navigation Drawer</string>
     <string name="navigation_drawer_close">Schließe Navigation Drawer</string>
 
@@ -11,16 +13,24 @@
     <string name="misc">Verschiedenes</string>
     <string name="share">Teilen</string>
     <string name="series">Serien</string>
+    <string name="nav_shoutbox">Shoutbox</string>
 
     <string name="logout">Logout</string>
     <string name="login">Login</string>
 
+    <!-- Actions / Menu items -->
+
     <string name="action_search">Suche in Serien ...</string>
     <string name="action_refresh">Neuladen</string>
     <string name="search_hint">Suche in Serien ...</string>
-    <string name="nav_shoutbox">Shoutbox</string>
+
+    <string name="share_using">Teilen mit</string>
+
+    <string name="no_series_found">Keine Serien gefunden</string>
+    <string name="not_logged_in">Nicht angemeldet</string>
 
     <!-- Strings related to login -->
+
     <string name="prompt_user">User</string>
     <string name="prompt_password">Passwort</string>
     <string name="action_sign_in">Einloggen</string>
@@ -34,14 +44,48 @@
     <string name="season">"Staffel "</string>
 
     <!-- Activity labels -->
+
     <string name="title_activity_scrolling">ScrollingActivity</string>
     <string name="title_activity_video_player">VideoPlayer</string>
     <string name="title_activity_login">Login</string>
     <string name="title_activity_settings">Settings</string>
 
+
+
     <!-- Preferences -->
-    <string name="preference_bs_test">Test1</string>
-    <string name="preference_bs_test_key">Test2</string>
-    <string name="preference_bs_test_default">Test3</string>
+
+    <!-- Main Categories -->
+
+    <string name="pref_cat_theme">Theme</string>
+    <string name="pref_cat_settings">Einstellungen</string>
+    <string name="pref_cat_misc">Verschiedenes</string>
+
+    <!-- Sub Categories -->
+
+    <string name="pref_cat_behaviour">Verhalten</string>
+    <string name="pref_cat_behaviour_summary">Hier kannst du verschiedene Einstellungen zum verhalten der App vornehmen, z.B. deine Startseite.</string>
+
+    <string name="pref_cat_behaviour_datausage">Datenverbrauch</string>
+
+    <!-- Pseudo Settings -->
+    <string name="pref_pseudo_changelog">Changelog</string>
+    <string name="pref_pseudo_changelog_summary">Changelog</string>
+    <string name="pref_pseudo_website">Website</string>
+    <string name="pref_pseudo_website_summary">Dir gefällt die App? Dann empfiehl sie doch deinen Freunden :)</string>
+    <string name="pref_pseudo_user">Angemeldeter Benutzer</string>
+    <string name="pref_peudo_session">Session</string>
+
+    <!-- Settings -->
+    
+    <string name="pref_dummy">Dummy Label</string>
+    <string name="pref_dummy_summary">Dummy Summary</string>
+    <string name="pref_set_wip_summary">Noch in Arbeit...</string>
+
+    <string name="pref_theme">Theme auswählen</string>
+    <string name="pref_theme_summary">Hier kannst du das generelle Farbschema der App auswählen, falls die das Standard-Blau nicht so gefällt.</string>
+
+    <string name="pref_alarm_on_mobile_data">Warnen bei mobilen Daten</string>
+    <string name="pref_alarm_on_mobile_data_summary_on">Warne mich vor jedem Video falls ich mobile Daten benutze.</string>
+    <string name="pref_alarm_on_mobile_data_summary_off">Warne mich nicht falls ich mobile Daten benutze.\n </string>
 
 </resources>

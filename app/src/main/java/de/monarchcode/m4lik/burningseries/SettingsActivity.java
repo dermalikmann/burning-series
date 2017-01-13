@@ -1,14 +1,18 @@
 package de.monarchcode.m4lik.burningseries;
 
+import android.content.Intent;
 import android.content.SharedPreferences;
 import android.os.Bundle;
+import android.preference.EditTextPreference;
 import android.preference.Preference;
-import android.preference.PreferenceActivity;
 import android.preference.PreferenceFragment;
 import android.preference.PreferenceScreen;
 import android.support.annotation.NonNull;
+import android.util.Log;
+import android.view.MenuItem;
 
 import de.monarchcode.m4lik.burningseries.util.AndroidUtility;
+import de.monarchcode.m4lik.burningseries.util.PreferenceWithActionbar;
 
 import static com.google.common.base.Strings.emptyToNull;
 
@@ -18,11 +22,14 @@ import static com.google.common.base.Strings.emptyToNull;
  * @author M4lik, mm.malik.mann@gmail.com
  */
 
-public class SettingsActivity extends PreferenceActivity {
+public class SettingsActivity extends PreferenceWithActionbar {
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+
+        getSupportActionBar().setDisplayHomeAsUpEnabled(true);
+        getSupportActionBar().setDisplayShowHomeEnabled(true);
 
         String category = null;
         String action = getIntent().getAction();
@@ -39,6 +46,18 @@ public class SettingsActivity extends PreferenceActivity {
         }
     }
 
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+        switch (item.getItemId())
+        {
+            case android.R.id.home:
+                onBackPressed();
+                return true;
+        }
+        return super.onOptionsItemSelected(item);
+    }
+
+
     public static class SettingsFragment extends PreferenceFragment
             implements SharedPreferences.OnSharedPreferenceChangeListener {
 
@@ -47,6 +66,12 @@ public class SettingsActivity extends PreferenceActivity {
             super.onCreate(savedInstanceState);
 
             addPreferencesFromResource(R.xml.preferences);
+
+            EditTextPreference userpref = (EditTextPreference) getPreferenceManager().findPreference("pref_user");
+            EditTextPreference sessionpref = (EditTextPreference) getPreferenceManager().findPreference("pref_session");
+
+            userpref.setSummary(userpref.getText());
+            sessionpref.setSummary(sessionpref.getText());
 
             String category = getArguments().getString("category");
             if (category != null) {
@@ -62,7 +87,7 @@ public class SettingsActivity extends PreferenceActivity {
             }
         }
 
-        private void hideDebugPreferences() { /** Maybe some time in the future... **/
+        private void hideDebugPreferences() {
             Preference pref = findPreference("prefcat_debug");
             if (pref != null) {
                 getPreferenceScreen().removePreference(pref);
@@ -71,6 +96,18 @@ public class SettingsActivity extends PreferenceActivity {
 
         @Override
         public boolean onPreferenceTreeClick(PreferenceScreen preferenceScreen, @NonNull Preference preference) {
+
+            String preferenceKey = preference.getKey();
+            Log.e("BS", preferenceKey);
+
+            if ("pref_pseudo_recommend".equals(preferenceKey)) {
+                String text = "Versuch mal die neue Burning Series App. https://github.com/M4lik/burning-series/releases";
+                Intent intent = new Intent(Intent.ACTION_SEND);
+                intent.setType("text/plain");
+                intent.putExtra(Intent.EXTRA_SUBJECT, "Burning-Series app");
+                intent.putExtra(Intent.EXTRA_TEXT, text);
+                startActivity(Intent.createChooser(intent, getString(R.string.share_using)));
+            }
 
             return super.onPreferenceTreeClick(preferenceScreen, preference);
         }

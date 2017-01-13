@@ -8,6 +8,7 @@ import android.content.Intent;
 import android.content.SharedPreferences;
 import android.os.Build;
 import android.os.Bundle;
+import android.preference.PreferenceManager;
 import android.support.v7.app.AppCompatActivity;
 import android.text.TextUtils;
 import android.view.View;
@@ -127,13 +128,10 @@ public class LoginActivity extends AppCompatActivity implements Callback<Respons
                 String[] data = json.split(",");
                 String session = data[1].split(":")[1].replace("\"", "").replace("}", "").trim();
                 String user = data[0].split(":")[1].replace("\"", "").replace("}", "").trim();
-                SharedPreferences sharedPreferences = getApplicationContext().getSharedPreferences(
-                        "de.monarchcode.m4lik.burningseries.LOGIN",
-                        Context.MODE_PRIVATE
-                );
+                SharedPreferences sharedPreferences = PreferenceManager.getDefaultSharedPreferences(this);
                 SharedPreferences.Editor editor = sharedPreferences.edit();
-                editor.putString("session", session);
-                editor.putString("user", user);
+                editor.putString("pref_session", session);
+                editor.putString("pref_user", user);
                 editor.commit();
 
                 Context context = getApplicationContext();

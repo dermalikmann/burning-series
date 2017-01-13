@@ -1,13 +1,15 @@
 package de.monarchcode.m4lik.burningseries.showFragments;
 
 
+import android.app.AlertDialog;
 import android.app.ProgressDialog;
-import android.content.Context;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.net.Uri;
 import android.os.AsyncTask;
 import android.os.Bundle;
+import android.preference.PreferenceManager;
 import android.support.annotation.NonNull;
 import android.support.customtabs.CustomTabsIntent;
 import android.support.design.widget.Snackbar;
@@ -35,6 +37,7 @@ import de.monarchcode.m4lik.burningseries.hoster.Hoster;
 import de.monarchcode.m4lik.burningseries.objects.EpisodeObj;
 import de.monarchcode.m4lik.burningseries.objects.HosterListItem;
 import de.monarchcode.m4lik.burningseries.objects.VideoObj;
+import de.monarchcode.m4lik.burningseries.util.AndroidUtility;
 import retrofit2.Call;
 import retrofit2.Callback;
 import retrofit2.Response;
@@ -74,13 +77,10 @@ public class HosterFragment extends Fragment implements Callback<EpisodeObj> {
         LinearLayout epicontainer = (LinearLayout) rootview.findViewById(R.id.hostercontainer);
         epicontainer.setVisibility(View.GONE);
 
-        SharedPreferences sharedPreferences = getActivity().getSharedPreferences(
-                "de.monarchcode.m4lik.burningseries.LOGIN",
-                Context.MODE_PRIVATE
-        );
+        SharedPreferences sharedPreferences = PreferenceManager.getDefaultSharedPreferences(getContext());
 
         API api = new API();
-        api.setSession(sharedPreferences.getString("session", ""));
+        api.setSession(sharedPreferences.getString("pref_session", ""));
         api.generateToken("series/" + selectedShow + "/" + selectedSeason + "/" + selectedEpisode);
         APIInterface apii = api.getInterface();
         Call<EpisodeObj> call = apii.getEpisode(api.getToken(), api.getUserAgent(), selectedShow, selectedSeason, selectedEpisode, api.getSession());
@@ -139,22 +139,40 @@ public class HosterFragment extends Fragment implements Callback<EpisodeObj> {
 
         hostersListView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             @Override
-            public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
-                TextView idView = (TextView) view.findViewById(R.id.linkId);
-                showVideo(Integer.parseInt(idView.getText().toString()));
+            public void onItemClick(AdapterView<?> parent, final View view, int position, long id) {
+
+                if (PreferenceManager.getDefaultSharedPreferences(getContext()).getBoolean("pref_alarm_on_mobile_data", true) &&
+                        AndroidUtility.isOnMobile(getContext())) {
+
+                    AlertDialog.Builder builder = new AlertDialog.Builder(getContext());
+                    builder.setTitle("Mobile Daten");
+                    builder.setMessage("Achtung! Du bist über mobile Daten im Internet. Willst du Fortfahren?");
+
+                    builder.setPositiveButton("Weiter", new DialogInterface.OnClickListener() {
+                        @Override
+                        public void onClick(DialogInterface dialogInterface, int i) {
+                            TextView idView = (TextView) view.findViewById(R.id.linkId);
+                            showVideo(Integer.parseInt(idView.getText().toString()));
+                        }
+                    });
+
+                    builder.setNegativeButton("Abbrechen", null);
+
+                    builder.show();
+                } else {
+                    TextView idView = (TextView) view.findViewById(R.id.linkId);
+                    showVideo(Integer.parseInt(idView.getText().toString()));
+                }
             }
         });
     }
 
     private void showVideo(Integer id) {
 
-        SharedPreferences sharedPreferences = getActivity().getSharedPreferences(
-                "de.monarchcode.m4lik.burningseries.LOGIN",
-                Context.MODE_PRIVATE
-        );
+        SharedPreferences sharedPreferences = PreferenceManager.getDefaultSharedPreferences(getContext());
 
         API api = new API();
-        api.setSession(sharedPreferences.getString("session", ""));
+        api.setSession(sharedPreferences.getString("pref_session", ""));
         api.generateToken("watch/" + id);
         APIInterface apii = api.getInterface();
         Call<VideoObj> call = apii.watch(api.getToken(), api.getUserAgent(), id, api.getSession());

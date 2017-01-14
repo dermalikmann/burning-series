@@ -66,14 +66,7 @@
     <string name="pref_cat_behaviour_summary">Hier kannst du verschiedene Einstellungen zum verhalten der App vornehmen, z.B. deine Startseite.</string>
 
     <string name="pref_cat_behaviour_datausage">Datenverbrauch</string>
-
-    <!-- Pseudo Settings -->
-    <string name="pref_pseudo_changelog">Changelog</string>
-    <string name="pref_pseudo_changelog_summary">Changelog</string>
-    <string name="pref_pseudo_website">Website</string>
-    <string name="pref_pseudo_website_summary">Dir gefällt die App? Dann empfiehl sie doch deinen Freunden :)</string>
-    <string name="pref_pseudo_user">Angemeldeter Benutzer</string>
-    <string name="pref_peudo_session">Session</string>
+    <string name="pref_cat_behaviour_customization">Anpassung</string>
 
     <!-- Settings -->
     
@@ -87,5 +80,16 @@
     <string name="pref_alarm_on_mobile_data">Warnen bei mobilen Daten</string>
     <string name="pref_alarm_on_mobile_data_summary_on">Warne mich vor jedem Video falls ich mobile Daten benutze.</string>
     <string name="pref_alarm_on_mobile_data_summary_off">Warne mich nicht falls ich mobile Daten benutze.\n </string>
+
+    <string name="pref_startup_view">Standardansicht</string>
+    <string name="pref_startup_view_summary">Hier kannst du feslegen, was du beim Starten der App als erstes sehen willst.</string>
+    <!-- Pseudo Settings -->
+
+    <string name="pref_pseudo_changelog">Changelog</string>
+    <string name="pref_pseudo_changelog_summary">Changelog</string>
+    <string name="pref_pseudo_website">Website</string>
+    <string name="pref_pseudo_website_summary">Dir gefällt die App? Dann empfiehl sie doch deinen Freunden :)</string>
+    <string name="pref_pseudo_user">Angemeldeter Benutzer</string>
+    <string name="pref_peudo_session">Session</string>
 
 </resources>

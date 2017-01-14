@@ -44,6 +44,20 @@
 
             </PreferenceCategory>
 
+            <PreferenceCategory
+                android:key="prefcat_behaviour_customization"
+                android:title="@string/pref_cat_behaviour_customization">
+
+                <ListPreference
+                    android:defaultValue="@string/pref_startup_view_default"
+                    android:entries="@array/pref_startup_view"
+                    android:entryValues="@array/pref_startup_view_values"
+                    android:key="pref_startup_view"
+                    android:summary="@string/pref_startup_view_summary"
+                    android:title="@string/pref_startup_view"/>
+
+            </PreferenceCategory>
+
         </PreferenceScreen>
 
     </PreferenceCategory>

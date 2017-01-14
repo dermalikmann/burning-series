@@ -17,4 +17,21 @@
         <item>ORANGE</item>
         <item>GREEN</item>
     </string-array>
+
+    <string name="pref_startup_view_default" translatable="false">series</string>
+    <string name="startup_series">Alle Serien</string>
+    <string name="startup_genres">Genres</string>
+    <string name="startup_favorites">Favoriten</string>
+
+    <string-array name="pref_startup_view">
+        <item>@string/startup_series</item>
+        <item>@string/startup_genres</item>
+        <item>@string/startup_favorites</item>
+    </string-array>
+
+    <string-array name="pref_startup_view_values">
+        <item>series</item>
+        <item>genres</item>
+        <item>favorites</item>
+    </string-array>
 </resources>

@@ -117,7 +117,7 @@ public class API {
         return new String(cArr);
     }
 
-    /**
+    /*
      * Getter & Setter
      */
 

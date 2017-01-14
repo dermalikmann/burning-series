@@ -40,6 +40,7 @@ import de.monarchcode.m4lik.burningseries.mainFragments.SeriesFragment;
 import de.monarchcode.m4lik.burningseries.objects.GenreMap;
 import de.monarchcode.m4lik.burningseries.objects.GenreObj;
 import de.monarchcode.m4lik.burningseries.objects.ShowObj;
+import de.monarchcode.m4lik.burningseries.util.Settings;
 import okhttp3.ResponseBody;
 import retrofit2.Call;
 import retrofit2.Callback;
@@ -119,7 +120,7 @@ public class MainActivity extends AppCompatActivity
     public void onBackPressed() {
 
         if (seriesList) {
-            setFragment("genresFragment");
+            setFragment("genres");
             seriesList = false;
             return;
         }
@@ -156,7 +157,7 @@ public class MainActivity extends AppCompatActivity
         if (c.getCount() == 0)
             fetchSeries();
         else
-            setFragment("seriesFragment");
+            setFragment(Settings.of(getApplicationContext()).getStartupView());
 
         c.close();
 
@@ -167,16 +168,13 @@ public class MainActivity extends AppCompatActivity
     public boolean onOptionsItemSelected(MenuItem item) {
         if (item.getItemId() == R.id.action_refresh) {
             switch (visibleFragment) {
-                case "genresFragment":
+                case "genres":
                     fetchSeries();
                     break;
-                case "favsFragment":
+                case "favorites":
                     fetchSeries();
                     break;
-                case "seriesFragment":
-                    fetchSeries();
-                    break;
-                default:
+                case "series":
                     fetchSeries();
                     break;
             }
@@ -193,15 +191,15 @@ public class MainActivity extends AppCompatActivity
         switch (item.getItemId()) {
 
             case R.id.nav_series:
-                setFragment("seriesFragment");
+                setFragment("series");
                 break;
 
             case R.id.nav_genres:
-                setFragment("genresFragment");
+                setFragment("genres");
                 break;
 
             case R.id.nav_favs:
-                setFragment("favsFragment");
+                setFragment("favorites");
                 break;
 
             case R.id.login_menu_item:
@@ -277,26 +275,26 @@ public class MainActivity extends AppCompatActivity
         MenuItem searchItem = getMenu().findItem(R.id.action_search);
 
         if (fragment == null)
-            fragment = "seriesFragment";
+            fragment = "series";
 
         switch (fragment) {
-            case "genresFragment":
+            case "genres":
                 searchItem.setVisible(false);
                 transaction.replace(R.id.fragmentContainerMain, new GenresFragment());
                 transaction.commit();
-                visibleFragment = "genresFragment";
+                visibleFragment = "genres";
                 break;
-            case "favsFragment":
+            case "favorites":
                 searchItem.setVisible(true);
                 transaction.replace(R.id.fragmentContainerMain, new FavsFragment());
                 transaction.commit();
-                visibleFragment = "favsFragment";
+                visibleFragment = "favorites";
                 break;
             default:
                 searchItem.setVisible(true);
                 transaction.replace(R.id.fragmentContainerMain, new SeriesFragment());
                 transaction.commit();
-                visibleFragment = "seriesFragment";
+                visibleFragment = "series";
                 break;
         }
     }

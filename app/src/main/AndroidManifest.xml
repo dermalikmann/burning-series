@@ -40,16 +40,6 @@
             android:label="@string/title_activity_login"
             android:screenOrientation="portrait" />
         <activity
-            android:name=".simpleVideoPlayer"
-            android:label="@string/title_activity_video_player"
-            android:screenOrientation="landscape" />
-        <activity
-            android:name=".FullScreenVideoPlayer"
-            android:configChanges="orientation|keyboardHidden|screenSize"
-            android:label="@string/title_activity_full_screen_video_player"
-            android:screenOrientation="landscape"
-            android:theme="@style/FullscreenTheme" />
-        <activity
             android:name=".BufferedVideoPlayerActivity"
             android:screenOrientation="landscape"
             android:theme="@style/BurningSeries.NoActionBar.Dark" />

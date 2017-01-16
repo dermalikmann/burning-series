@@ -205,9 +205,9 @@ public class ShowActivity extends AppCompatActivity implements Callback<SeasonOb
         super.onDestroy();
     }
 
-    /**
+    /*
      * Getter & Setter
-     **/
+     */
 
     public String getDescription() {
         return description;
@@ -245,9 +245,9 @@ public class ShowActivity extends AppCompatActivity implements Callback<SeasonOb
         this.fragmentView = fragmentView;
     }
 
-    /**
+    /*
      * Fragment transactions
-     **/
+     */
 
     public void switchSeasonsToEpisodes() {
 

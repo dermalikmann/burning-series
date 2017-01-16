@@ -3,6 +3,7 @@ package de.monarchcode.m4lik.burningseries.util;
 import android.content.Context;
 import android.net.ConnectivityManager;
 import android.os.Bundle;
+import android.os.Looper;
 import android.support.v4.net.ConnectivityManagerCompat;
 
 import com.google.common.cache.Cache;
@@ -43,5 +44,15 @@ public class AndroidUtility {
                 .getSystemService(Context.CONNECTIVITY_SERVICE);
 
         return ConnectivityManagerCompat.isActiveNetworkMetered(cm);
+    }
+
+    public static void checkMainThread() {
+        if (Looper.getMainLooper().getThread() != Thread.currentThread())
+            throw new IllegalStateException("Must be called from the main thread.");
+    }
+
+    public static void checkNotMainThread() {
+        if (Looper.getMainLooper().getThread() == Thread.currentThread())
+            throw new IllegalStateException("Must not be called from the main thread.");
     }
 }

@@ -3,6 +3,19 @@
     <color name="colorPrimary">#4354a9</color>
     <color name="colorPrimaryDark">#303F9F</color>
     <color name="colorAccent">#4070ff</color>
+
+    <color name="blue_primary">#4354a9</color>
+    <color name="blue_primary_dark">#303F9F</color>
+    <color name="blue_accent">@color/blue_primary</color>
+
+    <color name="green_primary">#4caf50</color>
+    <color name="green_primary_dark">#2b6a2e</color>
+    <color name="green_accent">@color/green_primary</color>
+
+    <color name="orange_primary">#f8782d</color>
+    <color name="orange_primary_dark">#ba5b24</color>
+    <color name="orange_accent">@color/orange_primary</color>
+
     <color name="bs">#ff112277</color>
     <color name="bsdark">#ff0d1c5b</color>
     <color name="bslight">#ff4455aa</color>

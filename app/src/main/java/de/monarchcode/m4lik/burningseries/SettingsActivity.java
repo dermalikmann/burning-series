@@ -17,9 +17,9 @@ import de.monarchcode.m4lik.burningseries.util.PreferenceWithActionbar;
 import static com.google.common.base.Strings.emptyToNull;
 
 /**
- * Created by Malik (M4lik) on 12.01.2017.
+ * Created by Malik on 12.01.2017.
  *
- * @author M4lik, mm.malik.mann@gmail.com
+ * @author Malik Mann
  */
 
 public class SettingsActivity extends PreferenceWithActionbar {
@@ -70,8 +70,8 @@ public class SettingsActivity extends PreferenceWithActionbar {
             EditTextPreference userpref = (EditTextPreference) getPreferenceManager().findPreference("pref_user");
             EditTextPreference sessionpref = (EditTextPreference) getPreferenceManager().findPreference("pref_session");
 
-            userpref.setSummary(userpref.getText());
-            sessionpref.setSummary(sessionpref.getText());
+            userpref.setSummary(userpref.getText().equals("")? "Nicht angemeldet" : userpref.getText());
+            sessionpref.setSummary(sessionpref.getText().equals("")? " " : sessionpref.getText());
 
             String category = getArguments().getString("category");
             if (category != null) {

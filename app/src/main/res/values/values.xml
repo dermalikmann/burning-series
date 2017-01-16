@@ -34,4 +34,5 @@
         <item>genres</item>
         <item>favorites</item>
     </string-array>
+    <color name="background_material_light">#db0505</color>
 </resources>

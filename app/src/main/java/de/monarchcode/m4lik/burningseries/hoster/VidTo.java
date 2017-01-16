@@ -12,14 +12,12 @@ import java.util.regex.Pattern;
  * Created by Malik on 04.11.2016.
  */
 public class VidTo extends Hoster {
-    protected static final Pattern idPattern;
     protected static final Pattern filenamePattern;
     protected static final Pattern hashPattern;
     protected static final Pattern geturlPattern;
 
     static {
-        idPattern = Pattern.compile("<input type=\"hidden\" name=\"fid\" value=\"([0-9a-zA-Z-._ ]+)\">");
-        filenamePattern = Pattern.compile("<input type=\"hidden\" name=\"fname\" value=\"([0-9a-zA-Z-._ ]+)\">");
+        filenamePattern = Pattern.compile("<input type=\"hidden\" name=\"fname\" value=\"(.*)\">");
         hashPattern = Pattern.compile("<input type=\"hidden\" name=\"hash\" value=\"([a-zA-Z0-9-]+)\">");
         geturlPattern = Pattern.compile("',\\d+,\\d+,'");
     }

@@ -27,13 +27,17 @@ public class PowerWatch extends Hoster {
                 //Oh damnit. Took too long...
                 return "1";
             }
+
             Map dataArgs = new HashMap(7);
+
             Matcher matcher = filenamePattern.matcher(GetRequest);
             Matcher matcher2 = hashPattern.matcher(GetRequest);
+
             if (!matcher.find() || !matcher2.find()) {
                 //The Skies are clear. Unusual.
                 return "2";
             }
+
             dataArgs.put("fname", matcher.group(1));
             dataArgs.put("hash", matcher2.group(1));
             dataArgs.put("op", "download1");

@@ -83,6 +83,9 @@ public class Hoster {
             case "vidto":
                 VidTo vt = new VidTo();
                 return vt.get(videoID);
+            case "thevideo":
+                TheVideo tv = new TheVideo();
+                return tv.get(videoID);
             default:
                 return "unkown_hoster";
         }
@@ -113,16 +116,16 @@ public class Hoster {
         return GetRequestString(str, new HashMap(0));
     }
 
-
     String PostRequestString(String url, Map<String, String> dataArgs, Map<String, String> refererArgs) throws IOException {
         HttpURLConnection httpURLConnection = (HttpURLConnection) new URL(url).openConnection();
         httpURLConnection.setRequestMethod("POST");
         httpURLConnection.setRequestProperty("Content-Type", "application/x-www-form-urlencoded");
         httpURLConnection.setRequestProperty("User-Agent", selectUAS());
 
-        for (Map.Entry entry : refererArgs.entrySet()) {
-            httpURLConnection.setRequestProperty((String) entry.getKey(), (String) entry.getValue());
-        }
+        if (refererArgs != null)
+            for (Map.Entry entry : refererArgs.entrySet()) {
+                httpURLConnection.setRequestProperty((String) entry.getKey(), (String) entry.getValue());
+            }
 
         httpURLConnection.setDoInput(true);
         httpURLConnection.setDoOutput(true);
@@ -136,6 +139,10 @@ public class Hoster {
         outputStream.close();
         httpURLConnection.connect();
         return getConnectionString(httpURLConnection);
+    }
+
+    String PostRequestString(String url, Map<String, String> dataArgs) throws IOException {
+        return PostRequestString(url, dataArgs, null);
     }
 
     private String map2URLEncodedString(Map<String, String> map) throws IOException {

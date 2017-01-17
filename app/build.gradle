@@ -5,11 +5,11 @@ android {
     buildToolsVersion "25.0.1"
 
     defaultConfig {
-        applicationId "de.monarchcode.m4lik.burningseries"
+        applicationId "de.m4lik.burningseries"
         minSdkVersion 19
         targetSdkVersion 24
-        versionCode 27
-        versionName "v0.9.9"
+        versionCode 35
+        versionName "0.9.13"
         vectorDrawables.useSupportLibrary = true
     }
     buildTypes {
@@ -28,16 +28,16 @@ repositories {
 dependencies {
     compile fileTree(dir: 'libs', include: ['*.jar'])
 
-    compile 'com.android.support:appcompat-v7:25.0.1'
-    compile 'com.android.support:customtabs:25.0.1'
-    compile 'com.android.support:design:25.0.1'
-    compile 'com.android.support:percent:25.0.1'
-    compile 'com.android.support:support-v4:25.0.1'
+    compile 'com.android.support:appcompat-v7:25.1.0'
+    compile 'com.android.support:customtabs:25.1.0'
+    compile 'com.android.support:design:25.1.0'
+    compile 'com.android.support:percent:25.1.0'
+    compile 'com.android.support:support-v4:25.1.0'
     compile 'com.android.support.constraint:constraint-layout:1.0.0-alpha8'
 
     compile 'com.devbrackets.android:exomedia:3.1.0'
 
-    compile 'com.google.android.gms:play-services-gcm:10.0.0'
+    compile 'com.google.android.gms:play-services-gcm:10.0.1'
     compile 'com.google.code.gson:gson:2.7'
     compile 'com.google.firebase:firebase-auth:9.8.0'
     compile 'com.google.firebase:firebase-core:9.8.0'

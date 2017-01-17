@@ -7,10 +7,10 @@
 
 # Java class files
 *.class
-
 # Androidstudio/IntelliJ folder
 .idea/
 .idea/*
+
 
 # Generated files
 bin/
@@ -37,3 +37,4 @@ captures/
 
 # my stuff
 hoaster_bkp/
+gitignore/

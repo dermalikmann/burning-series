@@ -1,0 +1,38 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+
+    <string name="pref_theme_default" translatable="false">BLUE</string>
+    <string name="theme_blue" translatable="false">Blau</string>
+    <string name="theme_orange" translatable="false">Orange</string>
+    <string name="theme_green" translatable="false">Grün</string>
+
+    <string-array name="pref_theme">
+        <item>@string/theme_blue</item>
+        <item>@string/theme_orange</item>
+        <item>@string/theme_green</item>
+    </string-array>
+
+    <string-array name="pref_theme_values">
+        <item>BLUE</item>
+        <item>ORANGE</item>
+        <item>GREEN</item>
+    </string-array>
+
+    <string name="pref_startup_view_default" translatable="false">series</string>
+    <string name="startup_series">Alle Serien</string>
+    <string name="startup_genres">Genres</string>
+    <string name="startup_favorites">Favoriten</string>
+
+    <string-array name="pref_startup_view">
+        <item>@string/startup_series</item>
+        <item>@string/startup_genres</item>
+        <item>@string/startup_favorites</item>
+    </string-array>
+
+    <string-array name="pref_startup_view_values">
+        <item>series</item>
+        <item>genres</item>
+        <item>favorites</item>
+    </string-array>
+    <color name="background_material_light">#db0505</color>
+</resources>

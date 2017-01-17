@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
-    package="de.monarchcode.m4lik.burningseries">
+    package="de.m4lik.burningseries">
 
     <application
         android:allowBackup="true"
@@ -12,9 +12,9 @@
             android:name=".SplashActivity"
             android:theme="@style/SplashTheme">
             <intent-filter>
-                <action android:name="android.intent.action.MAIN"/>
+                <action android:name="android.intent.action.MAIN" />
 
-                <category android:name="android.intent.category.LAUNCHER"/>
+                <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
         <activity
@@ -23,36 +23,33 @@
             android:screenOrientation="portrait"
             android:theme="@style/BurningSeries.NoActionBar">
             <intent-filter>
-                <action android:name="android.intent.action.SEARCH"/>
+                <action android:name="android.intent.action.SEARCH" />
             </intent-filter>
-
             <meta-data
                 android:name="android.app.searchable"
-                android:resource="@xml/searchable"/>
+                android:resource="@xml/searchable" />
         </activity>
         <activity
             android:name=".ShowActivity"
             android:label="@string/title_activity_scrolling"
             android:screenOrientation="portrait"
-            android:theme="@style/BurningSeries.NoActionBar"/>
+            android:theme="@style/BurningSeries.NoActionBar" />
         <activity
             android:name=".LoginActivity"
             android:label="@string/title_activity_login"
-            android:screenOrientation="portrait"/>
-        <activity
-            android:name=".simpleVideoPlayer"
-            android:label="@string/title_activity_video_player"
-            android:screenOrientation="landscape"/>
-        <activity
-            android:name=".FullScreenVideoPlayer"
-            android:configChanges="orientation|keyboardHidden|screenSize"
-            android:label="@string/title_activity_full_screen_video_player"
-            android:screenOrientation="landscape"
-            android:theme="@style/FullscreenTheme"/>
+            android:screenOrientation="portrait" />
         <activity
             android:name=".BufferedVideoPlayerActivity"
             android:screenOrientation="landscape"
-            android:theme="@style/BurningSeries.NoActionBar"/>
+            android:theme="@style/BurningSeries.NoActionBar.Dark" />
+        <activity
+            android:name=".SettingsActivity"
+            android:label="@string/settings"
+            android:screenOrientation="portrait">
+            <meta-data
+                android:name="android.support.PARENT_ACTIVITY"
+                android:value=".MainActivity" />
+        </activity>
     </application>
 
 </manifest>

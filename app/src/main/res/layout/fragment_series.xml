@@ -19,7 +19,7 @@
         app:indicatorColor="@color/colorPrimaryDark"/>
 
     <TextView
-        android:text="TextView"
+        android:text="@string/no_series_found"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:id="@+id/nothing_found"

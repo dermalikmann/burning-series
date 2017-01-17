@@ -33,6 +33,7 @@ public class Hoster {
     static {
         compatibleHosters.add("PowerWatch");
         compatibleHosters.add("Vidto");
+        compatibleHosters.add("TheVideo");
         userAgents = new String[]{
                 "Mozilla/5.0 (Windows NT 6.3; rv:36.0) Gecko/20100101 Firefox/36.0",
                 "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_10; rv:33.0) Gecko/20100101 Firefox/33.0",

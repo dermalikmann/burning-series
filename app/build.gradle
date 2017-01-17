@@ -5,7 +5,7 @@ android {
     buildToolsVersion "25.0.1"
 
     defaultConfig {
-        applicationId "de.monarchcode.m4lik.burningseries"
+        applicationId "de.m4lik.burningseries"
         minSdkVersion 19
         targetSdkVersion 24
         versionCode 30

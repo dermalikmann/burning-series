@@ -8,7 +8,7 @@
     android:paddingLeft="@dimen/activity_horizontal_margin"
     android:paddingRight="@dimen/activity_horizontal_margin"
     android:paddingTop="@dimen/activity_vertical_margin"
-    tools:context="de.monarchcode.m4lik.burningseries.LoginActivity">
+    tools:context="de.m4lik.burningseries.LoginActivity">
 
     <!-- Login progress -->
     <ProgressBar

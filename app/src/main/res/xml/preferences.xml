@@ -28,7 +28,7 @@
 
             <intent
                 android:action="preference://prefcat_behaviour"
-                android:targetClass="de.monarchcode.m4lik.burningseries.SettingsActivity"
+                android:targetClass="de.m4lik.burningseries.SettingsActivity"
                 android:targetPackage="@string/app_id"/>
 
             <PreferenceCategory

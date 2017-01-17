@@ -115,10 +115,6 @@ public class MainActivity extends AppCompatActivity
             navigationView.getMenu().findItem(R.id.login_menu_item).setVisible(false);
             navigationView.getMenu().findItem(R.id.logout_menu_item).setVisible(true);
         }
-        Snackbar snackbar = Snackbar.make(findViewById(android.R.id.content), "Test Test", Snackbar.LENGTH_SHORT);
-        View snackbarView = snackbar.getView();
-        snackbarView.setBackgroundColor(ContextCompat.getColor(getApplicationContext(), ThemeHelperService.theme().primaryColor));
-        snackbar.show();
     }
 
     @Override

@@ -10,7 +10,7 @@ import java.util.Map;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-public class PowerWatch extends Hoster {
+class PowerWatch extends Hoster {
     protected static final Pattern filenamePattern;
     protected static final Pattern hashPattern;
     protected static final Pattern urlPattern;

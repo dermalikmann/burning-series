@@ -13,7 +13,7 @@ import java.util.regex.Pattern;
 /**
  * Created by Malik on 04.11.2016.
  */
-public class VidTo extends Hoster {
+class VidTo extends Hoster {
     protected static final Pattern filenamePattern;
     protected static final Pattern hashPattern;
     protected static final Pattern geturlPattern;

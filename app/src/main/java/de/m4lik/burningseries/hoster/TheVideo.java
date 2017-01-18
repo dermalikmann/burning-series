@@ -9,7 +9,7 @@ import java.util.Map;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-public class TheVideo extends Hoster {
+class TheVideo extends Hoster {
     protected static final Pattern filenamePattern;
     protected static final Pattern hashPattern;
     protected static final Pattern mpriPattern;

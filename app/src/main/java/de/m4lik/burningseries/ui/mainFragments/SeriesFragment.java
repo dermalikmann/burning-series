@@ -1,4 +1,4 @@
-package de.m4lik.burningseries.mainFragments;
+package de.m4lik.burningseries.ui.mainFragments;
 
 
 import android.content.ContentValues;
@@ -31,7 +31,7 @@ import de.m4lik.burningseries.api.API;
 import de.m4lik.burningseries.api.APIInterface;
 import de.m4lik.burningseries.database.MainDBHelper;
 import de.m4lik.burningseries.database.SeriesContract;
-import de.m4lik.burningseries.objects.ShowListItem;
+import de.m4lik.burningseries.ui.listitems.ShowListItem;
 import de.m4lik.burningseries.util.Logger;
 import okhttp3.ResponseBody;
 import retrofit2.Call;

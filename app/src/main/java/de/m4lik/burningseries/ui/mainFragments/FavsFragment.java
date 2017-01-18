@@ -1,4 +1,4 @@
-package de.m4lik.burningseries.mainFragments;
+package de.m4lik.burningseries.ui.mainFragments;
 
 import android.content.Intent;
 import android.database.Cursor;
@@ -24,7 +24,7 @@ import de.m4lik.burningseries.R;
 import de.m4lik.burningseries.ShowActivity;
 import de.m4lik.burningseries.database.MainDBHelper;
 import de.m4lik.burningseries.database.SeriesContract;
-import de.m4lik.burningseries.objects.ShowListItem;
+import de.m4lik.burningseries.ui.listitems.ShowListItem;
 
 import static de.m4lik.burningseries.database.SeriesContract.seriesTable.COLUMN_NAME_ISFAV;
 import static de.m4lik.burningseries.database.SeriesContract.seriesTable.COLUMN_NAME_TITLE;

@@ -1,4 +1,4 @@
-package de.m4lik.burningseries.showFragments;
+package de.m4lik.burningseries.ui.showFragments;
 
 
 import android.app.AlertDialog;
@@ -34,9 +34,9 @@ import de.m4lik.burningseries.ShowActivity;
 import de.m4lik.burningseries.api.API;
 import de.m4lik.burningseries.api.APIInterface;
 import de.m4lik.burningseries.hoster.Hoster;
-import de.m4lik.burningseries.objects.EpisodeObj;
-import de.m4lik.burningseries.objects.HosterListItem;
-import de.m4lik.burningseries.objects.VideoObj;
+import de.m4lik.burningseries.api.objects.EpisodeObj;
+import de.m4lik.burningseries.ui.listitems.HosterListItem;
+import de.m4lik.burningseries.api.objects.VideoObj;
 import de.m4lik.burningseries.util.AndroidUtility;
 import retrofit2.Call;
 import retrofit2.Callback;

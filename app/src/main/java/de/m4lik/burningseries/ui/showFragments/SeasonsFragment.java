@@ -1,4 +1,4 @@
-package de.m4lik.burningseries.showFragments;
+package de.m4lik.burningseries.ui.showFragments;
 
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
@@ -15,7 +15,7 @@ import java.util.ArrayList;
 
 import de.m4lik.burningseries.R;
 import de.m4lik.burningseries.ShowActivity;
-import de.m4lik.burningseries.objects.SeasonListItem;
+import de.m4lik.burningseries.ui.listitems.SeasonListItem;
 
 public class SeasonsFragment extends Fragment {
 

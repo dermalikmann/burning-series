@@ -1,4 +1,4 @@
-package de.m4lik.burningseries.mainFragments;
+package de.m4lik.burningseries.ui.mainFragments;
 
 import android.app.ProgressDialog;
 import android.content.Intent;
@@ -23,8 +23,8 @@ import de.m4lik.burningseries.MainActivity;
 import de.m4lik.burningseries.R;
 import de.m4lik.burningseries.ShowActivity;
 import de.m4lik.burningseries.database.MainDBHelper;
-import de.m4lik.burningseries.objects.GenreListItem;
-import de.m4lik.burningseries.objects.ShowListItem;
+import de.m4lik.burningseries.ui.listitems.GenreListItem;
+import de.m4lik.burningseries.ui.listitems.ShowListItem;
 import de.m4lik.burningseries.util.Logger;
 
 import static de.m4lik.burningseries.database.SeriesContract.genresTable;

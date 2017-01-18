@@ -1,4 +1,4 @@
-package de.m4lik.burningseries.objects;
+package de.m4lik.burningseries.api.objects;
 
 /**
  * Created by Malik on 01.10.2016.

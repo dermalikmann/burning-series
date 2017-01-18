@@ -1,4 +1,4 @@
-package de.m4lik.burningseries.objects;
+package de.m4lik.burningseries.api.objects;
 
 import com.google.gson.annotations.SerializedName;
 

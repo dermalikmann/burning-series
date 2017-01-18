@@ -32,6 +32,7 @@ import de.m4lik.burningseries.api.APIInterface;
 import de.m4lik.burningseries.database.MainDBHelper;
 import de.m4lik.burningseries.database.SeriesContract;
 import de.m4lik.burningseries.objects.ShowListItem;
+import de.m4lik.burningseries.util.Logger;
 import okhttp3.ResponseBody;
 import retrofit2.Call;
 import retrofit2.Callback;
@@ -215,10 +216,11 @@ public class SeriesFragment extends Fragment {
             getSeriesListView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
                 @Override
                 public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
-                    TextView nameView = (TextView) view.findViewById(R.id.seriesTitle);
-                    TextView idView = (TextView) view.findViewById(R.id.seriesId);
-                    TextView genreView = (TextView) view.findViewById(R.id.seriesGenre);
-                    showSeries(Integer.parseInt(idView.getText().toString()), nameView.getText().toString(), genreView.getText().toString());
+                    String nameString = ((TextView) view.findViewById(R.id.seriesTitle)).getText().toString();
+                    String idString = ((TextView) view.findViewById(R.id.seriesId)).getText().toString();
+                    String genreString = ((TextView) view.findViewById(R.id.seriesGenre)).getText().toString();
+                    Logger.logSeriesSelection(getContext(), idString, nameString);
+                    showSeries(Integer.parseInt(idString), nameString, genreString);
                 }
             });
 
@@ -231,7 +233,6 @@ public class SeriesFragment extends Fragment {
         Intent i = new Intent(getActivity(), ShowActivity.class);
         i.putExtra("ShowName", name);
         i.putExtra("ShowID", id);
-        i.putExtra("ShowGenre", genre);
         startActivity(i);
     }
 

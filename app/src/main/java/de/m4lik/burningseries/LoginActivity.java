@@ -21,6 +21,7 @@ import java.io.IOException;
 import de.m4lik.burningseries.api.API;
 import de.m4lik.burningseries.api.APIInterface;
 import de.m4lik.burningseries.database.MainDBHelper;
+import de.m4lik.burningseries.util.Logger;
 import okhttp3.ResponseBody;
 import retrofit2.Call;
 import retrofit2.Callback;
@@ -137,6 +138,8 @@ public class LoginActivity extends AppCompatActivity implements Callback<Respons
                 Context context = getApplicationContext();
 
                 getApplicationContext().deleteDatabase(MainDBHelper.DATABASE_NAME);
+
+                Logger.login(context);
 
                 Intent intent = new Intent(this, MainActivity.class);
                 intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP | Intent.FLAG_ACTIVITY_NEW_TASK);

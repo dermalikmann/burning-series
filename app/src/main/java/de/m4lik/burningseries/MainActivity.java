@@ -41,6 +41,7 @@ import de.m4lik.burningseries.objects.GenreMap;
 import de.m4lik.burningseries.objects.GenreObj;
 import de.m4lik.burningseries.objects.ShowObj;
 import de.m4lik.burningseries.services.ThemeHelperService;
+import de.m4lik.burningseries.util.Logger;
 import de.m4lik.burningseries.util.Settings;
 import okhttp3.ResponseBody;
 import retrofit2.Call;
@@ -238,6 +239,7 @@ public class MainActivity extends AppCompatActivity
         api.setSession(sharedPreferences.getString("pref_session", ""));
         api.generateToken("logout");
 
+        Logger.logout(getApplicationContext());
 
         APIInterface apii = api.getInterface();
         Call<ResponseBody> call = apii.logout(api.getToken(), api.getUserAgent(), api.getSession());

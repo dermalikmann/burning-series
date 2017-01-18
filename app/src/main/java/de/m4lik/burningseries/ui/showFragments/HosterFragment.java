@@ -38,6 +38,7 @@ import de.m4lik.burningseries.api.objects.EpisodeObj;
 import de.m4lik.burningseries.ui.listitems.HosterListItem;
 import de.m4lik.burningseries.api.objects.VideoObj;
 import de.m4lik.burningseries.util.AndroidUtility;
+import de.m4lik.burningseries.util.Settings;
 import retrofit2.Call;
 import retrofit2.Callback;
 import retrofit2.Response;
@@ -141,7 +142,7 @@ public class HosterFragment extends Fragment implements Callback<EpisodeObj> {
             @Override
             public void onItemClick(AdapterView<?> parent, final View view, int position, long id) {
 
-                if (PreferenceManager.getDefaultSharedPreferences(getContext()).getBoolean("pref_alarm_on_mobile_data", true) &&
+                if (Settings.of(getContext()).alarmOnMobile() &&
                         AndroidUtility.isOnMobile(getContext())) {
 
                     AlertDialog.Builder builder = new AlertDialog.Builder(getContext());

@@ -6,6 +6,7 @@ import android.content.Intent;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.os.Bundle;
+import android.support.annotation.Nullable;
 import android.support.design.widget.Snackbar;
 import android.support.v4.app.Fragment;
 import android.support.v4.content.ContextCompat;
@@ -67,9 +68,16 @@ public class SeriesFragment extends Fragment {
         rootView = inflater.inflate(R.layout.fragment_series, container, false);
         getSeriesListView = (ListView) rootView.findViewById(R.id.seriesListView);
 
-        MenuItem searchItem = MainActivity.getMenu().findItem(R.id.action_search);
-        searchItem.setVisible(true);
+        fillList();
+        showList();
 
+        return rootView;
+    }
+
+    @Override
+    public void onViewCreated(View view, @Nullable Bundle savedInstanceState) {
+
+        MenuItem searchItem = MainActivity.getMenu().findItem(R.id.action_search);
         SearchView searchView = (SearchView) MenuItemCompat.getActionView(searchItem);
         searchView.setOnQueryTextListener(new SearchView.OnQueryTextListener() {
             @Override
@@ -84,20 +92,17 @@ public class SeriesFragment extends Fragment {
             }
         });
 
-
-        fillList();
-        showList();
-
-
-        return rootView;
+        super.onViewCreated(view, savedInstanceState);
     }
 
     public void filterList(String query) {
 
+        query = query.toLowerCase();
+
         List<ShowListItem> filteredList = new ArrayList<>();
 
         for (ShowListItem single : seriesList) {
-            if (single.getTitle().toLowerCase().contains(query.toLowerCase()))
+            if (single.getTitle().toLowerCase().contains(query))
                 filteredList.add(single);
         }
 
@@ -219,7 +224,7 @@ public class SeriesFragment extends Fragment {
                     String nameString = ((TextView) view.findViewById(R.id.seriesTitle)).getText().toString();
                     String idString = ((TextView) view.findViewById(R.id.seriesId)).getText().toString();
                     String genreString = ((TextView) view.findViewById(R.id.seriesGenre)).getText().toString();
-                    Logger.logSeriesSelection(getContext(), idString, nameString);
+                    Logger.seriesSelection(getContext(), idString, nameString);
                     showSeries(Integer.parseInt(idString), nameString, genreString);
                 }
             });

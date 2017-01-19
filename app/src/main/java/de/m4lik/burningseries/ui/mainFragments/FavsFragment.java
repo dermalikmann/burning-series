@@ -45,12 +45,6 @@ public class FavsFragment extends Fragment {
                              Bundle savedInstanceState) {
         View rootView = inflater.inflate(R.layout.fragment_favs, container, false);
 
-        MenuItem menuItem = MainActivity.menu.findItem(R.id.action_search);
-        menuItem.setVisible(false);
-
-        SearchView searchView = (SearchView) MenuItemCompat.getActionView(menuItem);
-        searchView.setOnQueryTextListener(null);
-
         ListView favsListView = (ListView) rootView.findViewById(R.id.favsListView);
 
         favs.clear();

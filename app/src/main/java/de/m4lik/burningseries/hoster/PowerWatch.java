@@ -3,12 +3,14 @@ package de.m4lik.burningseries.hoster;
 import android.os.SystemClock;
 import android.util.Log;
 
+import com.google.firebase.crash.FirebaseCrash;
+
 import java.util.HashMap;
 import java.util.Map;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-public class PowerWatch extends Hoster {
+class PowerWatch extends Hoster {
     protected static final Pattern filenamePattern;
     protected static final Pattern hashPattern;
     protected static final Pattern urlPattern;
@@ -53,17 +55,19 @@ public class PowerWatch extends Hoster {
                 if (matcher3.find()) {
                     return matcher3.group(1);
                 }
-                Log.e("BS", "Error while finding video URL");
+                FirebaseCrash.logcat(Log.ERROR, "HOSTER", "No video URL found (" + fullURL + ")");
                 //We ain't found shit, Sir!
                 return "3";
             } catch (Exception e) {
                 e.printStackTrace();
-                Log.e("BS", "Error while fetching video URL");
+                FirebaseCrash.logcat(Log.ERROR, "HOSTER", "Error while fetching video URL (" + fullURL + ")");
+                FirebaseCrash.report(e);
                 return "4";
             }
         } catch (Exception e) {
             e.printStackTrace();
-            Log.e("BS", "Error while getting video page");
+            FirebaseCrash.logcat(Log.ERROR, "HOSTER", "Error while getting video page (" + fullURL + ")");
+            FirebaseCrash.report(e);
             //Whoops... The thing broke.
             return "5";
         }

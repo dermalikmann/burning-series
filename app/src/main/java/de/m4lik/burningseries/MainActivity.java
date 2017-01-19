@@ -34,13 +34,14 @@ import java.util.Map;
 import de.m4lik.burningseries.api.API;
 import de.m4lik.burningseries.api.APIInterface;
 import de.m4lik.burningseries.database.MainDBHelper;
-import de.m4lik.burningseries.mainFragments.FavsFragment;
-import de.m4lik.burningseries.mainFragments.GenresFragment;
-import de.m4lik.burningseries.mainFragments.SeriesFragment;
-import de.m4lik.burningseries.objects.GenreMap;
-import de.m4lik.burningseries.objects.GenreObj;
-import de.m4lik.burningseries.objects.ShowObj;
+import de.m4lik.burningseries.ui.mainFragments.FavsFragment;
+import de.m4lik.burningseries.ui.mainFragments.GenresFragment;
+import de.m4lik.burningseries.ui.mainFragments.SeriesFragment;
+import de.m4lik.burningseries.api.objects.GenreMap;
+import de.m4lik.burningseries.api.objects.GenreObj;
+import de.m4lik.burningseries.api.objects.ShowObj;
 import de.m4lik.burningseries.services.ThemeHelperService;
+import de.m4lik.burningseries.util.Logger;
 import de.m4lik.burningseries.util.Settings;
 import okhttp3.ResponseBody;
 import retrofit2.Call;
@@ -238,6 +239,7 @@ public class MainActivity extends AppCompatActivity
         api.setSession(sharedPreferences.getString("pref_session", ""));
         api.generateToken("logout");
 
+        Logger.logout(getApplicationContext());
 
         APIInterface apii = api.getInterface();
         Call<ResponseBody> call = apii.logout(api.getToken(), api.getUserAgent(), api.getSession());

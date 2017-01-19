@@ -1,4 +1,4 @@
-package de.m4lik.burningseries.objects;
+package de.m4lik.burningseries.ui.listitems;
 
 /**
  * Created by Malik on 12.06.2016.

@@ -2,11 +2,11 @@ package de.m4lik.burningseries.api;
 
 import java.util.List;
 
-import de.m4lik.burningseries.objects.EpisodeObj;
-import de.m4lik.burningseries.objects.GenreMap;
-import de.m4lik.burningseries.objects.SeasonObj;
-import de.m4lik.burningseries.objects.ShowObj;
-import de.m4lik.burningseries.objects.VideoObj;
+import de.m4lik.burningseries.api.objects.EpisodeObj;
+import de.m4lik.burningseries.api.objects.GenreMap;
+import de.m4lik.burningseries.api.objects.SeasonObj;
+import de.m4lik.burningseries.api.objects.ShowObj;
+import de.m4lik.burningseries.api.objects.VideoObj;
 import okhttp3.ResponseBody;
 import retrofit2.Call;
 import retrofit2.http.Field;

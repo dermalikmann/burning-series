@@ -1,4 +1,4 @@
-package de.m4lik.burningseries.mainFragments;
+package de.m4lik.burningseries.ui.mainFragments;
 
 
 import android.content.ContentValues;
@@ -6,6 +6,7 @@ import android.content.Intent;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.os.Bundle;
+import android.support.annotation.Nullable;
 import android.support.design.widget.Snackbar;
 import android.support.v4.app.Fragment;
 import android.support.v4.content.ContextCompat;
@@ -31,7 +32,8 @@ import de.m4lik.burningseries.api.API;
 import de.m4lik.burningseries.api.APIInterface;
 import de.m4lik.burningseries.database.MainDBHelper;
 import de.m4lik.burningseries.database.SeriesContract;
-import de.m4lik.burningseries.objects.ShowListItem;
+import de.m4lik.burningseries.ui.listitems.ShowListItem;
+import de.m4lik.burningseries.util.Logger;
 import okhttp3.ResponseBody;
 import retrofit2.Call;
 import retrofit2.Callback;
@@ -66,9 +68,16 @@ public class SeriesFragment extends Fragment {
         rootView = inflater.inflate(R.layout.fragment_series, container, false);
         getSeriesListView = (ListView) rootView.findViewById(R.id.seriesListView);
 
-        MenuItem searchItem = MainActivity.getMenu().findItem(R.id.action_search);
-        searchItem.setVisible(true);
+        fillList();
+        showList();
 
+        return rootView;
+    }
+
+    @Override
+    public void onViewCreated(View view, @Nullable Bundle savedInstanceState) {
+
+        MenuItem searchItem = MainActivity.getMenu().findItem(R.id.action_search);
         SearchView searchView = (SearchView) MenuItemCompat.getActionView(searchItem);
         searchView.setOnQueryTextListener(new SearchView.OnQueryTextListener() {
             @Override
@@ -83,20 +92,17 @@ public class SeriesFragment extends Fragment {
             }
         });
 
-
-        fillList();
-        showList();
-
-
-        return rootView;
+        super.onViewCreated(view, savedInstanceState);
     }
 
     public void filterList(String query) {
 
+        query = query.toLowerCase();
+
         List<ShowListItem> filteredList = new ArrayList<>();
 
         for (ShowListItem single : seriesList) {
-            if (single.getTitle().toLowerCase().contains(query.toLowerCase()))
+            if (single.getTitle().toLowerCase().contains(query))
                 filteredList.add(single);
         }
 
@@ -215,10 +221,11 @@ public class SeriesFragment extends Fragment {
             getSeriesListView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
                 @Override
                 public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
-                    TextView nameView = (TextView) view.findViewById(R.id.seriesTitle);
-                    TextView idView = (TextView) view.findViewById(R.id.seriesId);
-                    TextView genreView = (TextView) view.findViewById(R.id.seriesGenre);
-                    showSeries(Integer.parseInt(idView.getText().toString()), nameView.getText().toString(), genreView.getText().toString());
+                    String nameString = ((TextView) view.findViewById(R.id.seriesTitle)).getText().toString();
+                    String idString = ((TextView) view.findViewById(R.id.seriesId)).getText().toString();
+                    String genreString = ((TextView) view.findViewById(R.id.seriesGenre)).getText().toString();
+                    Logger.seriesSelection(getContext(), idString, nameString);
+                    showSeries(Integer.parseInt(idString), nameString, genreString);
                 }
             });
 
@@ -231,7 +238,6 @@ public class SeriesFragment extends Fragment {
         Intent i = new Intent(getActivity(), ShowActivity.class);
         i.putExtra("ShowName", name);
         i.putExtra("ShowID", id);
-        i.putExtra("ShowGenre", genre);
         startActivity(i);
     }
 

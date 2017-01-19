@@ -12,7 +12,7 @@ import android.util.Log;
 import android.view.MenuItem;
 
 import de.m4lik.burningseries.util.AndroidUtility;
-import de.m4lik.burningseries.util.PreferenceWithActionbar;
+import de.m4lik.burningseries.ui.PreferenceWithActionbar;
 
 import static com.google.common.base.Strings.emptyToNull;
 

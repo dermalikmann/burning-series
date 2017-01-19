@@ -1,4 +1,4 @@
-package de.m4lik.burningseries.util;
+package de.m4lik.burningseries.ui;
 
 import android.content.res.Configuration;
 import android.os.Bundle;

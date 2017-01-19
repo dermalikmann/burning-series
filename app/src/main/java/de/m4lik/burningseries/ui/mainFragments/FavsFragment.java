@@ -1,4 +1,4 @@
-package de.m4lik.burningseries.mainFragments;
+package de.m4lik.burningseries.ui.mainFragments;
 
 import android.content.Intent;
 import android.database.Cursor;
@@ -24,7 +24,7 @@ import de.m4lik.burningseries.R;
 import de.m4lik.burningseries.ShowActivity;
 import de.m4lik.burningseries.database.MainDBHelper;
 import de.m4lik.burningseries.database.SeriesContract;
-import de.m4lik.burningseries.objects.ShowListItem;
+import de.m4lik.burningseries.ui.listitems.ShowListItem;
 
 import static de.m4lik.burningseries.database.SeriesContract.seriesTable.COLUMN_NAME_ISFAV;
 import static de.m4lik.burningseries.database.SeriesContract.seriesTable.COLUMN_NAME_TITLE;
@@ -44,12 +44,6 @@ public class FavsFragment extends Fragment {
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
         View rootView = inflater.inflate(R.layout.fragment_favs, container, false);
-
-        MenuItem menuItem = MainActivity.menu.findItem(R.id.action_search);
-        menuItem.setVisible(false);
-
-        SearchView searchView = (SearchView) MenuItemCompat.getActionView(menuItem);
-        searchView.setOnQueryTextListener(null);
 
         ListView favsListView = (ListView) rootView.findViewById(R.id.favsListView);
 

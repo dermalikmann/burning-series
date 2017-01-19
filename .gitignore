@@ -7,10 +7,13 @@
 
 # Java class files
 *.class
+
 # Androidstudio/IntelliJ folder
 .idea/
 .idea/*
 
+# google-service
+google-services.json
 
 # Generated files
 bin/

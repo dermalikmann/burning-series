@@ -1,4 +1,4 @@
-package de.m4lik.burningseries.mainFragments;
+package de.m4lik.burningseries.ui.mainFragments;
 
 import android.app.ProgressDialog;
 import android.content.Intent;
@@ -23,8 +23,9 @@ import de.m4lik.burningseries.MainActivity;
 import de.m4lik.burningseries.R;
 import de.m4lik.burningseries.ShowActivity;
 import de.m4lik.burningseries.database.MainDBHelper;
-import de.m4lik.burningseries.objects.GenreListItem;
-import de.m4lik.burningseries.objects.ShowListItem;
+import de.m4lik.burningseries.ui.listitems.GenreListItem;
+import de.m4lik.burningseries.ui.listitems.ShowListItem;
+import de.m4lik.burningseries.util.Logger;
 
 import static de.m4lik.burningseries.database.SeriesContract.genresTable;
 import static de.m4lik.burningseries.database.SeriesContract.seriesTable;
@@ -95,8 +96,9 @@ public class GenresFragment extends Fragment {
         genresListView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             @Override
             public void onItemClick(AdapterView<?> adapterView, View view, int i, long l) {
-                TextView txtView = (TextView) view.findViewById(R.id.genreLable);
-                populateSeriesList(txtView.getText().toString());
+                String lableString = ((TextView) view.findViewById(R.id.genreLable)).getText().toString();
+                Logger.genreSelection(getContext(), lableString);
+                populateSeriesList(lableString);
                 ((MainActivity) getActivity()).seriesList = true;
             }
         });

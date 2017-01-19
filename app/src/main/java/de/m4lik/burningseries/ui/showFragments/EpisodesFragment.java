@@ -1,4 +1,4 @@
-package de.m4lik.burningseries.showFragments;
+package de.m4lik.burningseries.ui.showFragments;
 
 
 import android.content.SharedPreferences;
@@ -23,10 +23,10 @@ import de.m4lik.burningseries.R;
 import de.m4lik.burningseries.ShowActivity;
 import de.m4lik.burningseries.api.API;
 import de.m4lik.burningseries.api.APIInterface;
-import de.m4lik.burningseries.objects.EpisodeListItem;
-import de.m4lik.burningseries.objects.EpisodeObj;
-import de.m4lik.burningseries.objects.SeasonObj;
-import de.m4lik.burningseries.objects.VideoObj;
+import de.m4lik.burningseries.ui.listitems.EpisodeListItem;
+import de.m4lik.burningseries.api.objects.EpisodeObj;
+import de.m4lik.burningseries.api.objects.SeasonObj;
+import de.m4lik.burningseries.api.objects.VideoObj;
 import retrofit2.Call;
 import retrofit2.Callback;
 import retrofit2.Response;

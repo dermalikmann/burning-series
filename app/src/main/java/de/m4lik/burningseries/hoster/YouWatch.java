@@ -13,7 +13,7 @@ import java.util.regex.Pattern;
  * @author Malik Mann
  */
 
-public class YouWatch extends Hoster {
+class YouWatch extends Hoster {
     private static final Pattern a;
     private static final Pattern b;
     private static final Pattern c;

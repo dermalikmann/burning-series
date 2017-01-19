@@ -2,19 +2,27 @@
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
     package="de.m4lik.burningseries">
 
+    <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" />
+    <uses-permission android:name="android.permission.WAKE_LOCK" />
+
     <application
         android:allowBackup="true"
         android:icon="@mipmap/ic_launcher"
         android:label="@string/app_name"
         android:supportsRtl="true"
         android:theme="@style/BurningSeries">
+
+        <!-- Services -->
+
+        <!-- Activities -->
+
         <activity
             android:name=".SplashActivity"
             android:theme="@style/SplashTheme">
             <intent-filter>
-                <action android:name="android.intent.action.MAIN" />
+                <action android:name="android.intent.action.MAIN"/>
 
-                <category android:name="android.intent.category.LAUNCHER" />
+                <category android:name="android.intent.category.LAUNCHER"/>
             </intent-filter>
         </activity>
         <activity
@@ -23,32 +31,33 @@
             android:screenOrientation="portrait"
             android:theme="@style/BurningSeries.NoActionBar">
             <intent-filter>
-                <action android:name="android.intent.action.SEARCH" />
+                <action android:name="android.intent.action.SEARCH"/>
             </intent-filter>
+
             <meta-data
                 android:name="android.app.searchable"
-                android:resource="@xml/searchable" />
+                android:resource="@xml/searchable"/>
         </activity>
         <activity
             android:name=".ShowActivity"
             android:label="@string/title_activity_scrolling"
             android:screenOrientation="portrait"
-            android:theme="@style/BurningSeries.NoActionBar" />
+            android:theme="@style/BurningSeries.NoActionBar"/>
         <activity
             android:name=".LoginActivity"
             android:label="@string/title_activity_login"
-            android:screenOrientation="portrait" />
+            android:screenOrientation="portrait"/>
         <activity
             android:name=".BufferedVideoPlayerActivity"
             android:screenOrientation="landscape"
-            android:theme="@style/BurningSeries.NoActionBar.Dark" />
+            android:theme="@style/BurningSeries.NoActionBar.Dark"/>
         <activity
             android:name=".SettingsActivity"
             android:label="@string/settings"
             android:screenOrientation="portrait">
             <meta-data
                 android:name="android.support.PARENT_ACTIVITY"
-                android:value=".MainActivity" />
+                android:value=".MainActivity"/>
         </activity>
     </application>
 

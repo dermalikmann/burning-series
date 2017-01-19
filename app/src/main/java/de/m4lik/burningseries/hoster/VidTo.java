@@ -3,6 +3,8 @@ package de.m4lik.burningseries.hoster;
 import android.os.SystemClock;
 import android.util.Log;
 
+import com.google.firebase.crash.FirebaseCrash;
+
 import java.util.HashMap;
 import java.util.Map;
 import java.util.regex.Matcher;
@@ -11,7 +13,7 @@ import java.util.regex.Pattern;
 /**
  * Created by Malik on 04.11.2016.
  */
-public class VidTo extends Hoster {
+class VidTo extends Hoster {
     protected static final Pattern filenamePattern;
     protected static final Pattern hashPattern;
     protected static final Pattern geturlPattern;
@@ -49,6 +51,7 @@ public class VidTo extends Hoster {
             dataArgs.put("referer", "");
             dataArgs.put("hash", hashMatcher.group(1));
             dataArgs.put("imhuman", "Proceed to video");
+
             Map refererArgs = new HashMap(1);
             refererArgs.put("Referer", fullURL);
 
@@ -73,18 +76,19 @@ public class VidTo extends Hoster {
                     String quality = p.split("hd_default:\"")[1].split("\"")[0];
                     return p.split("label:\"" + quality + "\",file:\"")[1].split("\"")[0];
                 } catch (Exception e) {
-                    Log.e("BS", "Error while finding video URL");
+                    FirebaseCrash.logcat(Log.ERROR, "HOSTER", "Error while finding video URL (" + fullURL + ")");
+                    FirebaseCrash.report(e);
                     //We ain't found shit, Sir!
                     return "3";
                 }
             } catch (Exception e) {
-                e.printStackTrace();
-                Log.e("BS", "Error while fetching video URL");
+                FirebaseCrash.logcat(Log.ERROR, "HOSTER", "Error while fetching video URL (" + fullURL + ")");
+                FirebaseCrash.report(e);
                 return "4";
             }
         } catch (Exception e) {
-            e.printStackTrace();
-            Log.e("BS", "Error while getting video page");
+            FirebaseCrash.logcat(Log.ERROR, "HOSTER", "Error while getting video page (" + fullURL + ")");
+            FirebaseCrash.report(e);
             //Whoops... The thing broke.
             return "5";
         }

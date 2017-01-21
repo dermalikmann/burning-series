@@ -288,7 +288,7 @@ public class MainActivity extends AppCompatActivity
                 visibleFragment = "genres";
                 break;
             case "favorites":
-                searchItem.setVisible(true);
+                searchItem.setVisible(false);
                 transaction.replace(R.id.fragmentContainerMain, new FavsFragment());
                 transaction.commit();
                 visibleFragment = "favorites";

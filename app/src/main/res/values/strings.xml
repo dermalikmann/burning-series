@@ -83,13 +83,17 @@
 
     <string name="pref_startup_view">Standardansicht</string>
     <string name="pref_startup_view_summary">Hier kannst du feslegen, was du beim Starten der App als erstes sehen willst.</string>
+
     <!-- Pseudo Settings -->
 
     <string name="pref_pseudo_changelog">Changelog</string>
     <string name="pref_pseudo_changelog_summary">Changelog</string>
     <string name="pref_pseudo_website">Website</string>
     <string name="pref_pseudo_website_summary">Dir gefällt die App? Dann empfiehl sie doch deinen Freunden :)</string>
+    <string name="pref_pseudo_debug_notification">Testbenachrichtigung</string>
+    <string name="pref_pseudo_debug_notification_summary">Zeige eine Test-Benachrichtigung an.</string>
     <string name="pref_pseudo_user">Angemeldeter Benutzer</string>
-    <string name="pref_peudo_session">Session</string>
+    <string name="pref_pseudo_session">Session</string>
+    <string name="pref_pseudo_version">Version</string>
 
 </resources>

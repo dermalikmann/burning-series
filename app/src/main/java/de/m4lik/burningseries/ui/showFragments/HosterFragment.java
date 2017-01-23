@@ -33,10 +33,10 @@ import de.m4lik.burningseries.R;
 import de.m4lik.burningseries.ShowActivity;
 import de.m4lik.burningseries.api.API;
 import de.m4lik.burningseries.api.APIInterface;
-import de.m4lik.burningseries.hoster.Hoster;
 import de.m4lik.burningseries.api.objects.EpisodeObj;
-import de.m4lik.burningseries.ui.listitems.HosterListItem;
 import de.m4lik.burningseries.api.objects.VideoObj;
+import de.m4lik.burningseries.hoster.Hoster;
+import de.m4lik.burningseries.ui.listitems.HosterListItem;
 import de.m4lik.burningseries.util.AndroidUtility;
 import de.m4lik.burningseries.util.Settings;
 import retrofit2.Call;
@@ -111,9 +111,8 @@ public class HosterFragment extends Fragment implements Callback<EpisodeObj> {
 
     @Override
     public void onFailure(Call<EpisodeObj> call, Throwable t) {
-        Snackbar.make(rootview, "Fehler beim laden der Hoster", Snackbar.LENGTH_SHORT);
 
-        Snackbar snackbar = Snackbar.make(rootview.findViewById(android.R.id.content), "Fehler beim laden der Hoster.", Snackbar.LENGTH_SHORT);
+        Snackbar snackbar = Snackbar.make(rootview, "Fehler beim laden der Hoster.", Snackbar.LENGTH_SHORT);
         View snackbarView = snackbar.getView();
         snackbarView.setBackgroundColor(ContextCompat.getColor(getContext(), R.color.colorPrimaryDark));
         snackbar.show();
@@ -230,19 +229,19 @@ public class HosterFragment extends Fragment implements Callback<EpisodeObj> {
 
             switch (hosterReturn) {
                 case "1":
-                    snackbar = Snackbar.make(rootview.findViewById(android.R.id.content), "Hoster hat nicht geantwortet.", Snackbar.LENGTH_SHORT);
+                    snackbar = Snackbar.make(rootview, "Hoster hat nicht geantwortet.", Snackbar.LENGTH_SHORT);
                     snackbarView = snackbar.getView();
                     snackbarView.setBackgroundColor(ContextCompat.getColor(getContext(), R.color.colorPrimaryDark));
                     snackbar.show();
                     return;
                 case "2":
-                    snackbar = Snackbar.make(rootview.findViewById(android.R.id.content), "Video wurde wahrscheinlich gelöscht.", Snackbar.LENGTH_SHORT);
+                    snackbar = Snackbar.make(rootview, "Video wurde wahrscheinlich gelöscht.", Snackbar.LENGTH_SHORT);
                     snackbarView = snackbar.getView();
                     snackbarView.setBackgroundColor(ContextCompat.getColor(getContext(), R.color.colorPrimaryDark));
                     snackbar.show();
                     return;
                 case "3":
-                    snackbar = Snackbar.make(rootview.findViewById(android.R.id.content), "Fehler beim auflösen der Video URL.", Snackbar.LENGTH_SHORT);
+                    snackbar = Snackbar.make(rootview, "Fehler beim auflösen der Video URL.", Snackbar.LENGTH_SHORT);
                     snackbarView = snackbar.getView();
                     snackbarView.setBackgroundColor(ContextCompat.getColor(getContext(), R.color.colorPrimaryDark));
                     snackbar.show();

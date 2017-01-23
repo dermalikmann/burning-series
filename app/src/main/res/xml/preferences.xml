@@ -63,7 +63,8 @@
     </PreferenceCategory>
 
     <PreferenceCategory
-        android:title="Verschiedenes">
+        android:title="@string/pref_cat_misc"
+        android:key="prefcat_misc">
 
         <Preference
             android:key="pref_pseudo_changelog"
@@ -75,6 +76,17 @@
             android:key="pref_pseudo_recommend"
             android:title="@string/pref_pseudo_website"
             android:summary="@string/pref_pseudo_website_summary"/>
+
+    </PreferenceCategory>
+
+    <PreferenceCategory
+        android:key="prefcat_debug"
+        android:title="Debug">
+
+        <Preference
+            android:key="pref_pseudo_debug_notification"
+            android:title="@string/pref_pseudo_debug_notification"
+            android:summary="@string/pref_pseudo_debug_notification_summary"/>
 
     </PreferenceCategory>
 
@@ -92,7 +104,14 @@
             android:enabled="false"
             android:key="pref_session"
             android:defaultValue=""
-            android:title="@string/pref_peudo_session"
+            android:title="@string/pref_pseudo_session"
+            android:summary=" "/>
+
+        <EditTextPreference
+            android:enabled="false"
+            android:key="pref_version"
+            android:defaultValue=""
+            android:title="@string/pref_pseudo_version"
             android:summary=" "/>
 
     </PreferenceCategory>

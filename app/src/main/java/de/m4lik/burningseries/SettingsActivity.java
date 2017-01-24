@@ -84,7 +84,7 @@ public class SettingsActivity extends PreferenceWithActionbar {
                 PackageManager manager = context.getPackageManager();
                 PackageInfo info = manager.getPackageInfo(
                         context.getPackageName(), 0);
-                version = info.versionName;
+                version = info.versionName + " (Build " + info.versionCode + ")";
             } catch (Exception e) {
                 version = "Error getting version";
             }

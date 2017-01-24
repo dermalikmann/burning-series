@@ -94,21 +94,18 @@
         android:title="Info">
 
         <EditTextPreference
-            android:enabled="false"
             android:key="pref_user"
             android:defaultValue=""
             android:title="@string/pref_pseudo_user"
             android:summary="@string/not_logged_in"/>
 
         <EditTextPreference
-            android:enabled="false"
             android:key="pref_session"
             android:defaultValue=""
             android:title="@string/pref_pseudo_session"
             android:summary=" "/>
 
         <EditTextPreference
-            android:enabled="false"
             android:key="pref_version"
             android:defaultValue=""
             android:title="@string/pref_pseudo_version"

@@ -20,9 +20,11 @@ import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentTransaction;
 import android.support.v4.content.ContextCompat;
 import android.support.v4.view.GravityCompat;
+import android.support.v4.view.MenuItemCompat;
 import android.support.v4.widget.DrawerLayout;
 import android.support.v7.app.ActionBarDrawerToggle;
 import android.support.v7.app.AppCompatActivity;
+import android.support.v7.widget.SearchView;
 import android.support.v7.widget.Toolbar;
 import android.view.Menu;
 import android.view.MenuInflater;
@@ -37,14 +39,14 @@ import java.util.Map;
 
 import de.m4lik.burningseries.api.API;
 import de.m4lik.burningseries.api.APIInterface;
-import de.m4lik.burningseries.database.MainDBHelper;
-import de.m4lik.burningseries.ui.mainFragments.FavsFragment;
-import de.m4lik.burningseries.ui.mainFragments.GenresFragment;
-import de.m4lik.burningseries.ui.mainFragments.SeriesFragment;
 import de.m4lik.burningseries.api.objects.GenreMap;
 import de.m4lik.burningseries.api.objects.GenreObj;
 import de.m4lik.burningseries.api.objects.ShowObj;
+import de.m4lik.burningseries.database.MainDBHelper;
 import de.m4lik.burningseries.services.ThemeHelperService;
+import de.m4lik.burningseries.ui.mainFragments.FavsFragment;
+import de.m4lik.burningseries.ui.mainFragments.GenresFragment;
+import de.m4lik.burningseries.ui.mainFragments.SeriesFragment;
 import de.m4lik.burningseries.util.Logger;
 import de.m4lik.burningseries.util.Settings;
 import okhttp3.ResponseBody;
@@ -181,6 +183,21 @@ public class MainActivity extends AppCompatActivity
 
         c.close();
 
+        SearchView searchView = (SearchView) MenuItemCompat.getActionView(getMenu().findItem(R.id.action_search));
+        searchView.setOnQueryTextListener(new SearchView.OnQueryTextListener() {
+            @Override
+            public boolean onQueryTextSubmit(String query) {
+                return true;
+            }
+
+            @Override
+            public boolean onQueryTextChange(String newText) {
+                SeriesFragment fragment = (SeriesFragment) getSupportFragmentManager().findFragmentByTag("seriesFragment");
+                fragment.filterList(newText);
+                return false;
+            }
+        });
+
         return true;
     }
 
@@ -301,19 +318,19 @@ public class MainActivity extends AppCompatActivity
         switch (fragment) {
             case "genres":
                 searchItem.setVisible(false);
-                transaction.replace(R.id.fragmentContainerMain, new GenresFragment());
+                transaction.replace(R.id.fragmentContainerMain, new GenresFragment(), "genresFragment");
                 transaction.commit();
                 visibleFragment = "genres";
                 break;
             case "favorites":
                 searchItem.setVisible(false);
-                transaction.replace(R.id.fragmentContainerMain, new FavsFragment());
+                transaction.replace(R.id.fragmentContainerMain, new FavsFragment(), "favsFragment");
                 transaction.commit();
                 visibleFragment = "favorites";
                 break;
             default:
                 searchItem.setVisible(true);
-                transaction.replace(R.id.fragmentContainerMain, new SeriesFragment());
+                transaction.replace(R.id.fragmentContainerMain, new SeriesFragment(), "seriesFragment");
                 transaction.commit();
                 visibleFragment = "series";
                 break;

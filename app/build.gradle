@@ -8,8 +8,8 @@ android {
         applicationId "de.m4lik.burningseries"
         minSdkVersion 19
         targetSdkVersion 24
-        versionCode 47
-        versionName "0.9.17"
+        versionCode 49
+        versionName "0.9.18"
         vectorDrawables.useSupportLibrary = true
     }
     buildTypes {

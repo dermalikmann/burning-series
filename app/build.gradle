@@ -113,6 +113,8 @@ dependencies {
     compile "io.reactivex:rxjava-async-util:0.21.0"
     compile "com.artemzin.rxjava:proguard-rules:1.2.5.0"
 
+    compile 'net.danlew:android.joda:2.9.5.1'
+
     compile 'org.jsoup:jsoup:1.9.2'
     compile 'org.solovyev.android.views:linear-layout-manager:0.5@aar'
 

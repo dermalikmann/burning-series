@@ -1,8 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <PreferenceScreen xmlns:android="http://schemas.android.com/apk/res/android">
 
-    <PreferenceCategory
-        android:title="@string/pref_cat_theme">
+    <PreferenceCategory android:title="@string/pref_cat_theme">
 
         <ListPreference
             android:defaultValue="@string/pref_theme_default"
@@ -11,7 +10,7 @@
             android:entryValues="@array/pref_theme_values"
             android:key="pref_theme"
             android:summary="@string/pref_set_wip_summary"
-            android:title="@string/pref_theme"/>
+            android:title="@string/pref_theme" />
 
     </PreferenceCategory>
 
@@ -29,7 +28,7 @@
             <intent
                 android:action="preference://prefcat_behaviour"
                 android:targetClass="de.m4lik.burningseries.SettingsActivity"
-                android:targetPackage="@string/app_id"/>
+                android:targetPackage="@string/app_id" />
 
             <PreferenceCategory
                 android:key="prefcat_behaviour_datausage"
@@ -40,7 +39,7 @@
                     android:key="pref_alarm_on_mobile_data"
                     android:summaryOff="@string/pref_alarm_on_mobile_data_summary_off"
                     android:summaryOn="@string/pref_alarm_on_mobile_data_summary_on"
-                    android:title="@string/pref_alarm_on_mobile_data"/>
+                    android:title="@string/pref_alarm_on_mobile_data" />
 
             </PreferenceCategory>
 
@@ -54,7 +53,47 @@
                     android:entryValues="@array/pref_startup_view_values"
                     android:key="pref_startup_view"
                     android:summary="@string/pref_startup_view_summary"
-                    android:title="@string/pref_startup_view"/>
+                    android:title="@string/pref_startup_view" />
+
+            </PreferenceCategory>
+
+        </PreferenceScreen>
+
+        <PreferenceScreen
+            android:key="prefcat_update"
+            android:persistent="true"
+            android:summary="@string/pref_cat_update_summary"
+            android:title="@string/pref_cat_update">
+
+            <intent
+                android:action="preference://prefcat_update"
+                android:targetClass="de.m4lik.burningseries.SettingsActivity"
+                android:targetPackage="@string/app_id" />
+
+            <PreferenceCategory
+                android:key="prefcat_update_update"
+                android:title="@string/pref_cat_update">
+
+                <Preference
+                    android:key="pref_pseudo_do_update"
+                    android:summary=" "
+                    android:title="@string/pref_update_pseudo_do_update" />
+
+                <CheckBoxPreference
+                    android:defaultValue="true"
+                    android:key="pref_update_announcement"
+                    android:summaryOff="@string/pref_update_announcement_summary_off"
+                    android:summaryOn="@string/pref_update_announcement_summary_on"
+                    android:title="@string/pref_update_announcement" />
+
+                <ListPreference
+                    android:defaultValue="@string/pref_update_channel_default"
+                    android:enabled="false"
+                    android:entries="@array/pref_update_channel"
+                    android:entryValues="@array/pref_update_channel_values"
+                    android:key="pref_update_channel"
+                    android:summary="@string/pref_set_wip_summary"
+                    android:title="@string/pref_update_channel" />
 
             </PreferenceCategory>
 
@@ -63,19 +102,19 @@
     </PreferenceCategory>
 
     <PreferenceCategory
-        android:title="@string/pref_cat_misc"
-        android:key="prefcat_misc">
+        android:key="prefcat_misc"
+        android:title="@string/pref_cat_misc">
 
         <Preference
+            android:enabled="false"
             android:key="pref_pseudo_changelog"
-            android:title="@string/pref_pseudo_changelog"
             android:summary="@string/pref_set_wip_summary"
-            android:enabled="false"/>
+            android:title="@string/pref_pseudo_changelog" />
 
         <Preference
             android:key="pref_pseudo_recommend"
-            android:title="@string/pref_pseudo_website"
-            android:summary="@string/pref_pseudo_website_summary"/>
+            android:summary="@string/pref_pseudo_website_summary"
+            android:title="@string/pref_pseudo_website" />
 
     </PreferenceCategory>
 
@@ -85,31 +124,30 @@
 
         <Preference
             android:key="pref_pseudo_debug_notification"
-            android:title="@string/pref_pseudo_debug_notification"
-            android:summary="@string/pref_pseudo_debug_notification_summary"/>
+            android:summary="@string/pref_pseudo_debug_notification_summary"
+            android:title="@string/pref_pseudo_debug_notification" />
 
     </PreferenceCategory>
 
-    <PreferenceCategory
-        android:title="Info">
+    <PreferenceCategory android:title="Info">
 
         <Preference
+            android:defaultValue=""
             android:key="pref_user"
-            android:defaultValue=""
-            android:title="@string/pref_pseudo_user"
-            android:summary="@string/not_logged_in"/>
+            android:summary="@string/not_logged_in"
+            android:title="@string/pref_pseudo_user" />
 
         <Preference
+            android:defaultValue=""
             android:key="pref_session"
-            android:defaultValue=""
-            android:title="@string/pref_pseudo_session"
-            android:summary=" "/>
+            android:summary=" "
+            android:title="@string/pref_pseudo_session" />
 
         <Preference
-            android:key="pref_version"
             android:defaultValue=""
-            android:title="@string/pref_pseudo_version"
-            android:summary=" "/>
+            android:key="pref_version"
+            android:summary=" "
+            android:title="@string/pref_pseudo_version" />
 
     </PreferenceCategory>
 

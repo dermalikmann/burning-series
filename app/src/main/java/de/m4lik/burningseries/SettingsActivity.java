@@ -7,7 +7,6 @@ import android.content.SharedPreferences;
 import android.content.pm.PackageInfo;
 import android.content.pm.PackageManager;
 import android.os.Bundle;
-import android.preference.EditTextPreference;
 import android.preference.Preference;
 import android.preference.PreferenceFragment;
 import android.preference.PreferenceScreen;
@@ -18,6 +17,7 @@ import android.view.MenuItem;
 
 import de.m4lik.burningseries.ui.PreferenceWithActionbar;
 import de.m4lik.burningseries.util.AndroidUtility;
+import de.m4lik.burningseries.util.Settings;
 
 import static com.google.common.base.Strings.emptyToNull;
 
@@ -72,9 +72,9 @@ public class SettingsActivity extends PreferenceWithActionbar {
 
             addPreferencesFromResource(R.xml.preferences);
 
-            EditTextPreference userpref = (EditTextPreference) getPreferenceManager().findPreference("pref_user");
-            EditTextPreference sessionpref = (EditTextPreference) getPreferenceManager().findPreference("pref_session");
-            EditTextPreference versionpref = (EditTextPreference) getPreferenceManager().findPreference("pref_version");
+            Preference userpref =  getPreferenceManager().findPreference("pref_user");
+            Preference sessionpref = getPreferenceManager().findPreference("pref_session");
+            Preference versionpref = getPreferenceManager().findPreference("pref_version");
 
             String version;
 
@@ -84,15 +84,15 @@ public class SettingsActivity extends PreferenceWithActionbar {
                 PackageManager manager = context.getPackageManager();
                 PackageInfo info = manager.getPackageInfo(
                         context.getPackageName(), 0);
-                version = info.versionName;
+                version = info.versionName + " (Build " + info.versionCode + ")";
             } catch (Exception e) {
                 version = "Error getting version";
             }
 
             versionpref.setSummary(version);
 
-            userpref.setSummary(userpref.getText().equals("")? "Nicht angemeldet" : userpref.getText());
-            sessionpref.setSummary(sessionpref.getText().equals("")? " " : sessionpref.getText());
+            userpref.setSummary(Settings.of(context).getUser().equals("")? "Nicht angemeldet" : Settings.of(context).getUser());
+            sessionpref.setSummary(Settings.of(context).getSession().equals("")? " " : Settings.of(context).getSession());
 
             String category = getArguments().getString("category");
             if (category != null) {

@@ -247,13 +247,13 @@ public class HosterFragment extends Fragment implements Callback<EpisodeObj> {
                     snackbar.show();
                     return;
                 case "4":
-                    snackbar = Snackbar.make(rootview.findViewById(android.R.id.content), "Hoster hat nicht geantwortet.", Snackbar.LENGTH_SHORT);
+                    snackbar = Snackbar.make(rootview, "Hoster hat nicht geantwortet.", Snackbar.LENGTH_SHORT);
                     snackbarView = snackbar.getView();
                     snackbarView.setBackgroundColor(ContextCompat.getColor(getContext(), R.color.colorPrimaryDark));
                     snackbar.show();
                     return;
                 case "5":
-                    snackbar = Snackbar.make(rootview.findViewById(android.R.id.content), "Da ist etwas ganz schief gelaufen. Fehler bitte melden.", Snackbar.LENGTH_SHORT);
+                    snackbar = Snackbar.make(rootview, "Da ist etwas ganz schief gelaufen. Fehler bitte melden.", Snackbar.LENGTH_SHORT);
                     snackbarView = snackbar.getView();
                     snackbarView.setBackgroundColor(ContextCompat.getColor(getContext(), R.color.colorPrimaryDark));
                     snackbar.show();

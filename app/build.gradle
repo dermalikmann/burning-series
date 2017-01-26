@@ -49,7 +49,7 @@ android {
         minSdkVersion 19
         targetSdkVersion 24
         versionCode versionBuild
-        versionName "0.9.18"
+        versionName "0.9.19"
         vectorDrawables.useSupportLibrary = true
     }
     buildTypes {

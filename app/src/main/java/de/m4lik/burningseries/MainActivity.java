@@ -398,7 +398,7 @@ public class MainActivity extends AppCompatActivity
         favscall.enqueue(new Callback<List<ShowObj>>() {
             @Override
             public void onResponse(Call<List<ShowObj>> call, Response<List<ShowObj>> response) {
-                new favoritesDatanaseUpdate(response.body()).execute();
+                new favoritesDatabaseUpdate(response.body()).execute();
             }
 
             @Override
@@ -481,11 +481,11 @@ public class MainActivity extends AppCompatActivity
         }
     }
 
-    class favoritesDatanaseUpdate extends AsyncTask<Void, Void, Void> {
+    class favoritesDatabaseUpdate extends AsyncTask<Void, Void, Void> {
 
         List<ShowObj> list;
 
-        favoritesDatanaseUpdate(List<ShowObj> list) {
+        favoritesDatabaseUpdate(List<ShowObj> list) {
             this.list = list;
         }
 

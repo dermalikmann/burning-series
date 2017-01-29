@@ -1,10 +1,12 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
 
+    <!-- Theme chooser -->
+
     <string name="pref_theme_default" translatable="false">BLUE</string>
-    <string name="theme_blue" translatable="false">Blau</string>
-    <string name="theme_orange" translatable="false">Orange</string>
-    <string name="theme_green" translatable="false">Grün</string>
+    <string name="theme_blue">Blau</string>
+    <string name="theme_orange">Orange</string>
+    <string name="theme_green">Grün</string>
 
     <string-array name="pref_theme">
         <item>@string/theme_blue</item>
@@ -17,6 +19,8 @@
         <item>ORANGE</item>
         <item>GREEN</item>
     </string-array>
+
+    <!-- Start view chooser -->
 
     <string name="pref_startup_view_default" translatable="false">series</string>
     <string name="startup_series">Alle Serien</string>
@@ -34,5 +38,21 @@
         <item>genres</item>
         <item>favorites</item>
     </string-array>
-    <color name="background_material_light">#db0505</color>
+
+    <!-- Update channel chooser -->
+
+    <string name="pref_update_channel_default" translatable="false">stable</string>
+    <string name="update_beta">Beta Channel</string>
+    <string name="update_stable">Stable Channel</string>
+
+    <string-array name="pref_update_channel">
+        <item>@string/update_beta</item>
+        <item>@string/update_stable</item>
+    </string-array>
+
+    <string-array name="pref_update_channel_values">
+        <item>beta</item>
+        <item>stable</item>
+    </string-array>
+
 </resources>

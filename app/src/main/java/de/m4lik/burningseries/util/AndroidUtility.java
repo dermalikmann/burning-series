@@ -11,6 +11,8 @@ import com.google.common.cache.CacheBuilder;
 
 import java.util.concurrent.TimeUnit;
 
+import de.m4lik.burningseries.BuildConfig;
+
 /**
  * Created by Malik on 12.01.2017
  *
@@ -54,5 +56,13 @@ public class AndroidUtility {
     public static void checkNotMainThread() {
         if (Looper.getMainLooper().getThread() == Thread.currentThread())
             throw new IllegalStateException("Must not be called from the main thread.");
+    }
+
+    public static int buildNumber() {
+        if (BuildConfig.DEBUG) {
+            return 100;
+        } else {
+            return BuildConfig.VERSION_CODE;
+        }
     }
 }

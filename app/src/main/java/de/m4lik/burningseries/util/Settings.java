@@ -60,4 +60,16 @@ public class Settings {
         return preferences.getString("pref_startup_view", "serieslist");
     }
 
+    public String getUser() {
+        return preferences.getString("pref_user", "");
+    }
+
+    public String getSession() {
+        return preferences.getString("pref_session", "");
+    }
+
+    public boolean isBetaChannel() {
+        return  preferences.getString("pref_update_channel", "stable").equals("beta");
+    }
+
 }

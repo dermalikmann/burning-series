@@ -1,18 +1,24 @@
 buildscript {
     repositories {
         mavenCentral()
+        jcenter()
     }
 
     dependencies {
-        classpath 'me.tatarka:gradle-retrolambda:3.5.0'
+        classpath "me.tatarka:gradle-retrolambda:3.5.0"
+        classpath "com.android.tools.build:gradle:2.2.3"
+        classpath "com.neenbedankt.gradle.plugins:android-apt:1.6"
     }
 }
 
 // Required because retrolambda is on maven central
 repositories {
-    mavenCentral()
+    mavenCentral();
+    jcenter();
 }
 
+apply plugin: 'com.android.application'
+apply plugin: 'android-apt'
 apply plugin: 'com.android.application' //or apply plugin: 'java'
 apply plugin: 'me.tatarka.retrolambda'
 
@@ -20,13 +26,38 @@ android {
     compileSdkVersion 25
     buildToolsVersion "25.0.1"
 
+    def versionPropsFile = file('version.properties')
+    def versionBuild
+
+    if (versionPropsFile.canRead()) {
+        def Properties versionProps = new Properties()
+        versionProps.load(new FileInputStream(versionPropsFile))
+        versionBuild = versionProps['VERSION_BUILD'].toInteger()
+    } else {
+        throw new GradleException("Could not read version.properties!")
+    }
+
+    ext.autoIncrementBuildNumber = {
+
+        if (versionPropsFile.canRead()) {
+            def Properties versionProps = new Properties()
+            versionProps.load(new FileInputStream(versionPropsFile))
+            versionBuild = versionProps['VERSION_BUILD'].toInteger() + 1
+            versionProps['VERSION_BUILD'] = versionBuild.toString()
+            versionProps.store(versionPropsFile.newWriter(), null)
+        } else {
+            throw new GradleException("Could not read version.properties!")
+        }
+    }
+
     defaultConfig {
         applicationId "de.m4lik.burningseries"
         minSdkVersion 19
         targetSdkVersion 24
-        versionCode 50
-        versionName "0.9.18"
+        versionCode versionBuild
+        versionName "0.9.19"
         vectorDrawables.useSupportLibrary = true
+        multiDexEnabled true
     }
     buildTypes {
         release {
@@ -35,58 +66,21 @@ android {
             debuggable false
         }
     }
+
+    gradle.taskGraph.whenReady { taskGraph ->
+        if (taskGraph.hasTask(generateDebugSources)) {  /* when run debug task */
+            println("Increasing Build number")
+            autoIncrementBuildNumber()
+        } else if (taskGraph.hasTask(assembleRelease)) { /* when run release task */
+            println("Increasing Build number")
+            autoIncrementBuildNumber()
+        }
+    }
 }
 
-repositories {
-    jcenter();
-}
+apply from: "dependencies.gradle"
 
 dependencies {
-    compile fileTree(dir: 'libs', include: ['*.jar'])
-
-    compile 'com.android.support:appcompat-v7:25.1.0'
-    compile 'com.android.support:customtabs:25.1.0'
-    compile 'com.android.support:design:25.1.0'
-    compile 'com.android.support:percent:25.1.0'
-    compile 'com.android.support:support-v4:25.1.0'
-    compile 'com.android.support.constraint:constraint-layout:1.0.0-alpha8'
-
-    compile 'com.devbrackets.android:exomedia:3.1.0'
-
     compile 'com.google.android.gms:play-services-gcm:10.0.1'
-    compile 'com.google.code.gson:gson:2.7'
-    compile 'com.google.firebase:firebase-auth:10.0.1'
-    compile 'com.google.firebase:firebase-core:10.0.1'
-    compile 'com.google.firebase:firebase-messaging:10.0.1'
-
-    compile 'com.github.bumptech.glide:glide:3.7.0'
-    compile 'com.github.nirhart:parallaxscroll:1.0'
-    compile 'com.github.satyan:sugar:1.4'
-
-    compile 'com.jakewharton:butterknife:8.4.0'
-
-    compile 'com.squareup.okhttp3:okhttp:3.4.1'
-    compile 'com.squareup.picasso:picasso:2.5.2'
-    compile 'com.squareup.retrofit2:converter-gson:2.1.0'
-    compile 'com.squareup.retrofit2:retrofit:2.1.0'
-
-    compile 'com.wang.avi:library:2.1.3'
-
-    compile 'de.hdodenhof:circleimageview:1.3.0'
-
-    compile "io.reactivex:rxjava:1.2.5"
-    compile "io.reactivex:rxandroid:1.2.1"
-    compile "io.reactivex:rxjava-async-util:0.21.0"
-    compile "com.artemzin.rxjava:proguard-rules:1.2.5.0"
-
-    compile 'org.jsoup:jsoup:1.9.2'
-    compile 'org.solovyev.android.views:linear-layout-manager:0.5@aar'
-
-    compile 'com.google.firebase:firebase-crash:10.0.1'
-    testCompile 'junit:junit:4.12'
-    testCompile 'com.squareup.leakcanary:leakcanary-android-no-op:1.5'
-    debugCompile 'com.squareup.leakcanary:leakcanary-android:1.5'
-    releaseCompile 'com.squareup.leakcanary:leakcanary-android-no-op:1.5'
 }
-
 apply plugin: 'com.google.gms.google-services'

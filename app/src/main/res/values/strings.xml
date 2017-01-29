@@ -51,6 +51,11 @@
     <string name="title_activity_settings">Settings</string>
 
 
+    <!-- Random stuff -->
+
+    <string name="please_wait">Bitte warten...</string>
+    <string name="please_wait_update">Bitte warte. Das Update wird heruntergeladen</string>
+
 
     <!-- Preferences -->
 
@@ -68,8 +73,11 @@
     <string name="pref_cat_behaviour_datausage">Datenverbrauch</string>
     <string name="pref_cat_behaviour_customization">Anpassung</string>
 
+    <string name="pref_cat_update">Updates</string>
+    <string name="pref_cat_update_summary">Hier kannst du die Einstellung zum Updateverhalten anpassen.</string>
+
     <!-- Settings -->
-    
+
     <string name="pref_dummy">Dummy Label</string>
     <string name="pref_dummy_summary">Dummy Summary</string>
     <string name="pref_set_wip_summary">Noch in Arbeit...</string>
@@ -83,6 +91,13 @@
 
     <string name="pref_startup_view">Standardansicht</string>
     <string name="pref_startup_view_summary">Hier kannst du feslegen, was du beim Starten der App als erstes sehen willst.</string>
+
+    <string name="pref_update_pseudo_do_update">Nach Updates suchen.</string>
+    <string name="pref_update_announcement">Bei neuen Updates benachrichtigen</string>
+    <string name="pref_update_announcement_summary_on">Du wirst benachrichtigt sobald ein neues Update zur verfügung steht.</string>
+    <string name="pref_update_announcement_summary_off">Du keine Benachrichtigung bei neuen Updates.</string>
+    <string name="pref_update_channel">Update Channel</string>
+    <string name="pref_update_channel_summary">Hier kannst du auswählen auf welchem Update Channel du dich befinden willst.</string>
 
     <!-- Pseudo Settings -->
 

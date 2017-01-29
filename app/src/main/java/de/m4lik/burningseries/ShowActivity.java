@@ -23,6 +23,7 @@ import android.widget.ImageView;
 
 import com.bumptech.glide.Glide;
 
+import butterknife.BindView;
 import de.m4lik.burningseries.api.API;
 import de.m4lik.burningseries.api.APIInterface;
 import de.m4lik.burningseries.database.MainDBHelper;
@@ -54,6 +55,8 @@ public class ShowActivity extends AppCompatActivity implements Callback<SeasonOb
     public Boolean fav = false;
 
     public View fragmentView;
+
+    @BindView(R.id.fab)
     FloatingActionButton fab;
 
     String userSession;
@@ -112,8 +115,6 @@ public class ShowActivity extends AppCompatActivity implements Callback<SeasonOb
 
         c.close();
         db.close();
-
-        fab = (FloatingActionButton) findViewById(R.id.fab);
 
         if (fav)
             fab.setImageDrawable(ContextCompat.getDrawable(getApplicationContext(), R.drawable.ic_star_white));

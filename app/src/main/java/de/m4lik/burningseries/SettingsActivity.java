@@ -12,10 +12,10 @@ import android.preference.PreferenceFragment;
 import android.preference.PreferenceScreen;
 import android.support.annotation.NonNull;
 import android.support.v7.app.NotificationCompat;
-import android.util.Log;
 import android.view.MenuItem;
 
-import de.m4lik.burningseries.ui.PreferenceWithActionbar;
+import de.m4lik.burningseries.ui.base.ActivityBase;
+import de.m4lik.burningseries.ui.dialogs.UpdateDialog;
 import de.m4lik.burningseries.util.AndroidUtility;
 import de.m4lik.burningseries.util.Settings;
 
@@ -27,7 +27,7 @@ import static com.google.common.base.Strings.emptyToNull;
  * @author Malik Mann
  */
 
-public class SettingsActivity extends PreferenceWithActionbar {
+public class SettingsActivity extends ActivityBase {
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -52,9 +52,13 @@ public class SettingsActivity extends PreferenceWithActionbar {
     }
 
     @Override
+    protected void injectComponent(ActivityComponent appComponent) {
+        appComponent.inject(this);
+    }
+
+    @Override
     public boolean onOptionsItemSelected(MenuItem item) {
-        switch (item.getItemId())
-        {
+        switch (item.getItemId()) {
             case android.R.id.home:
                 onBackPressed();
                 return true;
@@ -72,7 +76,7 @@ public class SettingsActivity extends PreferenceWithActionbar {
 
             addPreferencesFromResource(R.xml.preferences);
 
-            Preference userpref =  getPreferenceManager().findPreference("pref_user");
+            Preference userpref = getPreferenceManager().findPreference("pref_user");
             Preference sessionpref = getPreferenceManager().findPreference("pref_session");
             Preference versionpref = getPreferenceManager().findPreference("pref_version");
 
@@ -91,8 +95,8 @@ public class SettingsActivity extends PreferenceWithActionbar {
 
             versionpref.setSummary(version);
 
-            userpref.setSummary(Settings.of(context).getUser().equals("")? "Nicht angemeldet" : Settings.of(context).getUser());
-            sessionpref.setSummary(Settings.of(context).getSession().equals("")? " " : Settings.of(context).getSession());
+            userpref.setSummary(Settings.of(context).getUser().equals("") ? "Nicht angemeldet" : Settings.of(context).getUser());
+            sessionpref.setSummary(Settings.of(context).getSession().equals("") ? " " : Settings.of(context).getSession());
 
             String category = getArguments().getString("category");
             if (category != null) {
@@ -119,7 +123,6 @@ public class SettingsActivity extends PreferenceWithActionbar {
         public boolean onPreferenceTreeClick(PreferenceScreen preferenceScreen, @NonNull Preference preference) {
 
             String preferenceKey = preference.getKey();
-            Log.e("BS", preferenceKey);
 
             if ("pref_pseudo_recommend".equals(preferenceKey)) {
                 String text = "Versuch mal die neue Burning Series App. https://github.com/M4lik/burning-series/releases";
@@ -128,6 +131,13 @@ public class SettingsActivity extends PreferenceWithActionbar {
                 intent.putExtra(Intent.EXTRA_SUBJECT, "Burning-Series app");
                 intent.putExtra(Intent.EXTRA_TEXT, text);
                 startActivity(Intent.createChooser(intent, getString(R.string.share_using)));
+                return true;
+            }
+
+            if ("pref_pseudo_do_update".equals(preferenceKey)) {
+                ActivityBase activity = (ActivityBase) getActivity();
+                UpdateDialog.checkForUpdates(activity, true);
+                return true;
             }
 
             if ("pref_psudo_debug_notification".equals(preferenceKey)) {
@@ -142,6 +152,7 @@ public class SettingsActivity extends PreferenceWithActionbar {
                 NotificationManager notificationManager =
                         (NotificationManager) context.getSystemService(Context.NOTIFICATION_SERVICE);
                 notificationManager.notify(1337, builder.build());
+                return true;
             }
 
             return super.onPreferenceTreeClick(preferenceScreen, preference);

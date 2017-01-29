@@ -18,6 +18,8 @@ import android.widget.EditText;
 
 import java.io.IOException;
 
+import butterknife.BindView;
+import butterknife.ButterKnife;
 import de.m4lik.burningseries.api.API;
 import de.m4lik.burningseries.api.APIInterface;
 import de.m4lik.burningseries.database.MainDBHelper;
@@ -34,19 +36,24 @@ public class LoginActivity extends AppCompatActivity implements Callback<Respons
 
     Boolean loginInProgress = false;
 
-    // UI references.
-    private EditText userEditText;
-    private EditText passwordEditText;
-    private View mProgressView;
-    private View mLoginFormView;
+    @BindView(R.id.user)
+    EditText userEditText;
+
+    @BindView(R.id.password)
+    EditText passwordEditText;
+
+    @BindView(R.id.login_progress)
+    View mProgressView;
+
+    @BindView(R.id.login_form)
+    View mLoginFormView;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
-        super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_login);
-        // Set up the login form.
-        userEditText = (EditText) findViewById(R.id.user);
-        passwordEditText = (EditText) findViewById(R.id.password);
+        ButterKnife.bind(this);
+
+        super.onCreate(savedInstanceState);
 
         Button mEmailSignInButton = (Button) findViewById(R.id.email_sign_in_button);
         mEmailSignInButton.setOnClickListener(new OnClickListener() {
@@ -55,9 +62,6 @@ public class LoginActivity extends AppCompatActivity implements Callback<Respons
                 attemptLogin();
             }
         });
-
-        mLoginFormView = findViewById(R.id.login_form);
-        mProgressView = findViewById(R.id.login_progress);
     }
 
 

@@ -51,6 +51,11 @@
     <string name="title_activity_settings">Settings</string>
 
 
+    <!-- Random stuff -->
+
+    <string name="please_wait">Bitte warten...</string>
+    <string name="please_wait_update">Bitte warte. Das Update wird heruntergeladen</string>
+
 
     <!-- Preferences -->
 
@@ -72,7 +77,7 @@
     <string name="pref_cat_update_summary">Hier kannst du die Einstellung zum Updateverhalten anpassen.</string>
 
     <!-- Settings -->
-    
+
     <string name="pref_dummy">Dummy Label</string>
     <string name="pref_dummy_summary">Dummy Summary</string>
     <string name="pref_set_wip_summary">Noch in Arbeit...</string>

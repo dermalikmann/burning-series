@@ -14,14 +14,14 @@ import java.util.regex.Pattern;
  * Created by Malik on 04.11.2016.
  */
 class VidTo extends Hoster {
-    protected static final Pattern filenamePattern;
-    protected static final Pattern hashPattern;
-    protected static final Pattern geturlPattern;
+    private static final Pattern filenamePattern;
+    private static final Pattern hashPattern;
+    private static final Pattern getURLPattern;
 
     static {
         filenamePattern = Pattern.compile("<input type=\"hidden\" name=\"fname\" value=\"(.*)\">");
         hashPattern = Pattern.compile("<input type=\"hidden\" name=\"hash\" value=\"([a-zA-Z0-9-]+)\">");
-        geturlPattern = Pattern.compile("',\\d+,\\d+,'");
+        getURLPattern = Pattern.compile("',\\d+,\\d+,'");
     }
 
     public String get(String videoID) {
@@ -37,7 +37,7 @@ class VidTo extends Hoster {
                 return "2";
             }
             CharSequence GetRequest = GetRequestString(fullURL);
-            Map dataArgs = new HashMap(7);
+            Map<String, String> dataArgs = new HashMap<String, String>(7);
             Matcher filenameMatcher = filenamePattern.matcher(GetRequest);
             Matcher hashMatcher = hashPattern.matcher(GetRequest);
             if (!filenameMatcher.find() || !hashMatcher.find()) {
@@ -52,14 +52,14 @@ class VidTo extends Hoster {
             dataArgs.put("hash", hashMatcher.group(1));
             dataArgs.put("imhuman", "Proceed to video");
 
-            Map refererArgs = new HashMap(1);
+            Map<String, String> refererArgs = new HashMap<String, String>(1);
             refererArgs.put("Referer", fullURL);
 
             SystemClock.sleep(6500);
 
             try {
                 String postReq = "eval(" + PostRequestString(fullURL, dataArgs, refererArgs).split("eval\\(")[1];
-                Matcher test = geturlPattern.matcher(postReq);
+                Matcher test = getURLPattern.matcher(postReq);
                 test.find();
                 String p = postReq.split("return p\\}\\('")[1].split("',\\d+,\\d+")[0];
                 String[] urlMatcher1 = test.group().split(",");

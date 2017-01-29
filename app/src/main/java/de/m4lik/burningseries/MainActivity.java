@@ -23,7 +23,6 @@ import android.support.v4.view.GravityCompat;
 import android.support.v4.view.MenuItemCompat;
 import android.support.v4.widget.DrawerLayout;
 import android.support.v7.app.ActionBarDrawerToggle;
-import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.SearchView;
 import android.support.v7.widget.Toolbar;
 import android.view.Menu;
@@ -37,6 +36,7 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 
+import butterknife.BindView;
 import de.m4lik.burningseries.api.API;
 import de.m4lik.burningseries.api.APIInterface;
 import de.m4lik.burningseries.api.objects.GenreMap;
@@ -44,6 +44,7 @@ import de.m4lik.burningseries.api.objects.GenreObj;
 import de.m4lik.burningseries.api.objects.ShowObj;
 import de.m4lik.burningseries.database.MainDBHelper;
 import de.m4lik.burningseries.services.ThemeHelperService;
+import de.m4lik.burningseries.ui.base.ActivityBase;
 import de.m4lik.burningseries.ui.mainFragments.FavsFragment;
 import de.m4lik.burningseries.ui.mainFragments.GenresFragment;
 import de.m4lik.burningseries.ui.mainFragments.SeriesFragment;
@@ -65,7 +66,7 @@ import static de.m4lik.burningseries.database.SeriesContract.seriesTable;
  * @author Malik Mann
  */
 
-public class MainActivity extends AppCompatActivity
+public class MainActivity extends ActivityBase
         implements NavigationView.OnNavigationItemSelectedListener {
 
     public static String userName;
@@ -81,16 +82,25 @@ public class MainActivity extends AppCompatActivity
     MainDBHelper dbHelper;
     SQLiteDatabase database;
 
-    NavigationView navigationView = null;
-    Toolbar toolbar = null;
+    @BindView(R.id.nav_view)
+    NavigationView navigationView;
+
+    @BindView(R.id.toolbar)
+    Toolbar toolbar;
 
     public static Menu getMenu() {
         return menu;
     }
 
     @Override
+    protected void injectComponent(ActivityComponent appComponent) {
+        appComponent.inject(this);
+    }
+
+    @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        setContentView(R.layout.activity_main);
 
         Bitmap icon = BitmapFactory.decodeResource(getApplicationContext().getResources(),
                 R.drawable.ic_stat_name);
@@ -104,9 +114,7 @@ public class MainActivity extends AppCompatActivity
                             getApplicationContext().getResources().getColor(R.color.blue_primary)
                     ));
         }
-
-        setContentView(R.layout.activity_main);
-        toolbar = (Toolbar) findViewById(R.id.toolbar);
+        //toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
 
         DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
@@ -119,7 +127,7 @@ public class MainActivity extends AppCompatActivity
         dbHelper = new MainDBHelper(getApplicationContext());
         database = dbHelper.getWritableDatabase();
 
-        navigationView = (NavigationView) findViewById(R.id.nav_view);
+        //navigationView = (NavigationView) findViewById(R.id.nav_view);
         navigationView.setNavigationItemSelectedListener(this);
 
         ActionBarDrawerToggle toggle = new ActionBarDrawerToggle(
@@ -182,6 +190,7 @@ public class MainActivity extends AppCompatActivity
             setFragment(Settings.of(getApplicationContext()).getStartupView());
 
         c.close();
+        db.close();
 
         SearchView searchView = (SearchView) MenuItemCompat.getActionView(getMenu().findItem(R.id.action_search));
         searchView.setOnQueryTextListener(new SearchView.OnQueryTextListener() {
@@ -398,7 +407,7 @@ public class MainActivity extends AppCompatActivity
         favscall.enqueue(new Callback<List<ShowObj>>() {
             @Override
             public void onResponse(Call<List<ShowObj>> call, Response<List<ShowObj>> response) {
-                new favoritesDatanaseUpdate(response.body()).execute();
+                new favoritesDatabaseUpdate(response.body()).execute();
             }
 
             @Override
@@ -481,11 +490,11 @@ public class MainActivity extends AppCompatActivity
         }
     }
 
-    class favoritesDatanaseUpdate extends AsyncTask<Void, Void, Void> {
+    class favoritesDatabaseUpdate extends AsyncTask<Void, Void, Void> {
 
         List<ShowObj> list;
 
-        favoritesDatanaseUpdate(List<ShowObj> list) {
+        favoritesDatabaseUpdate(List<ShowObj> list) {
             this.list = list;
         }
 

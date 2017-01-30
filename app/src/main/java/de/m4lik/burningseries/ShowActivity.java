@@ -14,7 +14,6 @@ import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentTransaction;
 import android.support.v4.content.ContextCompat;
-import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
 import android.util.Log;
 import android.view.MenuItem;
@@ -26,9 +25,10 @@ import com.bumptech.glide.Glide;
 import butterknife.BindView;
 import de.m4lik.burningseries.api.API;
 import de.m4lik.burningseries.api.APIInterface;
+import de.m4lik.burningseries.api.objects.SeasonObj;
 import de.m4lik.burningseries.database.MainDBHelper;
 import de.m4lik.burningseries.database.SeriesContract;
-import de.m4lik.burningseries.api.objects.SeasonObj;
+import de.m4lik.burningseries.ui.base.ActivityBase;
 import de.m4lik.burningseries.ui.showFragments.EpisodesFragment;
 import de.m4lik.burningseries.ui.showFragments.HosterFragment;
 import de.m4lik.burningseries.ui.showFragments.SeasonsFragment;
@@ -39,7 +39,7 @@ import retrofit2.Response;
 
 import static de.m4lik.burningseries.database.SeriesContract.seriesTable;
 
-public class ShowActivity extends AppCompatActivity implements Callback<SeasonObj> {
+public class ShowActivity extends ActivityBase implements Callback<SeasonObj> {
 
     private String title;
     private String description;
@@ -62,6 +62,11 @@ public class ShowActivity extends AppCompatActivity implements Callback<SeasonOb
     String userSession;
 
     Intent i;
+
+    @Override
+    protected void injectComponent(ActivityComponent appComponent) {
+        appComponent.inject(this);
+    }
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {

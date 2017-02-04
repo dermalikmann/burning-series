@@ -88,7 +88,8 @@ public class SettingsActivity extends ActivityBase {
                 PackageManager manager = context.getPackageManager();
                 PackageInfo info = manager.getPackageInfo(
                         context.getPackageName(), 0);
-                version = info.versionName + " (Build " + info.versionCode + ")";
+                String debug = BuildConfig.DEBUG ? " DEBUG" : "";
+                version = info.versionName + " (Build " + info.versionCode + debug + ")";
             } catch (Exception e) {
                 version = "Error getting version";
             }

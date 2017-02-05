@@ -183,7 +183,7 @@ public class SeriesFragment extends Fragment {
                         db.close();
 
                     } else {
-                        Snackbar snackbar = Snackbar.make(rootView.findViewById(android.R.id.content), "Die Favoriten sind nur verfügbar wenn du angemeldet bist.", 500);
+                        Snackbar snackbar = Snackbar.make(rootView, "Die Favoriten sind nur verfügbar wenn du angemeldet bist.", 500);
                         View snackbarView = snackbar.getView();
                         snackbarView.setBackgroundColor(ContextCompat.getColor(getContext(), R.color.colorPrimaryDark));
                         snackbar.show();

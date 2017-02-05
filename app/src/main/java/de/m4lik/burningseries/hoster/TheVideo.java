@@ -31,7 +31,7 @@ class TheVideo extends Hoster {
     }
 
     public String get(String videoID) {
-        String fullURL = "http://thevideo.me/" + videoID;
+        String fullURL = "https://thevideo.me/" + videoID;
         try {
             CharSequence GetRequest = GetRequestString(fullURL);
 
@@ -43,6 +43,8 @@ class TheVideo extends Hoster {
             Map<String, String> dataArgs = new HashMap(10);
 
             Matcher hashMatcher = hashPattern.matcher(GetRequest);
+
+            Log.d("BSTV", GetRequest.toString());
 
             if (!hashMatcher.find()) {
                 //The Skies are clear. Unusual.
@@ -75,7 +77,7 @@ class TheVideo extends Hoster {
 
 
 
-            String videoTokenRequest = GetRequestString("http://thevideo.me/jwv/" + mpriKey);
+            String videoTokenRequest = GetRequestString("https://thevideo.me/jwv/" + mpriKey);
 
             Matcher vtMatcher = vtPattern.matcher(videoTokenRequest);
             vtMatcher.find();

@@ -1,9 +1,8 @@
 package de.m4lik.burningseries.ui.showFragments;
 
 
-import android.app.AlertDialog;
+import android.app.Dialog;
 import android.app.ProgressDialog;
-import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.net.Uri;
@@ -36,6 +35,7 @@ import de.m4lik.burningseries.api.APIInterface;
 import de.m4lik.burningseries.api.objects.EpisodeObj;
 import de.m4lik.burningseries.api.objects.VideoObj;
 import de.m4lik.burningseries.hoster.Hoster;
+import de.m4lik.burningseries.ui.dialogs.DialogBuilder;
 import de.m4lik.burningseries.ui.listitems.HosterListItem;
 import de.m4lik.burningseries.util.AndroidUtility;
 import de.m4lik.burningseries.util.Settings;
@@ -144,21 +144,20 @@ public class HosterFragment extends Fragment implements Callback<EpisodeObj> {
                 if (Settings.of(getContext()).alarmOnMobile() &&
                         AndroidUtility.isOnMobile(getContext())) {
 
-                    AlertDialog.Builder builder = new AlertDialog.Builder(getContext());
-                    builder.setTitle("Mobile Daten");
-                    builder.setMessage("Achtung! Du bist über mobile Daten im Internet. Willst du Fortfahren?");
+                    DialogBuilder.start(getActivity())
+                            .title("Mobile Daten")
+                            .content("Achtung! Du bist über mobile Daten im Internet. Willst du Fortfahren?")
+                            .positive("Weiter", new DialogBuilder.OnClickListener() {
+                                @Override
+                                public void onClick(Dialog dialog) {
+                                    TextView idView = (TextView) view.findViewById(R.id.linkId);
+                                    showVideo(Integer.parseInt(idView.getText().toString()));
+                                }
+                            })
+                            .negative("Abbrechen")
+                            .build()
+                            .show();
 
-                    builder.setPositiveButton("Weiter", new DialogInterface.OnClickListener() {
-                        @Override
-                        public void onClick(DialogInterface dialogInterface, int i) {
-                            TextView idView = (TextView) view.findViewById(R.id.linkId);
-                            showVideo(Integer.parseInt(idView.getText().toString()));
-                        }
-                    });
-
-                    builder.setNegativeButton("Abbrechen", null);
-
-                    builder.show();
                 } else {
                     TextView idView = (TextView) view.findViewById(R.id.linkId);
                     showVideo(Integer.parseInt(idView.getText().toString()));

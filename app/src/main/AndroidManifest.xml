@@ -52,6 +52,12 @@
             android:name=".BufferedVideoPlayerActivity"
             android:screenOrientation="landscape"
             android:theme="@style/BurningSeries.NoActionBar.Dark"/>
+
+        <activity
+            android:name=".FullscreenVideoActivity"
+            android:screenOrientation="landscape"
+            android:theme="@style/BurningSeries.NoActionBar.Dark"/>
+
         <activity
             android:name=".SettingsActivity"
             android:label="@string/settings"

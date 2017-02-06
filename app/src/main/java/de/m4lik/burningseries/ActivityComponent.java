@@ -22,6 +22,8 @@ public interface ActivityComponent {
 
     void inject(SettingsActivity settingsActivity);
 
+    void inject(FullscreenVideoActivity videoActivity);
+
     void inject(LoginActivity activity);
 
     void inject(DownloadUpdateDialog dialog);

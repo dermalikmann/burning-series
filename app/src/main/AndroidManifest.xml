@@ -1,9 +1,9 @@
 <?xml version="1.0" encoding="utf-8"?>
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
-    package="de.m4lik.burningseries">
+          package="de.m4lik.burningseries">
 
-    <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" />
-    <uses-permission android:name="android.permission.WAKE_LOCK" />
+    <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE"/>
+    <uses-permission android:name="android.permission.WAKE_LOCK"/>
 
     <application
         android:name=".ApplicationClass"
@@ -14,6 +14,17 @@
         android:theme="@style/BurningSeries">
 
         <!-- Services -->
+
+        <service
+            android:name=".services.SyncIntentService"
+            android:exported="false">
+        </service>
+
+        <receiver android:name=".services.SyncBroadcastReceiver">
+            <intent-filter>
+                <action android:name="android.intent.action.BOOT_COMPLETED"/>
+            </intent-filter>
+        </receiver>
 
         <!-- Activities -->
 
@@ -26,6 +37,7 @@
                 <category android:name="android.intent.category.LAUNCHER"/>
             </intent-filter>
         </activity>
+
         <activity
             android:name=".MainActivity"
             android:label="@string/app_name"
@@ -39,15 +51,28 @@
                 android:name="android.app.searchable"
                 android:resource="@xml/searchable"/>
         </activity>
+
         <activity
             android:name=".ShowActivity"
             android:label="@string/title_activity_scrolling"
             android:screenOrientation="portrait"
-            android:theme="@style/BurningSeries.NoActionBar"/>
+            android:parentActivityName=".MainActivity"
+            android:theme="@style/BurningSeries.NoActionBar">
+            <meta-data
+                android:name="android.support.PARENT_ACTIVITY"
+                android:value=".MainActivity"/>
+        </activity>
+
         <activity
             android:name=".LoginActivity"
             android:label="@string/title_activity_login"
-            android:screenOrientation="portrait"/>
+            android:screenOrientation="portrait"
+            android:parentActivityName=".MainActivity">
+            <meta-data
+                android:name="android.support.PARENT_ACTIVITY"
+                android:value=".MainActivity"/>
+        </activity>
+
         <activity
             android:name=".BufferedVideoPlayerActivity"
             android:screenOrientation="landscape"
@@ -60,12 +85,24 @@
 
         <activity
             android:name=".SettingsActivity"
-            android:label="@string/settings"
+            android:label="@string/title_activity_settings"
+            android:parentActivityName=".MainActivity"
             android:screenOrientation="portrait">
             <meta-data
                 android:name="android.support.PARENT_ACTIVITY"
                 android:value=".MainActivity"/>
         </activity>
+
+        <activity
+            android:name=".UpdateActivity"
+            android:label="@string/title_activity_update"
+            android:parentActivityName=".MainActivity"
+            android:screenOrientation="portrait">
+            <meta-data
+                android:name="android.support.PARENT_ACTIVITY"
+                android:value=".MainActivity"/>
+        </activity>
+
     </application>
 
 </manifest>

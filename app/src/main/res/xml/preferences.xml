@@ -127,6 +127,14 @@
             android:summary="@string/pref_pseudo_debug_notification_summary"
             android:title="@string/pref_pseudo_debug_notification" />
 
+        <Preference
+            android:key="pref_pseudo_debug_fullscreen_video"
+            android:title="FullscreenVideoActivity starten"/>
+
+        <Preference
+            android:key="pref_pseudo_debug_update_check"
+            android:title="Background update check"/>
+
     </PreferenceCategory>
 
     <PreferenceCategory android:title="Info">

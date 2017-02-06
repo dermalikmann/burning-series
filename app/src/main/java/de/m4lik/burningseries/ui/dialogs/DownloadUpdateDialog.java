@@ -53,11 +53,10 @@ public class DownloadUpdateDialog extends DialogBase {
     public Dialog onCreateDialog(Bundle savedInstanceState) {
         Dialog dialog = DialogBuilder.start(getActivity())
                 .layout(R.layout.dialog_update)
+                .cancelable(false)
                 .show();
         ButterKnife.bind(dialog);
 
-        dialog.setCancelable(false);
-        dialog.setCanceledOnTouchOutside(false);
         return dialog;
     }
 

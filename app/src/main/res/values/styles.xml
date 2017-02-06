@@ -6,7 +6,7 @@
         <item name="colorAccent">@color/colorPrimary</item>
     </style>
 
-    <style name="BurningSeries.NoActionBar" >
+    <style name="BurningSeries.NoActionBar">
         <item name="windowActionBar">false</item>
         <item name="windowNoTitle">true</item>
     </style>
@@ -35,8 +35,6 @@
     <style name="FullscreenActionBarStyle" parent="Widget.AppCompat.ActionBar">
         <item name="android:background">@color/black_overlay</item>
     </style>
-
-
 
 
     <!-- Design -->
@@ -72,7 +70,7 @@
 
     <!-- popup menus -->
 
-    <style name="BurningSeries.Popup" parent="ThemeOverlay.AppCompat.Light" />
+    <style name="BurningSeries.Popup" parent="ThemeOverlay.AppCompat.Light"/>
 
     <style name="BurningSeries.Popup.Blue">
         <item name="colorAccent">@color/blue_primary</item>
@@ -88,7 +86,7 @@
 
     <!-- dialog menus -->
 
-    <style name="BurningSeries.Dialog" parent="ThemeOverlay.AppCompat.Light" />
+    <style name="BurningSeries.Dialog" parent="ThemeOverlay.AppCompat.Light"/>
 
     <style name="BurningSeries.Dialog.Blue">
         <item name="colorAccent">@color/blue_primary</item>
@@ -148,11 +146,15 @@
     <!-- Placeholder -->
 
     <style name="BurningSeries.Blue.NoActionBar.Fullscreen"/>
+
     <style name="BurningSeries.Green.NoActionBar.Fullscreen"/>
+
     <style name="BurningSeries.Orange.NoActionBar.Fullscreen"/>
 
     <style name="BurningSeries.Blue.NoActionBar.TranslucentStatus"/>
+
     <style name="BurningSeries.Green.NoActionBar.TranslucentStatus"/>
+
     <style name="BurningSeries.Orange.NoActionBar.TranslucentStatus"/>
 
     <!-- Navigation Drawer -->

@@ -63,6 +63,11 @@ public class DialogBuilder {
         return this;
     }
 
+    public DialogBuilder cancelable(boolean cancelable) {
+        builder.setCancelable(cancelable);
+        return this;
+    }
+
     public DialogBuilder layout(@LayoutRes int view) {
         builder.setView(view);
         return this;

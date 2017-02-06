@@ -1,6 +1,6 @@
 package de.m4lik.burningseries;
 
-import android.app.NotificationManager;
+import android.app.Notification;
 import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
@@ -11,9 +11,10 @@ import android.preference.Preference;
 import android.preference.PreferenceFragment;
 import android.preference.PreferenceScreen;
 import android.support.annotation.NonNull;
-import android.support.v7.app.NotificationCompat;
+import android.support.v4.app.NotificationManagerCompat;
 import android.view.MenuItem;
 
+import de.m4lik.burningseries.services.SyncBroadcastReceiver;
 import de.m4lik.burningseries.ui.base.ActivityBase;
 import de.m4lik.burningseries.ui.dialogs.UpdateDialog;
 import de.m4lik.burningseries.util.AndroidUtility;
@@ -141,18 +142,32 @@ public class SettingsActivity extends ActivityBase {
                 return true;
             }
 
-            if ("pref_psudo_debug_notification".equals(preferenceKey)) {
+            if ("pref_pseudo_debug_fullscreen_video".equals(preferenceKey)) {
+                Intent intent = new Intent(getActivity(), FullscreenVideoActivity.class);
+                intent.putExtra("burning-series.videoURL", "https://d7467.thevideo.me:8777/lcjtbvndrgoammfvg6hvcdenexwdnu33ihjof5alluspwnezoxh7e7wpgav3ujfyemev2rarlfknfuafad7yfnhb62awu5c5gt6yfjswf3guzz2bqmvpehdcxuzigyjqqyjmlovz6vplfeb3rr2g5tfhx4ubg4p24dlr3dkmsz7ilbo4c23xw75a4uv4pmufbez6twehzidkx4nyhriby26alppmvre3fktwkcsggavnhn63stojm35noqlqir64elpbvqaygv6yc6qa3pvlihsw4m3a/v.mp4?direct=false&ua=1&vt=ogtkhqidyiexah3newi4coptgfgjoqsumikxtn53ukleggihq75m2e5sjlnf3b4h3ocljv2pwzzdximl6edsjsthtmg6rcp4oixrmnqmbzrfcatpve452loulk72prcbt4wbhh5yunyhyfblwctua3kek4meqdtnyotgtfjodxevt76vrdpbjl2oziinwbwfgn4l4fxmj6qmygltq2hdszfqqtgqcd5irbzzowy");
+                startActivity(intent);
+                return true;
+            }
+
+            if ("pref_pseudo_debug_update_check".equals(preferenceKey)) {
+                SyncBroadcastReceiver.syncNow(getActivity());
+                return true;
+            }
+
+            if ("pref_pseudo_debug_notification".equals(preferenceKey)) {
                 Context context = getActivity().getApplicationContext();
 
-                NotificationCompat.Builder builder =
-                        new NotificationCompat.Builder(context);
-                builder.setSmallIcon(R.drawable.ic_stat_name);
-                builder.setContentTitle("Test Benachrichtigung");
-                builder.setContentText("Hallo Welt!");
-                builder.setContentIntent(null);
-                NotificationManager notificationManager =
-                        (NotificationManager) context.getSystemService(Context.NOTIFICATION_SERVICE);
-                notificationManager.notify(1337, builder.build());
+                NotificationManagerCompat nm = NotificationManagerCompat.from(context);
+
+                Notification notification = newNotificationBuilder(context)
+                        .setContentTitle("Test Benachrichtigung")
+                        .setContentText("Hallo Welt!")
+                        .setSmallIcon(R.drawable.ic_stat_name)
+                        .setCategory(android.support.v4.app.NotificationCompat.CATEGORY_RECOMMENDATION)
+                        .setAutoCancel(false)
+                        .build();
+
+                nm.notify(1337, notification);
                 return true;
             }
 
@@ -162,6 +177,10 @@ public class SettingsActivity extends ActivityBase {
         @Override
         public void onSharedPreferenceChanged(SharedPreferences preferences, String key) {
 
+        }
+
+        private static android.support.v4.app.NotificationCompat.Builder newNotificationBuilder(Context context) {
+            return new android.support.v7.app.NotificationCompat.Builder(context);
         }
     }
 }

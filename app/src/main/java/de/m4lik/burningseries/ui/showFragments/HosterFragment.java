@@ -27,7 +27,7 @@ import android.widget.TextView;
 
 import java.util.ArrayList;
 
-import de.m4lik.burningseries.BufferedVideoPlayerActivity;
+import de.m4lik.burningseries.FullscreenVideoActivity;
 import de.m4lik.burningseries.R;
 import de.m4lik.burningseries.ShowActivity;
 import de.m4lik.burningseries.api.API;
@@ -264,7 +264,8 @@ public class HosterFragment extends Fragment implements Callback<EpisodeObj> {
                 CustomTabsIntent customTabsIntent = builder.build();
                 customTabsIntent.launchUrl(getActivity(), Uri.parse(videoObj.getFullUrl()));
             } else {
-                Intent intent = new Intent(getContext(), BufferedVideoPlayerActivity.class);
+                //Intent intent = new Intent(getContext(), BufferedVideoPlayerActivity.class);
+                Intent intent = new Intent(getContext(), FullscreenVideoActivity.class);
                 intent.putExtra("burning-series.videoURL", hosterReturn);
                 startActivity(intent);
             }

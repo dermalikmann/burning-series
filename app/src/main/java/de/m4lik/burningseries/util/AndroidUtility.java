@@ -6,12 +6,14 @@ import android.os.Bundle;
 import android.os.Looper;
 import android.support.v4.net.ConnectivityManagerCompat;
 
+import com.google.common.base.Optional;
 import com.google.common.cache.Cache;
 import com.google.common.cache.CacheBuilder;
 
 import java.util.concurrent.TimeUnit;
 
 import de.m4lik.burningseries.BuildConfig;
+import rx.Observable;
 
 /**
  * Created by Malik on 12.01.2017
@@ -56,6 +58,11 @@ public class AndroidUtility {
     public static void checkNotMainThread() {
         if (Looper.getMainLooper().getThread() == Thread.currentThread())
             throw new IllegalStateException("Must not be called from the main thread.");
+    }
+
+    public static <T> Optional<T> toOptional(Observable<T> observable) {
+        T element = observable.toBlocking().singleOrDefault(null);
+        return Optional.fromNullable(element);
     }
 
     public static int buildNumber() {

@@ -23,6 +23,7 @@ import butterknife.ButterKnife;
 import de.m4lik.burningseries.api.API;
 import de.m4lik.burningseries.api.APIInterface;
 import de.m4lik.burningseries.database.MainDBHelper;
+import de.m4lik.burningseries.services.SyncBroadcastReceiver;
 import de.m4lik.burningseries.util.Logger;
 import okhttp3.ResponseBody;
 import retrofit2.Call;
@@ -129,6 +130,8 @@ public class LoginActivity extends AppCompatActivity implements Callback<Respons
                 /**
                  * {"user":"name","session":"sessionstring"} -> sessionstring
                  */
+
+                SyncBroadcastReceiver.scheduleNextSync(this);
 
                 String[] data = json.split(",");
                 String session = data[1].split(":")[1].replace("\"", "").replace("}", "").trim();

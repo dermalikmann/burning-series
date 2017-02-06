@@ -31,10 +31,13 @@ import android.view.MenuItem;
 import android.view.View;
 import android.widget.TextView;
 
+import com.trello.rxlifecycle.android.RxLifecycleAndroid;
+
 import java.util.Arrays;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
+import java.util.concurrent.TimeUnit;
 
 import butterknife.BindView;
 import de.m4lik.burningseries.api.API;
@@ -43,6 +46,7 @@ import de.m4lik.burningseries.api.objects.GenreMap;
 import de.m4lik.burningseries.api.objects.GenreObj;
 import de.m4lik.burningseries.api.objects.ShowObj;
 import de.m4lik.burningseries.database.MainDBHelper;
+import de.m4lik.burningseries.services.SyncBroadcastReceiver;
 import de.m4lik.burningseries.services.ThemeHelperService;
 import de.m4lik.burningseries.ui.base.ActivityBase;
 import de.m4lik.burningseries.ui.mainFragments.FavsFragment;
@@ -54,6 +58,9 @@ import okhttp3.ResponseBody;
 import retrofit2.Call;
 import retrofit2.Callback;
 import retrofit2.Response;
+import rx.Observable;
+import rx.android.schedulers.AndroidSchedulers;
+import rx.functions.Action1;
 
 import static de.m4lik.burningseries.database.SeriesContract.SQL_TRUNCATE_GENRES_TABLE;
 import static de.m4lik.burningseries.database.SeriesContract.SQL_TRUNCATE_SERIES_TABLE;
@@ -164,6 +171,22 @@ public class MainActivity extends ActivityBase
         super.onBackPressed();
 
     }
+
+    @Override
+    protected void onStart() {
+        super.onStart();
+
+        // schedule a sync operation every minute
+        Observable.interval(0, 1, TimeUnit.MINUTES, AndroidSchedulers.mainThread())
+                .compose(RxLifecycleAndroid.bindActivity(lifecycle()))
+                .subscribe(new Action1<Object>() {
+                    @Override
+                    public void call(Object o) {
+                        SyncBroadcastReceiver.syncNow(MainActivity.this);
+                    }
+                });
+    }
+
 
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {

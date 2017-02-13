@@ -48,7 +48,7 @@ public class ShowActivity extends ActivityBase implements Callback<SeasonObj> {
     public Integer selectedSeason;
     public Integer selectedEpisode;
 
-    private String visibleFragment;
+    private String visibleFragment = "seasons";
 
     public Integer seasonCount;
 

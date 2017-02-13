@@ -1,9 +1,12 @@
 package de.m4lik.burningseries.util;
 
+import android.app.Activity;
 import android.content.Context;
+import android.content.Intent;
 import android.net.ConnectivityManager;
 import android.os.Bundle;
 import android.os.Looper;
+import android.support.v4.app.TaskStackBuilder;
 import android.support.v4.net.ConnectivityManagerCompat;
 
 import com.google.common.base.Optional;
@@ -71,5 +74,13 @@ public class AndroidUtility {
         } else {
             return BuildConfig.VERSION_CODE;
         }
+    }
+
+    public static void recreateActivity(Activity activity) {
+        final Intent intent = activity.getIntent();
+        intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+        TaskStackBuilder.create(activity)
+                .addNextIntentWithParentStack(intent)
+                .startActivities();
     }
 }

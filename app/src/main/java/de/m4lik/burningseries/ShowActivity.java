@@ -38,6 +38,7 @@ import retrofit2.Callback;
 import retrofit2.Response;
 
 import static de.m4lik.burningseries.database.SeriesContract.seriesTable;
+import static de.m4lik.burningseries.services.ThemeHelperService.theme;
 
 public class ShowActivity extends ActivityBase implements Callback<SeasonObj> {
 
@@ -70,6 +71,7 @@ public class ShowActivity extends ActivityBase implements Callback<SeasonObj> {
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
+        setTheme(theme().noActionBar);
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_show);
 
@@ -77,6 +79,8 @@ public class ShowActivity extends ActivityBase implements Callback<SeasonObj> {
 
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
         ImageView tbiv = (ImageView) findViewById(R.id.toolbarimage);
+        findViewById(R.id.gradient).setBackground(getResources().getDrawable(theme().gradient));
+
         title = i.getStringExtra("ShowName");
         selectedShow = i.getIntExtra("ShowID", 60);
         Uri imageUri = Uri.parse("https://s.bs.to/img/cover/" + selectedShow + ".jpg");

@@ -47,7 +47,6 @@ import de.m4lik.burningseries.api.objects.GenreObj;
 import de.m4lik.burningseries.api.objects.ShowObj;
 import de.m4lik.burningseries.database.MainDBHelper;
 import de.m4lik.burningseries.services.SyncBroadcastReceiver;
-import de.m4lik.burningseries.services.ThemeHelperService;
 import de.m4lik.burningseries.ui.base.ActivityBase;
 import de.m4lik.burningseries.ui.mainFragments.FavsFragment;
 import de.m4lik.burningseries.ui.mainFragments.GenresFragment;
@@ -66,6 +65,7 @@ import static de.m4lik.burningseries.database.SeriesContract.SQL_TRUNCATE_GENRES
 import static de.m4lik.burningseries.database.SeriesContract.SQL_TRUNCATE_SERIES_TABLE;
 import static de.m4lik.burningseries.database.SeriesContract.genresTable;
 import static de.m4lik.burningseries.database.SeriesContract.seriesTable;
+import static de.m4lik.burningseries.services.ThemeHelperService.theme;
 
 /**
  * MainActivity class
@@ -86,9 +86,6 @@ public class MainActivity extends ActivityBase
 
     ProgressDialog progressDialog;
 
-    MainDBHelper dbHelper;
-    SQLiteDatabase database;
-
     @BindView(R.id.nav_view)
     NavigationView navigationView;
 
@@ -106,6 +103,7 @@ public class MainActivity extends ActivityBase
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
+        setTheme(theme().noActionBar);
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
@@ -129,10 +127,6 @@ public class MainActivity extends ActivityBase
         SharedPreferences sharedPreferences = PreferenceManager.getDefaultSharedPreferences(this);
         userName = sharedPreferences.getString("pref_user", "Bitte Einloggen");
         userSession = sharedPreferences.getString("pref_session", "");
-
-
-        dbHelper = new MainDBHelper(getApplicationContext());
-        database = dbHelper.getWritableDatabase();
 
         //navigationView = (NavigationView) findViewById(R.id.nav_view);
         navigationView.setNavigationItemSelectedListener(this);
@@ -411,7 +405,7 @@ public class MainActivity extends ActivityBase
                 );
 
                 View snackbarView = snackbar.getView();
-                snackbarView.setBackgroundColor(ContextCompat.getColor(getApplicationContext(), ThemeHelperService.theme().primaryColor));
+                snackbarView.setBackgroundColor(ContextCompat.getColor(getApplicationContext(), theme().primaryColor));
                 snackbar.show();
 
                 getApplicationContext().deleteDatabase(MainDBHelper.DATABASE_NAME);

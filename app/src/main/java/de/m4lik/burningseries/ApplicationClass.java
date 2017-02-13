@@ -8,10 +8,6 @@ import com.google.common.base.Supplier;
 
 import net.danlew.android.joda.JodaTimeAndroid;
 
-import java.util.logging.Handler;
-import java.util.logging.Level;
-import java.util.logging.LogManager;
-
 import butterknife.ButterKnife;
 import de.m4lik.burningseries.modules.AppModule;
 import de.m4lik.burningseries.modules.HttpModule;
@@ -74,7 +70,6 @@ public class ApplicationClass extends MultiDexApplication {
         Settings.initialize(this);
 
         if (BuildConfig.DEBUG) {
-
             StrictMode.enableDefaults();
             ButterKnife.setDebug(true);
 
@@ -84,13 +79,5 @@ public class ApplicationClass extends MultiDexApplication {
 
         // get the correct theme for the app!
         ThemeHelperService.updateTheme(this);
-
-        // disable verbose logging
-        java.util.logging.Logger log = LogManager.getLogManager().getLogger("");
-        if (log != null) {
-            for (Handler h : log.getHandlers()) {
-                h.setLevel(Level.INFO);
-            }
-        }
     }
 }

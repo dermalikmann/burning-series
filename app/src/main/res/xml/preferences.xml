@@ -5,11 +5,10 @@
 
         <ListPreference
             android:defaultValue="@string/pref_theme_default"
-            android:enabled="false"
             android:entries="@array/pref_theme"
             android:entryValues="@array/pref_theme_values"
             android:key="pref_theme"
-            android:summary="@string/pref_set_wip_summary"
+            android:summary="@string/pref_theme_summary"
             android:title="@string/pref_theme" />
 
     </PreferenceCategory>

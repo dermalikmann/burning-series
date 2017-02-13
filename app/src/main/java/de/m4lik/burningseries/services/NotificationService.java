@@ -41,10 +41,16 @@ public class NotificationService {
     }
 
     public void showUpdateNotification(Update update) {
+
+        String message = "Es ist ein neues Update der App auf Version " + update.versionName() + " verfügbar, " +
+                "unter Anderem mit: " + update.changelog();
+
         Notification notification = newNotificationBuilder(context)
                 .setContentIntent(updateActivityIntent(update))
-                .setContentTitle("Neues Update verfügbar")
-                .setContentText("Es ist ein neues Update der App auf Version " + update.versionName() + " verfügbar. Lade es jetzt herunter!")
+                .setContentTitle("Neues Update verfügbar!")
+                .setContentText(message)
+                .setDefaults(Notification.DEFAULT_ALL)
+                .setStyle(new NotificationCompat.BigTextStyle().bigText(message))
                 .setSmallIcon(R.drawable.ic_stat_name)
                 .addAction(R.drawable.ic_action_download, "Download", updateActivityIntent(update))
                 .setCategory(NotificationCompat.CATEGORY_RECOMMENDATION)

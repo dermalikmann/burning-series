@@ -230,17 +230,7 @@ public class MainActivity extends ActivityBase
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
         if (item.getItemId() == R.id.action_refresh) {
-            switch (visibleFragment) {
-                case "genres":
-                    fetchSeries();
-                    break;
-                case "favorites":
-                    fetchSeries();
-                    break;
-                case "series":
-                    fetchSeries();
-                    break;
-            }
+            fetchSeries();
         }
         return super.onOptionsItemSelected(item);
     }
@@ -365,14 +355,6 @@ public class MainActivity extends ActivityBase
 
     private void fetchSeries() {
 
-        MainDBHelper dbHelper = new MainDBHelper(getApplicationContext());
-        SQLiteDatabase db = dbHelper.getWritableDatabase();
-
-        db.execSQL(SQL_TRUNCATE_SERIES_TABLE);
-        db.execSQL(SQL_TRUNCATE_GENRES_TABLE);
-
-        db.close();
-
         progressDialog = new ProgressDialog(MainActivity.this);
         progressDialog.setMessage("Serien werden geladen.\nBitte kurz warten...");
         progressDialog.setCancelable(false);
@@ -387,6 +369,13 @@ public class MainActivity extends ActivityBase
         call.enqueue(new Callback<GenreMap>() {
             @Override
             public void onResponse(Call<GenreMap> call, Response<GenreMap> response) {
+
+                MainDBHelper dbHelper = new MainDBHelper(getApplicationContext());
+                SQLiteDatabase db = dbHelper.getWritableDatabase();
+                db.execSQL(SQL_TRUNCATE_SERIES_TABLE);
+                db.execSQL(SQL_TRUNCATE_GENRES_TABLE);
+                db.close();
+
                 new seriesDatabaseUpdate(response.body()).execute();
             }
 

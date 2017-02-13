@@ -83,7 +83,7 @@ public class ShowActivity extends ActivityBase implements Callback<SeasonObj> {
 
         title = i.getStringExtra("ShowName");
         selectedShow = i.getIntExtra("ShowID", 60);
-        Uri imageUri = Uri.parse("https://s.bs.to/img/cover/" + selectedShow + ".jpg");
+        Uri imageUri = Uri.parse("https://bs.to/public/img/cover/" + selectedShow + ".jpg");
         toolbar.setTitle(title);
 
         Log.v("BS", "Lade Cover.");

@@ -81,7 +81,7 @@ public class SyncBroadcastReceiver extends WakefulBroadcastReceiver {
         scheduleNextSync(context, getNextSyncTime(context));
     }
 
-    private static SharedPreferences getSyncPrefs(Context context) {
+    static SharedPreferences getSyncPrefs(Context context) {
         return context.getSharedPreferences("sync", Context.MODE_PRIVATE);
     }
 }

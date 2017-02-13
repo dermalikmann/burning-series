@@ -30,6 +30,8 @@ import retrofit2.Call;
 import retrofit2.Callback;
 import retrofit2.Response;
 
+import static de.m4lik.burningseries.services.ThemeHelperService.theme;
+
 /**
  * A login screen that offers login via email/password.
  */
@@ -46,11 +48,12 @@ public class LoginActivity extends AppCompatActivity implements Callback<Respons
     @BindView(R.id.login_progress)
     View mProgressView;
 
-    @BindView(R.id.login_form)
+    @BindView(R.id.email_login_form)
     View mLoginFormView;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
+        setTheme(theme().basic);
         setContentView(R.layout.activity_login);
         ButterKnife.bind(this);
 

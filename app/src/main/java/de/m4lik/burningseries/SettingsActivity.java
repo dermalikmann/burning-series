@@ -15,12 +15,14 @@ import android.support.v4.app.NotificationManagerCompat;
 import android.view.MenuItem;
 
 import de.m4lik.burningseries.services.SyncBroadcastReceiver;
+import de.m4lik.burningseries.services.ThemeHelperService;
 import de.m4lik.burningseries.ui.base.ActivityBase;
 import de.m4lik.burningseries.ui.dialogs.UpdateDialog;
 import de.m4lik.burningseries.util.AndroidUtility;
 import de.m4lik.burningseries.util.Settings;
 
 import static com.google.common.base.Strings.emptyToNull;
+import static de.m4lik.burningseries.services.ThemeHelperService.theme;
 
 /**
  * Created by Malik on 12.01.2017.
@@ -32,6 +34,7 @@ public class SettingsActivity extends ActivityBase {
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
+        setTheme(theme().basic);
         super.onCreate(savedInstanceState);
 
         getSupportActionBar().setDisplayHomeAsUpEnabled(true);
@@ -176,7 +179,27 @@ public class SettingsActivity extends ActivityBase {
 
         @Override
         public void onSharedPreferenceChanged(SharedPreferences preferences, String key) {
+            if ("pref_theme".equals(key)) {
+                ThemeHelperService.updateTheme(getActivity());
+                AndroidUtility.recreateActivity(getActivity());
+            }
+        }
 
+        @Override
+        public void onResume() {
+            super.onResume();
+            getPreferenceScreen()
+                    .getSharedPreferences()
+                    .registerOnSharedPreferenceChangeListener(this);
+        }
+
+        @Override
+        public void onPause() {
+            getPreferenceScreen()
+                    .getSharedPreferences()
+                    .unregisterOnSharedPreferenceChangeListener(this);
+
+            super.onPause();
         }
 
         private static android.support.v4.app.NotificationCompat.Builder newNotificationBuilder(Context context) {

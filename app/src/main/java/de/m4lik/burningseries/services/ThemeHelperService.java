@@ -7,9 +7,8 @@ import android.support.annotation.Nullable;
 
 import com.google.common.base.Enums;
 
-import de.m4lik.burningseries.util.Settings;
-
 import de.m4lik.burningseries.ui.Themes;
+import de.m4lik.burningseries.util.Settings;
 
 /**
  * Created by Malik on 14.01.2017
@@ -40,6 +39,10 @@ public final class ThemeHelperService {
         return THEME != null ? THEME : Themes.BLUE;
     }
 
+    public static void updateTheme(Context context, String name) {
+        updateTheme(context, Enums.getIfPresent(Themes.class, name).or(Themes.BLUE));
+    }
+
     public static void updateTheme(Context context, Themes theme) {
         Settings.of(context)
                 .edit()
@@ -49,8 +52,7 @@ public final class ThemeHelperService {
     }
 
     public static void updateTheme(Context context) {
-        Settings settings = Settings.of(context);
-        String name = settings.themeName();
+        String name = Settings.of(context).themeName();
         THEME = Enums.getIfPresent(Themes.class, name).or(Themes.ORANGE);
     }
 }

@@ -2,6 +2,7 @@ package de.m4lik.burningseries;
 
 import android.content.Context;
 import android.content.SharedPreferences;
+import android.content.pm.ActivityInfo;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.view.View;
@@ -39,6 +40,12 @@ public class StatisticsActivity extends ActivityBase {
 
         getSupportActionBar().setDisplayHomeAsUpEnabled(true);
         getSupportActionBar().setDisplayShowHomeEnabled(true);
+
+        if (getApplicationContext().getResources().getBoolean(R.bool.isTablet)){
+            this.setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_SENSOR_LANDSCAPE);
+        } else {
+            this.setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_SENSOR_PORTRAIT);
+        }
 
         Context c = getApplicationContext();
         statsList.add(new StatsListItem("Registrierte User", getStatsPrefs(c).getString("regUsers", "")));

@@ -3,6 +3,7 @@ package de.m4lik.burningseries;
 import android.content.ContentValues;
 import android.content.Intent;
 import android.content.SharedPreferences;
+import android.content.pm.ActivityInfo;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.net.Uri;
@@ -80,6 +81,12 @@ public class ShowActivity extends ActivityBase implements Callback<SeasonObj> {
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
         ImageView tbiv = (ImageView) findViewById(R.id.toolbarimage);
         findViewById(R.id.gradient).setBackground(getResources().getDrawable(theme().gradient));
+
+        if (getApplicationContext().getResources().getBoolean(R.bool.isTablet)){
+            this.setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_SENSOR_LANDSCAPE);
+        } else {
+            this.setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_SENSOR_PORTRAIT);
+        }
 
         title = i.getStringExtra("ShowName");
         selectedShow = i.getIntExtra("ShowID", 60);

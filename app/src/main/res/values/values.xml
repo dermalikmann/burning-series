@@ -7,17 +7,26 @@
     <string name="theme_blue">Blau</string>
     <string name="theme_orange">Orange</string>
     <string name="theme_green">Grün</string>
+    <string name="theme_blue_dark">Blau (Dark)</string>
+    <string name="theme_orange_dark">Orange (Dark)</string>
+    <string name="theme_green_dark">Grün (Dark)</string>
 
     <string-array name="pref_theme">
         <item>@string/theme_blue</item>
         <item>@string/theme_orange</item>
         <item>@string/theme_green</item>
+        <item>@string/theme_blue_dark</item>
+        <item>@string/theme_orange_dark</item>
+        <item>@string/theme_green_dark</item>
     </string-array>
 
     <string-array name="pref_theme_values">
         <item>BLUE</item>
         <item>ORANGE</item>
         <item>GREEN</item>
+        <item>BLUE_DARK</item>
+        <item>ORANGE_DARK</item>
+        <item>GREEN_DARK</item>
     </string-array>
 
     <!-- Start view chooser -->

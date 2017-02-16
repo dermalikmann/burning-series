@@ -5,6 +5,7 @@ import android.app.ProgressDialog;
 import android.content.ContentValues;
 import android.content.Intent;
 import android.content.SharedPreferences;
+import android.content.pm.ActivityInfo;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.graphics.Bitmap;
@@ -84,6 +85,8 @@ public class MainActivity extends ActivityBase
     public String visibleFragment;
     public Boolean seriesList = false;
 
+    public boolean isTablet = false;
+
     ProgressDialog progressDialog;
 
     @BindView(R.id.nav_view)
@@ -103,7 +106,7 @@ public class MainActivity extends ActivityBase
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
-        setTheme(theme().noActionBar);
+        setTheme(theme().translucentStatus);
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
@@ -119,21 +122,28 @@ public class MainActivity extends ActivityBase
                             getApplicationContext().getResources().getColor(R.color.blue_primary)
                     ));
         }
-        //toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
 
-        DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
+        if (getApplicationContext().getResources().getBoolean(R.bool.isTablet)){
+            this.setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_SENSOR_LANDSCAPE);
+            isTablet = true;
+        } else {
+            this.setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_SENSOR_PORTRAIT);
+        }
 
         SharedPreferences sharedPreferences = PreferenceManager.getDefaultSharedPreferences(this);
         userName = sharedPreferences.getString("pref_user", "Bitte Einloggen");
         userSession = sharedPreferences.getString("pref_session", "");
 
-        //navigationView = (NavigationView) findViewById(R.id.nav_view);
         navigationView.setNavigationItemSelectedListener(this);
 
-        ActionBarDrawerToggle toggle = new ActionBarDrawerToggle(
-                this, drawer, toolbar, R.string.navigation_drawer_open, R.string.navigation_drawer_close);
-        toggle.syncState();
+        if (!isTablet) {
+            DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
+            ActionBarDrawerToggle toggle = new ActionBarDrawerToggle(
+                    this, drawer, toolbar, R.string.navigation_drawer_open, R.string.navigation_drawer_close);
+            toggle.syncState();
+        }
+
 
         TextView userTextView = (TextView) navigationView.getHeaderView(0).findViewById(R.id.nav_username_text);
         userTextView.setText(userName);
@@ -264,6 +274,11 @@ public class MainActivity extends ActivityBase
                 logout();
                 break;
 
+            case R.id.nav_stats:
+                intent = new Intent(this, StatisticsActivity.class);
+                startActivity(intent);
+                break;
+
             case R.id.nav_share:
                 String text = "Versuch mal die neue Burning-Series App. https://github.com/M4lik/burning-series/releases";
                 Intent shareintent = new Intent(Intent.ACTION_SEND);
@@ -279,8 +294,10 @@ public class MainActivity extends ActivityBase
                 break;
         }
 
-        DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
-        drawer.closeDrawer(GravityCompat.START);
+        if (!isTablet) {
+            DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
+            drawer.closeDrawer(GravityCompat.START);
+        }
         return true;
     }
 

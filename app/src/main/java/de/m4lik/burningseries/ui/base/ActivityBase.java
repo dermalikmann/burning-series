@@ -2,6 +2,7 @@ package de.m4lik.burningseries.ui.base;
 
 import android.os.Bundle;
 
+import com.f2prateek.dart.Dart;
 import com.trello.rxlifecycle.LifecycleTransformer;
 import com.trello.rxlifecycle.android.ActivityEvent;
 import com.trello.rxlifecycle.components.support.RxAppCompatActivity;
@@ -40,6 +41,7 @@ public abstract class ActivityBase extends RxAppCompatActivity {
         activityComponent = Dagger.newActivityComponent(this);
         injectComponent(activityComponent);
 
+        Dart.inject(this);
         super.onCreate(savedInstanceState);
     }
 

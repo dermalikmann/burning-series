@@ -21,7 +21,8 @@
             android:layout_margin="@dimen/text_margin"
             android:text="Hoster:"
             android:textAppearance="?android:attr/textAppearanceMedium"
-            android:textColor="#595959"/>
+            android:textColor="?android:attr/textColorPrimary"
+            />
 
         <ListView
             android:id="@+id/hosterListView"

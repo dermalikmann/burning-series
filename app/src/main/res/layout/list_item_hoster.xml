@@ -8,14 +8,15 @@
     >
 
     <LinearLayout
+        android:id="@+id/listItemContainer"
         android:orientation="horizontal"
         android:layout_width="fill_parent"
         android:layout_height="wrap_content"
-        android:background="@drawable/border"
+        android:background="@drawable/list_item_background_light"
         android:padding="15dp">
 
         <ImageView
-            app:srcCompat="@drawable/ic_open_in_browser"
+            app:srcCompat="@drawable/ic_ondemand_video"
             android:id="@+id/supImgView"
             android:layout_gravity="center_vertical"
             android:layout_width="25dp"
@@ -27,9 +28,9 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:textAppearance="?android:attr/textAppearanceMedium"
+            android:textColor="?android:attr/textColorPrimary"
             android:text="seasonLabel"
             android:id="@+id/hosterLabel"
-            android:textColor="#ff000000"
             android:layout_marginBottom="0dp"
             android:layout_marginLeft="5dp"
             android:layout_gravity="center_vertical"

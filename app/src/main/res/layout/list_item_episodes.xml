@@ -6,9 +6,10 @@
     android:padding="2.5dp">
 
     <LinearLayout
+        android:id="@+id/listItemContainer"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:background="@drawable/border"
+        android:background="@drawable/list_item_background_light"
         android:orientation="horizontal"
         android:padding="5dp">
 
@@ -43,7 +44,7 @@
                     android:layout_marginTop="10dp"
                     android:text="Episode Title Ger"
                     android:textAppearance="?android:attr/textAppearanceMedium"
-                    android:textColor="#ff000000" />
+                    android:textColor="?android:attr/textColorPrimary"/>
 
                 <TextView
                     android:id="@+id/episodeTitle"

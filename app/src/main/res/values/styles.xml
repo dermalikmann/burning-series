@@ -3,15 +3,15 @@
     <style name="BurningSeries" parent="@style/Theme.AppCompat.Light.DarkActionBar">
         <item name="colorPrimary">@color/colorPrimary</item>
         <item name="colorPrimaryDark">@color/colorPrimaryDark</item>
-        <item name="colorAccent">@color/colorPrimary</item>
+        <item name="colorAccent">@color/colorAccent</item>
     </style>
 
-    <style name="BurningSeries.NoActionBar">
+    <style name="BurningSeries.NoActionBar" parent="BurningSeries">
         <item name="windowActionBar">false</item>
         <item name="windowNoTitle">true</item>
     </style>
 
-    <style name="BurningSeries.NoActionBar.Dark" parent="@style/Theme.AppCompat.Light.DarkActionBar">
+    <style name="BurningSeries.NoActionBar.Dark" parent="BurningSeries.NoActionBar">
         <item name="windowActionBar">false</item>
         <item name="windowNoTitle">true</item>
     </style>
@@ -50,6 +50,22 @@
         <item name="alertDialogTheme">@style/BurningSeries.Dialog.Blue</item>
     </style>
 
+    <style name="BurningSeries.Blue.Dark" parent="Theme.AppCompat">
+        <item name="colorPrimary">@color/blue_primary</item>
+        <item name="colorPrimaryDark">@color/blue_primary_dark</item>
+        <item name="colorAccent">@color/blue_accent</item>
+        <item name="android:colorBackground">@color/background_dark</item>
+        <item name="android:textColorPrimary">@android:color/primary_text_dark</item>
+        <item name="android:textColorSecondary">@android:color/secondary_text_dark</item>
+        <item name="android:textColorTertiary">@android:color/tertiary_text_dark</item>
+        <item name="android:windowBackground">?android:attr/colorBackground</item>
+        <item name="android:colorForeground">@color/white</item>
+        <item name="colorButtonNormal">@color/blue_primary</item>
+        <item name="popupTheme">@style/BurningSeries.Popup.Dark.Blue</item>
+        <item name="dialogTheme">@style/BurningSeries.Dialog.Dark.Blue</item>
+        <item name="alertDialogTheme">@style/BurningSeries.Dialog.Dark.Blue</item>
+    </style>
+
     <style name="BurningSeries.Green">
         <item name="colorPrimary">@color/green_primary</item>
         <item name="colorPrimaryDark">@color/green_primary_dark</item>
@@ -57,6 +73,22 @@
         <!--<item name="drawerTheme">@style/DrawerTheme.Green</item>-->
         <item name="popupTheme">@style/BurningSeries.Popup.Green</item>
         <item name="alertDialogTheme">@style/BurningSeries.Dialog.Green</item>
+    </style>
+
+    <style name="BurningSeries.Green.Dark" parent="Theme.AppCompat">
+        <item name="colorPrimary">@color/green_primary</item>
+        <item name="colorPrimaryDark">@color/green_primary_dark</item>
+        <item name="colorAccent">@color/green_accent</item>
+        <item name="android:colorBackground">@color/background_dark</item>
+        <item name="android:textColorPrimary">@android:color/primary_text_dark</item>
+        <item name="android:textColorSecondary">@android:color/secondary_text_dark</item>
+        <item name="android:textColorTertiary">@android:color/tertiary_text_dark</item>
+        <item name="android:windowBackground">?android:attr/colorBackground</item>
+        <item name="android:colorForeground">@color/white</item>
+        <item name="colorButtonNormal">@color/green_primary</item>
+        <item name="popupTheme">@style/BurningSeries.Popup.Dark.Green</item>
+        <item name="dialogTheme">@style/BurningSeries.Dialog.Dark.Green</item>
+        <item name="alertDialogTheme">@style/BurningSeries.Dialog.Dark.Green</item>
     </style>
 
     <style name="BurningSeries.Orange">
@@ -68,41 +100,90 @@
         <item name="alertDialogTheme">@style/BurningSeries.Dialog.Orange</item>
     </style>
 
+    <style name="BurningSeries.Orange.Dark" parent="Theme.AppCompat">
+        <item name="colorPrimary">@color/orange_primary</item>
+        <item name="colorPrimaryDark">@color/orange_primary_dark</item>
+        <item name="colorAccent">@color/orange_accent</item>
+        <item name="android:colorBackground">@color/background_dark</item>
+        <item name="android:textColorPrimary">@android:color/primary_text_dark</item>
+        <item name="android:textColorSecondary">@android:color/secondary_text_dark</item>
+        <item name="android:textColorTertiary">@android:color/tertiary_text_dark</item>
+        <item name="android:windowBackground">?android:attr/colorBackground</item>
+        <item name="android:colorForeground">@color/white</item>
+        <item name="colorButtonNormal">@color/orange_primary</item>
+        <item name="popupTheme">@style/BurningSeries.Popup.Dark.Orange</item>
+        <item name="dialogTheme">@style/BurningSeries.Dialog.Dark.Orange</item>
+        <item name="alertDialogTheme">@style/BurningSeries.Dialog.Dark.Orange</item>
+    </style>
+
     <!-- popup menus -->
 
     <style name="BurningSeries.Popup" parent="ThemeOverlay.AppCompat.Light"/>
+    <style name="BurningSeries.Popup.Dark" parent="ThemeOverlay.AppCompat"/>
 
     <style name="BurningSeries.Popup.Blue">
         <item name="colorAccent">@color/blue_primary</item>
     </style>
 
-    <style name="BurningSeries.Popup.Green">
+    <style name="BurningSeries.Popup.Dark.Blue">
         <item name="colorAccent">@color/blue_primary</item>
     </style>
 
+    <style name="BurningSeries.Popup.Green">
+        <item name="colorAccent">@color/green_primary</item>
+    </style>
+
+    <style name="BurningSeries.Popup.Dark.Green">
+        <item name="colorAccent">@color/green_primary</item>
+    </style>
+
     <style name="BurningSeries.Popup.Orange">
-        <item name="colorAccent">@color/blue_primary</item>
+        <item name="colorAccent">@color/orange_primary</item>
+    </style>
+
+    <style name="BurningSeries.Popup.Dark.Orange">
+        <item name="colorAccent">@color/orange_primary</item>
     </style>
 
     <!-- dialog menus -->
 
-    <style name="BurningSeries.Dialog" parent="ThemeOverlay.AppCompat.Light"/>
+    <style name="BurningSeries.Dialog" parent="Theme.AppCompat.Light.Dialog.Alert"/>
+    <style name="BurningSeries.Dialog.Dark" parent="Theme.AppCompat.Dialog.Alert"/>
 
     <style name="BurningSeries.Dialog.Blue">
         <item name="colorAccent">@color/blue_primary</item>
     </style>
 
+    <style name="BurningSeries.Dialog.Dark.Blue">
+        <item name="colorAccent">@android:color/holo_blue_dark</item>
+    </style>
+
     <style name="BurningSeries.Dialog.Green">
-        <item name="colorAccent">@color/blue_primary</item>
+        <item name="colorAccent">@color/green_primary</item>
+    </style>
+
+    <style name="BurningSeries.Dialog.Dark.Green">
+        <item name="colorAccent">@color/green_primary</item>
     </style>
 
     <style name="BurningSeries.Dialog.Orange">
-        <item name="colorAccent">@color/blue_primary</item>
+        <item name="colorAccent">@color/orange_primary</item>
+    </style>
+
+    <style name="BurningSeries.Dialog.Dark.Orange">
+        <item name="colorAccent">@color/orange_primary</item>
     </style>
 
     <!-- NoActionBar -->
 
     <style name="BurningSeries.Blue.NoActionBar">
+        <item name="windowActionBar">false</item>
+        <item name="windowNoTitle">true</item>
+        <item name="android:windowActionBarOverlay">true</item>
+        <item name="windowActionModeOverlay">true</item>
+    </style>
+
+    <style name="BurningSeries.Blue.Dark.NoActionBar">
         <item name="windowActionBar">false</item>
         <item name="windowNoTitle">true</item>
         <item name="android:windowActionBarOverlay">true</item>
@@ -116,7 +197,21 @@
         <item name="windowActionModeOverlay">true</item>
     </style>
 
+    <style name="BurningSeries.Green.Dark.NoActionBar">
+        <item name="windowActionBar">false</item>
+        <item name="windowNoTitle">true</item>
+        <item name="android:windowActionBarOverlay">true</item>
+        <item name="windowActionModeOverlay">true</item>
+    </style>
+
     <style name="BurningSeries.Orange.NoActionBar">
+        <item name="windowActionBar">false</item>
+        <item name="windowNoTitle">true</item>
+        <item name="android:windowActionBarOverlay">true</item>
+        <item name="windowActionModeOverlay">true</item>
+    </style>
+
+    <style name="BurningSeries.Orange.Dark.NoActionBar">
         <item name="windowActionBar">false</item>
         <item name="windowNoTitle">true</item>
         <item name="android:windowActionBarOverlay">true</item>
@@ -131,13 +226,31 @@
         <item name="colorControlHighlight">@color/white</item>
     </style>
 
+    <style name="BurningSeries.Blue.Dark.NoActionBar.WhiteAccent">
+        <item name="colorControlNormal">@color/white</item>
+        <item name="colorControlActivated">@color/white</item>
+        <item name="colorControlHighlight">@color/white</item>
+    </style>
+
     <style name="BurningSeries.Green.NoActionBar.WhiteAccent">
         <item name="colorControlNormal">@color/white</item>
         <item name="colorControlActivated">@color/white</item>
         <item name="colorControlHighlight">@color/white</item>
     </style>
 
+    <style name="BurningSeries.Green.Dark.NoActionBar.WhiteAccent">
+        <item name="colorControlNormal">@color/white</item>
+        <item name="colorControlActivated">@color/white</item>
+        <item name="colorControlHighlight">@color/white</item>
+    </style>
+
     <style name="BurningSeries.Orange.NoActionBar.WhiteAccent">
+        <item name="colorControlNormal">@color/white</item>
+        <item name="colorControlActivated">@color/white</item>
+        <item name="colorControlHighlight">@color/white</item>
+    </style>
+
+    <style name="BurningSeries.Orange.Dark.NoActionBar.WhiteAccent">
         <item name="colorControlNormal">@color/white</item>
         <item name="colorControlActivated">@color/white</item>
         <item name="colorControlHighlight">@color/white</item>
@@ -157,6 +270,20 @@
 
     <style name="BurningSeries.Orange.NoActionBar.TranslucentStatus"/>
 
+
+
+    <style name="BurningSeries.Blue.Dark.NoActionBar.Fullscreen"/>
+
+    <style name="BurningSeries.Green.Dark.NoActionBar.Fullscreen"/>
+
+    <style name="BurningSeries.Orange.Dark.NoActionBar.Fullscreen"/>
+
+    <style name="BurningSeries.Blue.Dark.NoActionBar.TranslucentStatus"/>
+
+    <style name="BurningSeries.Green.Dark.NoActionBar.TranslucentStatus"/>
+
+    <style name="BurningSeries.Orange.Dark.NoActionBar.TranslucentStatus"/>
+
     <!-- Navigation Drawer -->
 
     <style name="DrawerTheme.Blue" parent="Theme.AppCompat.Light">
@@ -164,11 +291,11 @@
     </style>
 
     <style name="DrawerTheme.Green" parent="Theme.AppCompat.Light">
-        <item name="colorPrimary">@color/blue_primary</item>
+        <item name="colorPrimary">@color/green_primary</item>
     </style>
 
     <style name="DrawerTheme.Orange" parent="Theme.AppCompat.Light">
-        <item name="colorPrimary">@color/blue_primary</item>
+        <item name="colorPrimary">@color/orange_primary</item>
     </style>
 
 </resources>

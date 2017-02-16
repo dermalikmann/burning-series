@@ -5,10 +5,7 @@ import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
-import android.support.v4.view.MenuItemCompat;
-import android.support.v7.widget.SearchView;
 import android.view.LayoutInflater;
-import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.AdapterView;
@@ -19,7 +16,6 @@ import android.widget.TextView;
 import java.util.ArrayList;
 import java.util.List;
 
-import de.m4lik.burningseries.MainActivity;
 import de.m4lik.burningseries.R;
 import de.m4lik.burningseries.ShowActivity;
 import de.m4lik.burningseries.database.MainDBHelper;
@@ -28,6 +24,7 @@ import de.m4lik.burningseries.ui.listitems.ShowListItem;
 
 import static de.m4lik.burningseries.database.SeriesContract.seriesTable.COLUMN_NAME_ISFAV;
 import static de.m4lik.burningseries.database.SeriesContract.seriesTable.COLUMN_NAME_TITLE;
+import static de.m4lik.burningseries.services.ThemeHelperService.theme;
 
 
 /**
@@ -121,6 +118,8 @@ public class FavsFragment extends Fragment {
             if (view == null) {
                 view = getActivity().getLayoutInflater().inflate(R.layout.list_item_favorites, parent, false);
             }
+
+            view.findViewById(R.id.listItemContainer).setBackground(getResources().getDrawable(theme().listItemBackground));
 
             ShowListItem current = list.get(pos);
 

@@ -18,13 +18,17 @@ public interface ActivityComponent {
 
     void inject(MainActivity mainActivity);
 
-    void inject(ShowActivity showActivity);
-
-    void inject(SettingsActivity settingsActivity);
-
-    void inject(FullscreenVideoActivity videoActivity);
+    void inject(FullscreenVideoActivity activity);
 
     void inject(LoginActivity activity);
+
+    void inject(SettingsActivity activity);
+
+    void inject(ShowActivity activity);
+
+    void inject(StatisticsActivity activity);
+
+
 
     void inject(DownloadUpdateDialog dialog);
 

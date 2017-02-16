@@ -50,8 +50,8 @@ public class Logger {
         Bundle bundle = new Bundle();
         //bundle.putString(GENRE_ID, Integer.toString(id));
         bundle.putString(GENRE_NAME, genre);
-        firebaseAnalytics.logEvent(EVENT_GENRE_SELECTED, bundle);
-        Log.i("BS_FA", "Event logged: " + EVENT_SERIES_SELECTED);
+        firebaseAnalytics.logEvent(EVENT_GENRE_SELECTED + "_" + genre, bundle);
+        Log.i("BS_FA", "Event logged: " + EVENT_SERIES_SELECTED + "_" + genre);
     }
 
     public static void seriesSelection(Context context, String id, String name) {
@@ -59,8 +59,8 @@ public class Logger {
         Bundle bundle = new Bundle();
         bundle.putString(SERIES_ID, id);
         bundle.putString(SERIES_NAME, name);
-        firebaseAnalytics.logEvent(EVENT_SERIES_SELECTED, bundle);
-        Log.i("BS_FA", "Event logged: " + EVENT_SERIES_SELECTED);
+        firebaseAnalytics.logEvent(EVENT_SERIES_SELECTED + "_" + id, bundle);
+        Log.i("BS_FA", "Event logged: " + EVENT_SERIES_SELECTED + "_" + id);
     }
 
     public static void login(Context context) {

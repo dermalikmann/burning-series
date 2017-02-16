@@ -43,6 +43,8 @@ import retrofit2.Call;
 import retrofit2.Callback;
 import retrofit2.Response;
 
+import static de.m4lik.burningseries.services.ThemeHelperService.theme;
+
 /**
  * A simple {@link Fragment} subclass.
  */
@@ -286,6 +288,8 @@ public class HosterFragment extends Fragment implements Callback<EpisodeObj> {
                 view = getActivity().getLayoutInflater().inflate(R.layout.list_item_hoster, parent, false);
             }
 
+            view.findViewById(R.id.listItemContainer).setBackground(getResources().getDrawable(theme().listItemBackground));
+
             HosterListItem current = hostersList.get(pos);
 
             TextView lable = (TextView) view.findViewById(R.id.hosterLabel);
@@ -295,7 +299,10 @@ public class HosterFragment extends Fragment implements Callback<EpisodeObj> {
             url.setText(current.getLinkId().toString());
 
             ImageView fav = (ImageView) view.findViewById(R.id.supImgView);
-            fav.setImageDrawable(ContextCompat.getDrawable(getContext(), current.isSupported() ? R.drawable.ic_ondemand_video : R.drawable.ic_public));
+            if (!Settings.of(getContext()).themeName().contains("_DARK"))
+                fav.setImageDrawable(ContextCompat.getDrawable(getContext(), current.isSupported() ? R.drawable.ic_ondemand_video : R.drawable.ic_public));
+            else
+                fav.setImageDrawable(ContextCompat.getDrawable(getContext(), current.isSupported() ? R.drawable.ic_ondemand_video_white : R.drawable.ic_public_white));
 
             return view;
         }

@@ -21,14 +21,17 @@ import android.widget.TextView;
 import java.util.ArrayList;
 import java.util.List;
 
+import de.m4lik.burningseries.MainActivity;
 import de.m4lik.burningseries.R;
 import de.m4lik.burningseries.ShowActivity;
+import de.m4lik.burningseries.TabletShowActivity;
 import de.m4lik.burningseries.api.API;
 import de.m4lik.burningseries.api.APIInterface;
 import de.m4lik.burningseries.database.MainDBHelper;
 import de.m4lik.burningseries.database.SeriesContract;
 import de.m4lik.burningseries.ui.listitems.ShowListItem;
 import de.m4lik.burningseries.util.Logger;
+import de.m4lik.burningseries.util.Settings;
 import okhttp3.ResponseBody;
 import retrofit2.Call;
 import retrofit2.Callback;
@@ -40,6 +43,7 @@ import static de.m4lik.burningseries.database.SeriesContract.seriesTable.COLUMN_
 import static de.m4lik.burningseries.database.SeriesContract.seriesTable.COLUMN_NAME_ISFAV;
 import static de.m4lik.burningseries.database.SeriesContract.seriesTable.COLUMN_NAME_TITLE;
 import static de.m4lik.burningseries.database.SeriesContract.seriesTable.TABLE_NAME;
+import static de.m4lik.burningseries.services.ThemeHelperService.theme;
 
 
 /**
@@ -230,6 +234,8 @@ public class SeriesFragment extends Fragment {
                 view = getActivity().getLayoutInflater().inflate(R.layout.list_item_series, parent, false);
             }
 
+            view.findViewById(R.id.listItemContainer).setBackground(getResources().getDrawable(theme().listItemBackground));
+
             ShowListItem current = list.get(pos);
 
             TextView title = (TextView) view.findViewById(R.id.seriesTitle);
@@ -242,7 +248,10 @@ public class SeriesFragment extends Fragment {
             id.setText(current.getId().toString());
 
             ImageView fav = (ImageView) view.findViewById(R.id.favImageView);
-            fav.setImageDrawable(ContextCompat.getDrawable(getContext(), current.isFav() ? R.drawable.ic_star : R.drawable.ic_star_border));
+            if (!Settings.of(getContext()).themeName().contains("_DARK"))
+                fav.setImageDrawable(ContextCompat.getDrawable(getContext(), current.isFav() ? R.drawable.ic_star : R.drawable.ic_star_border));
+            else
+                fav.setImageDrawable(ContextCompat.getDrawable(getContext(), current.isFav() ? R.drawable.ic_star_white : R.drawable.ic_star_border_white));
 
             return view;
         }

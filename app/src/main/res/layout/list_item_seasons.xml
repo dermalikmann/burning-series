@@ -6,10 +6,11 @@
     android:padding="2.5dp">
 
     <LinearLayout
+        android:id="@+id/listItemContainer"
         android:orientation="vertical"
         android:layout_width="fill_parent"
         android:layout_height="wrap_content"
-        android:background="@drawable/border"
+        android:background="@drawable/list_item_background_light"
         android:padding="15dp">
 
         <TextView
@@ -18,7 +19,6 @@
             android:textAppearance="?android:attr/textAppearanceMedium"
             android:text="seasonLabel"
             android:id="@+id/seasonLabel"
-            android:textColor="#ff000000"
             android:layout_marginBottom="0dp"
             android:layout_marginLeft="5dp"
             android:layout_gravity="center_vertical" />

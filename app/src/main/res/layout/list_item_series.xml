@@ -12,8 +12,9 @@
         android:visibility="gone"/>
 
     <RelativeLayout
+        android:id="@+id/listItemContainer"
         android:layout_width="match_parent"
-        android:background="@drawable/border"
+        android:background="@drawable/list_item_background_light"
         android:orientation="horizontal"
         android:padding="5dp"
         android:layout_height="90dp">

@@ -23,14 +23,13 @@
             android:layout_marginTop="@dimen/text_margin"
             android:text="Beschreibung:"
             android:textAppearance="?android:attr/textAppearanceMedium"
-            android:textColor="#595959"/>
+            />
 
         <TextView
             android:id="@+id/descriptionTextView"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_margin="@dimen/text_margin"
-            android:textColor="#494949"
             android:textSize="15dp"/>
 
         <View
@@ -45,7 +44,7 @@
             android:layout_margin="@dimen/text_margin"
             android:text="Staffeln:"
             android:textAppearance="?android:attr/textAppearanceMedium"
-            android:textColor="#595959"/>
+            />
 
         <ListView
             android:id="@+id/seasonsListView"

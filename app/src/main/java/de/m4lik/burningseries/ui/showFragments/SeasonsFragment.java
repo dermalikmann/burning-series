@@ -17,6 +17,8 @@ import de.m4lik.burningseries.R;
 import de.m4lik.burningseries.ShowActivity;
 import de.m4lik.burningseries.ui.listitems.SeasonListItem;
 
+import static de.m4lik.burningseries.services.ThemeHelperService.theme;
+
 public class SeasonsFragment extends Fragment {
 
     View rootview;
@@ -98,6 +100,8 @@ public class SeasonsFragment extends Fragment {
             if (view == null) {
                 view = getActivity().getLayoutInflater().inflate(R.layout.list_item_seasons, parent, false);
             }
+
+            view.findViewById(R.id.listItemContainer).setBackground(getResources().getDrawable(theme().listItemBackground));
 
             SeasonListItem current = seasonsList.get(pos);
 

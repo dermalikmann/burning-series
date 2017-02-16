@@ -4,6 +4,7 @@ import dagger.Subcomponent;
 import de.m4lik.burningseries.modules.ActivityModule;
 import de.m4lik.burningseries.ui.dialogs.DownloadUpdateDialog;
 import de.m4lik.burningseries.ui.dialogs.ErrorDialog;
+import de.m4lik.burningseries.ui.dialogs.ImageDialog;
 import de.m4lik.burningseries.ui.dialogs.UpdateDialog;
 import de.m4lik.burningseries.util.ContextSingleton;
 
@@ -33,6 +34,8 @@ public interface ActivityComponent {
     void inject(DownloadUpdateDialog dialog);
 
     void inject(ErrorDialog dialog);
+
+    void inject(ImageDialog dialog);
 
     void inject(UpdateDialog dialog);
 }

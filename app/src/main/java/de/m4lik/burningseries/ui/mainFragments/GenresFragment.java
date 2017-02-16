@@ -29,6 +29,7 @@ import de.m4lik.burningseries.util.Logger;
 
 import static de.m4lik.burningseries.database.SeriesContract.genresTable;
 import static de.m4lik.burningseries.database.SeriesContract.seriesTable;
+import static de.m4lik.burningseries.services.ThemeHelperService.theme;
 
 /**
  * A simple {@link Fragment} subclass.
@@ -209,6 +210,8 @@ public class GenresFragment extends Fragment {
             if (view == null) {
                 view = getActivity().getLayoutInflater().inflate(R.layout.list_item_series, parent, false);
             }
+
+            view.findViewById(R.id.listItemContainer).setBackground(getResources().getDrawable(theme().listItemBackground));
 
             ShowListItem current = list.get(pos);
 

@@ -1,8 +1,8 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <color name="colorPrimary">#4354a9</color>
+    <color name="colorPrimary">#3F51B5</color>
     <color name="colorPrimaryDark">#303F9F</color>
-    <color name="colorAccent">#4070ff</color>
+    <color name="colorAccent">#FF4081</color>
 
     <color name="blue_primary">#4354a9</color>
     <color name="blue_primary_dark">#303F9F</color>
@@ -25,4 +25,12 @@
     <color name="white">#ffffffff</color>
 
     <color name="black_overlay">#66000000</color>
+
+    <color name="backgound">#e1e1e1</color>
+    <color name="list_item_background">#ffffff</color>
+    <color name="list_item_border">#dfdfdf</color>
+
+    <color name="background_dark">#111111</color>
+    <color name="list_item_background_dark">#202020</color>
+    <color name="list_item_border_dark">#262626</color>
 </resources>

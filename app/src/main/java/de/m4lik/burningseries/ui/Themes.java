@@ -25,7 +25,8 @@ public enum Themes {
             R.style.BurningSeries_Blue_NoActionBar_Fullscreen,
             R.style.BurningSeries_Blue_NoActionBar_TranslucentStatus,
             R.style.BurningSeries_Blue_NoActionBar_WhiteAccent,
-            R.drawable.cover_gradient_blue
+            R.drawable.cover_gradient_blue,
+            R.drawable.list_item_background_light
     ),
 
     GREEN(R.string.theme_green,
@@ -37,7 +38,8 @@ public enum Themes {
             R.style.BurningSeries_Green_NoActionBar_Fullscreen,
             R.style.BurningSeries_Green_NoActionBar_TranslucentStatus,
             R.style.BurningSeries_Green_NoActionBar_WhiteAccent,
-            R.drawable.cover_gradient_green
+            R.drawable.cover_gradient_green,
+            R.drawable.list_item_background_light
     ),
 
     ORANGE(R.string.theme_orange,
@@ -49,7 +51,47 @@ public enum Themes {
             R.style.BurningSeries_Orange_NoActionBar_Fullscreen,
             R.style.BurningSeries_Orange_NoActionBar_TranslucentStatus,
             R.style.BurningSeries_Orange_NoActionBar_WhiteAccent,
-            R.drawable.cover_gradient_orange
+            R.drawable.cover_gradient_orange,
+            R.drawable.list_item_background_light
+    ),
+
+    BLUE_DARK(R.string.theme_blue_dark,
+            "4354a9",
+            R.color.blue_primary,
+            R.color.blue_primary_dark,
+            R.style.BurningSeries_Blue_Dark,
+            R.style.BurningSeries_Blue_Dark_NoActionBar,
+            R.style.BurningSeries_Blue_Dark_NoActionBar_Fullscreen,
+            R.style.BurningSeries_Blue_Dark_NoActionBar_TranslucentStatus,
+            R.style.BurningSeries_Blue_Dark_NoActionBar_WhiteAccent,
+            R.drawable.cover_gradient_blue,
+            R.drawable.list_item_background_dark
+    ),
+
+    GREEN_DARK(R.string.theme_green_dark,
+            "4354a9",
+            R.color.green_primary,
+            R.color.green_primary_dark,
+            R.style.BurningSeries_Green_Dark,
+            R.style.BurningSeries_Green_Dark_NoActionBar,
+            R.style.BurningSeries_Green_Dark_NoActionBar_Fullscreen,
+            R.style.BurningSeries_Green_Dark_NoActionBar_TranslucentStatus,
+            R.style.BurningSeries_Green_Dark_NoActionBar_WhiteAccent,
+            R.drawable.cover_gradient_green,
+            R.drawable.list_item_background_dark
+    ),
+
+    ORANGE_DARK(R.string.theme_orange_dark,
+            "4354a9",
+            R.color.orange_primary,
+            R.color.orange_primary_dark,
+            R.style.BurningSeries_Orange_Dark,
+            R.style.BurningSeries_Orange_Dark_NoActionBar,
+            R.style.BurningSeries_Orange_Dark_NoActionBar_Fullscreen,
+            R.style.BurningSeries_Orange_Dark_NoActionBar_TranslucentStatus,
+            R.style.BurningSeries_Orange_Dark_NoActionBar_WhiteAccent,
+            R.drawable.cover_gradient_orange,
+            R.drawable.list_item_background_dark
     );
 
 
@@ -82,6 +124,9 @@ public enum Themes {
     @DrawableRes
     public final int gradient;
 
+    @DrawableRes
+    public final int listItemBackground;
+
     Themes(@StringRes int title,
            String rName,
            @ColorRes int primaryColor,
@@ -91,7 +136,8 @@ public enum Themes {
            @StyleRes int fullscreen,
            @StyleRes int translucentStatus,
            @StyleRes int whiteAccent,
-           @DrawableRes int gradient) {
+           @DrawableRes int gradient,
+           @DrawableRes int listItemBackground) {
 
         this.title = title;
         this.rName = rName;
@@ -103,6 +149,7 @@ public enum Themes {
         this.translucentStatus = translucentStatus;
         this.whiteAccent = whiteAccent;
         this.gradient = gradient;
+        this.listItemBackground = listItemBackground;
     }
 
     public String title(Context context) {

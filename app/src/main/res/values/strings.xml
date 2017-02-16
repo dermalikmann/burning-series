@@ -49,7 +49,8 @@
     <string name="title_activity_video_player">VideoPlayer</string>
     <string name="title_activity_login">Login</string>
     <string name="title_activity_settings">Einstellungen</string>
-    <string name="title_activity_update">Settings</string>
+    <string name="title_activity_update">Update</string>
+    <string name="title_activity_stats">Statistiken der Seite</string>
 
 
     <!-- Random stuff -->

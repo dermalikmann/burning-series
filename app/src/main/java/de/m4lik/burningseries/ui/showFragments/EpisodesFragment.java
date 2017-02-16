@@ -27,9 +27,12 @@ import de.m4lik.burningseries.ui.listitems.EpisodeListItem;
 import de.m4lik.burningseries.api.objects.EpisodeObj;
 import de.m4lik.burningseries.api.objects.SeasonObj;
 import de.m4lik.burningseries.api.objects.VideoObj;
+import de.m4lik.burningseries.util.Settings;
 import retrofit2.Call;
 import retrofit2.Callback;
 import retrofit2.Response;
+
+import static de.m4lik.burningseries.services.ThemeHelperService.theme;
 
 /**
  * A simple {@link Fragment} subclass.
@@ -196,11 +199,14 @@ public class EpisodesFragment extends Fragment implements Callback<SeasonObj> {
                 view = getActivity().getLayoutInflater().inflate(R.layout.list_item_episodes, parent, false);
             }
 
+            view.findViewById(R.id.listItemContainer).setBackground(getResources().getDrawable(theme().listItemBackground));
+
             EpisodeListItem current = episodesList.get(pos);
 
             TextView titleGerView = (TextView) view.findViewById(R.id.episodeTitleGer);
             titleGerView.setText( (pos + 1) + " " + current.getTitleGer());
-            titleGerView.setTextColor(ContextCompat.getColor(getContext() , current.isWatched()? android.R.color.darker_gray : android.R.color.black));
+            if (!Settings.of(getContext()).themeName().contains("_DARK"))
+                titleGerView.setTextColor(ContextCompat.getColor(getContext() , current.isWatched()? android.R.color.darker_gray : android.R.color.black));
 
             TextView titleView = (TextView) view.findViewById(R.id.episodeTitle);
             titleView.setText(current.getTitle());
@@ -210,7 +216,10 @@ public class EpisodesFragment extends Fragment implements Callback<SeasonObj> {
 
             ImageView fav = (ImageView) view.findViewById(R.id.watchedImageView);
             if (current.isWatched())
-                fav.setImageDrawable(ContextCompat.getDrawable(getContext(), R.drawable.ic_watched));
+                if (!Settings.of(getContext()).themeName().contains("_DARK"))
+                    fav.setImageDrawable(ContextCompat.getDrawable(getContext(), R.drawable.ic_watched));
+                else
+                    fav.setImageDrawable(ContextCompat.getDrawable(getContext(), R.drawable.ic_watched_white));
             else
                 fav.setImageDrawable(null);
 

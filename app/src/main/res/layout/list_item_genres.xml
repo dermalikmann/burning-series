@@ -6,10 +6,11 @@
     android:padding="2.5dp">
 
     <LinearLayout
+        android:id="@+id/listItemContainer"
         android:orientation="vertical"
         android:layout_width="fill_parent"
         android:layout_height="wrap_content"
-        android:background="@drawable/border"
+        android:background="@drawable/list_item_background_light"
         android:padding="15dp">
 
         <TextView

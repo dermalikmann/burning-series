@@ -103,7 +103,7 @@ public class MainActivity extends ActivityBase
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
-        setTheme(theme().noActionBar);
+        setTheme(theme().translucentStatus);
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
@@ -262,6 +262,11 @@ public class MainActivity extends ActivityBase
 
             case R.id.logout_menu_item:
                 logout();
+                break;
+
+            case R.id.nav_stats:
+                intent = new Intent(this, StatisticsActivity.class);
+                startActivity(intent);
                 break;
 
             case R.id.nav_share:

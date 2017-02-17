@@ -5,12 +5,8 @@ import android.content.Intent;
 
 import com.google.common.base.Optional;
 
-import org.joda.time.DateTime;
-import org.joda.time.Duration;
-
 import javax.inject.Inject;
 
-import de.m4lik.burningseries.BuildConfig;
 import de.m4lik.burningseries.Dagger;
 import de.m4lik.burningseries.services.objects.Update;
 import de.m4lik.burningseries.util.Updater;
@@ -35,19 +31,14 @@ public class SyncIntentService extends IntentService {
     protected void onHandleIntent(Intent intent) {
         Dagger.appComponent(this).inject(this);
 
-        Optional<Update> update = toOptional(new Updater(this).check());
-        if (update.isPresent() && showNotification()) {
-            SyncBroadcastReceiver.getSyncPrefs(getApplicationContext()).edit().putString("last-update-notification", DateTime.now().toString()).apply();
-            notificationService.showUpdateNotification(update.get());
+        //if (BuildConfig.DEBUG || singleShotService.firstTimeInHour("background-update-check")) {
+        if (singleShotService.firstTimeInHour("background-update-check")) {
+            Optional<Update> update = toOptional(new Updater(this).check());
+            if (update.isPresent()) {
+                notificationService.showUpdateNotification(update.get());
+            }
         }
 
         completeWakefulIntent(intent);
-    }
-
-    boolean showNotification() {
-        String lastUpdateTime = SyncBroadcastReceiver.getSyncPrefs(getApplicationContext()).getString("last-update-notification", DateTime.now().toString());
-        if (BuildConfig.DEBUG || new Duration(DateTime.parse(lastUpdateTime), DateTime.now()).getStandardHours() >= 6)
-            return true;
-        return false;
     }
 }

@@ -21,10 +21,8 @@ import android.widget.TextView;
 import java.util.ArrayList;
 import java.util.List;
 
-import de.m4lik.burningseries.MainActivity;
 import de.m4lik.burningseries.R;
 import de.m4lik.burningseries.ShowActivity;
-import de.m4lik.burningseries.TabletShowActivity;
 import de.m4lik.burningseries.api.API;
 import de.m4lik.burningseries.api.APIInterface;
 import de.m4lik.burningseries.database.MainDBHelper;

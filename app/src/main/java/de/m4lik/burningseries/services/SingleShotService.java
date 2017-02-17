@@ -76,49 +76,6 @@ public class SingleShotService {
         return timeStringHasChanged(action, timeString);
     }
 
-    public TestOnlySingleShotService test() {
-        return new TestOnlySingleShotService();
-    }
-
-    public class TestOnlySingleShotService {
-        TestOnlySingleShotService() {
-        }
-
-        public boolean isFirstTime(String action) {
-            synchronized (lock) {
-                return !preferences
-                        .getStringSet(KEY_ACTIONS, Collections.<String>emptySet())
-                        .contains(action);
-            }
-        }
-
-        public boolean firstTimeInVersion(String action) {
-            int version = AndroidUtility.buildNumber();
-            return isFirstTime(action + "--" + version);
-        }
-
-        public boolean firstTimeToday(String action) {
-            return firstTimeByTimePattern(action, "YYYY-MM-dd");
-        }
-
-        public boolean firstTimeInHour(String action) {
-            return firstTimeByTimePattern(action, "YYYY-MM-dd:HH");
-        }
-
-        public boolean firstTimeByTimePattern(String action, String pattern) {
-            String timeString = DateTime.now()
-                    .minusMillis(TIME_OFFSET_IN_MILLIS)
-                    .toString(DateTimeFormat.forPattern(pattern));
-            return timeStringHasChanged(action, timeString);
-        }
-
-        private boolean timeStringHasChanged(String action, String timeString) {
-            synchronized (lock) {
-                return timeStringMap == null || !timeString.equals(timeStringMap.get(action));
-            }
-        }
-    }
-
     @SuppressWarnings("unchecked")
     private boolean timeStringHasChanged(String action, String timeString) {
         synchronized (lock) {

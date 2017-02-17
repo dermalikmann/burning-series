@@ -191,7 +191,7 @@ public class ShowActivity extends ActivityBase implements Callback<SeasonObj> {
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
         if (item.getItemId() == android.R.id.home) {
-            finish();
+            onBackPressed();
         }
         return super.onOptionsItemSelected(item);
     }

@@ -46,7 +46,7 @@ public class SeasonsFragment extends Fragment {
         Integer count = ((ShowActivity) getActivity()).getSeasonCount();
         String description = ((ShowActivity) getActivity()).getDescription();
 
-        TextView descriptionView = (TextView) rootview.findViewById(R.id.descriptionTextView);
+        TextView descriptionView = (TextView) rootview.findViewById(R.id.descriptionTV);
         descriptionView.setText(description);
         for (int i = 1; i <= count; i++) {
             seasonsList.add(new SeasonListItem(i));

@@ -18,6 +18,7 @@ import java.util.List;
 
 import de.m4lik.burningseries.R;
 import de.m4lik.burningseries.ShowActivity;
+import de.m4lik.burningseries.TabletShowActivity;
 import de.m4lik.burningseries.database.MainDBHelper;
 import de.m4lik.burningseries.database.SeriesContract;
 import de.m4lik.burningseries.ui.listitems.ShowListItem;
@@ -99,6 +100,8 @@ public class FavsFragment extends Fragment {
 
     private void showSeries(Integer id, String name) {
         Intent i = new Intent(getActivity(), ShowActivity.class);
+        if (getContext().getResources().getBoolean(R.bool.isTablet))
+            i = new Intent(getActivity(), TabletShowActivity.class);
         i.putExtra("ShowID", id);
         i.putExtra("ShowName", name);
         startActivity(i);

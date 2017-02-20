@@ -43,27 +43,19 @@ import static de.m4lik.burningseries.services.ThemeHelperService.theme;
 
 public class ShowActivity extends ActivityBase implements Callback<SeasonObj> {
 
-    private String title;
-    private String description;
-
     public Integer selectedShow;
     public Integer selectedSeason;
     public Integer selectedEpisode;
-
-    private String visibleFragment = "seasons";
-
     public Integer seasonCount;
-
     public Boolean fav = false;
-
     public View fragmentView;
-
     @BindView(R.id.fab)
     FloatingActionButton fab;
-
     String userSession;
-
     Intent i;
+    private String title;
+    private String description;
+    private String visibleFragment = "seasons";
 
     @Override
     protected void injectComponent(ActivityComponent appComponent) {
@@ -82,7 +74,7 @@ public class ShowActivity extends ActivityBase implements Callback<SeasonObj> {
         ImageView tbiv = (ImageView) findViewById(R.id.toolbarimage);
         findViewById(R.id.gradient).setBackground(getResources().getDrawable(theme().gradient));
 
-        if (getApplicationContext().getResources().getBoolean(R.bool.isTablet)){
+        if (getApplicationContext().getResources().getBoolean(R.bool.isTablet)) {
             this.setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_SENSOR_LANDSCAPE);
         } else {
             this.setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_SENSOR_PORTRAIT);
@@ -113,7 +105,7 @@ public class ShowActivity extends ActivityBase implements Callback<SeasonObj> {
         };
 
         final String selection = seriesTable.COLUMN_NAME_ID + " = ? AND "
-                         + seriesTable.COLUMN_NAME_ISFAV + " = ?";
+                + seriesTable.COLUMN_NAME_ISFAV + " = ?";
         final String[] selectionArgs = {selectedShow.toString(), "1"};
 
         Cursor c = db.query(
@@ -138,14 +130,22 @@ public class ShowActivity extends ActivityBase implements Callback<SeasonObj> {
         fab.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                if (!fav) {
-                    addToFavorites();
-                    fab.setImageDrawable(ContextCompat.getDrawable(getApplicationContext(), R.drawable.ic_star_white));
-                    fav = !fav;
+                if (!userSession.equals("")) {
+                    if (!fav) {
+                        addToFavorites();
+                        fab.setImageDrawable(ContextCompat.getDrawable(getApplicationContext(), R.drawable.ic_star_white));
+                        fav = !fav;
+                    } else {
+                        removeFromFavorites();
+                        fab.setImageDrawable(ContextCompat.getDrawable(getApplicationContext(), R.drawable.ic_star_border_white));
+                        fav = !fav;
+                    }
+
                 } else {
-                    removeFromFavorites();
-                    fab.setImageDrawable(ContextCompat.getDrawable(getApplicationContext(), R.drawable.ic_star_border_white));
-                    fav = !fav;
+                    Snackbar snackbar = Snackbar.make(findViewById(android.R.id.content), "Die Favoriten sind nur verfügbar wenn du angemeldet bist.", Snackbar.LENGTH_SHORT);
+                    View snackbarView = snackbar.getView();
+                    snackbarView.setBackgroundColor(ContextCompat.getColor(getApplicationContext(), theme().primaryColorDark));
+                    snackbar.show();
                 }
             }
         });
@@ -238,20 +238,20 @@ public class ShowActivity extends ActivityBase implements Callback<SeasonObj> {
         return selectedSeason;
     }
 
-    public Integer getSelectedEpisode() {
-        return selectedEpisode;
+    public void setSelectedSeason(Integer selectedSeason) {
+        this.selectedSeason = selectedSeason;
     }
 
-    public Integer getSeasonCount() {
-        return seasonCount;
+    public Integer getSelectedEpisode() {
+        return selectedEpisode;
     }
 
     public void setSelectedEpisode(Integer selectedEpisode) {
         this.selectedEpisode = selectedEpisode;
     }
 
-    public void setSelectedSeason(Integer selectedSeason) {
-        this.selectedSeason = selectedSeason;
+    public Integer getSeasonCount() {
+        return seasonCount;
     }
 
     public void setVisibleFragment(String visibleFragment) {

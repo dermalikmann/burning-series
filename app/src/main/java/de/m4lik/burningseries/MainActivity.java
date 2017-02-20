@@ -119,7 +119,7 @@ public class MainActivity extends ActivityBase
                     new ActivityManager.TaskDescription(
                             "Burning Series",
                             icon,
-                            getApplicationContext().getResources().getColor(R.color.blue_primary)
+                            getApplicationContext().getResources().getColor(theme().primaryColor)
                     ));
         }
         setSupportActionBar(toolbar);
@@ -166,10 +166,12 @@ public class MainActivity extends ActivityBase
             return;
         }
 
-        DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
-        if (!drawer.isDrawerOpen(GravityCompat.START)) {
-            drawer.openDrawer(GravityCompat.START);
-            return;
+        if (!isTablet) {
+            DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
+            if (!drawer.isDrawerOpen(GravityCompat.START)) {
+                drawer.openDrawer(GravityCompat.START);
+                return;
+            }
         }
 
         super.onBackPressed();
@@ -321,7 +323,7 @@ public class MainActivity extends ActivityBase
 
                 Snackbar snackbar = Snackbar.make(findViewById(android.R.id.content), "Ausgeloggt", Snackbar.LENGTH_SHORT);
                 View snackbarView = snackbar.getView();
-                snackbarView.setBackgroundColor(ContextCompat.getColor(getApplicationContext(), R.color.colorPrimaryDark));
+                snackbarView.setBackgroundColor(ContextCompat.getColor(getApplicationContext(), theme().primaryColorDark));
                 snackbar.show();
 
                 Intent intent = new Intent(getApplicationContext(), MainActivity.class);
@@ -441,7 +443,7 @@ public class MainActivity extends ActivityBase
 
                 Snackbar snackbar = Snackbar.make(findViewById(android.R.id.content), "Da ist was schief gelaufen...", Snackbar.LENGTH_SHORT);
                 View snackbarView = snackbar.getView();
-                snackbarView.setBackgroundColor(ContextCompat.getColor(getApplicationContext(), R.color.colorPrimaryDark));
+                snackbarView.setBackgroundColor(ContextCompat.getColor(getApplicationContext(), theme().primaryColorDark));
                 snackbar.show();
             }
         });

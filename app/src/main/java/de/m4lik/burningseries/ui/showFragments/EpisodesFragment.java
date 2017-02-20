@@ -167,8 +167,6 @@ public class EpisodesFragment extends Fragment implements Callback<SeasonObj> {
 
                     }
                 });
-
-
                 return true;
             }
         });

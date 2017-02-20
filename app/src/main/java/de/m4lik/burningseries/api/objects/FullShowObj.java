@@ -1,5 +1,7 @@
 package de.m4lik.burningseries.api.objects;
 
+import com.google.gson.annotations.SerializedName;
+
 /**
  * Created by Malik on 01.10.2016.
  */
@@ -63,6 +65,7 @@ public class FullShowObj {
         private String[] author;
         private String[] genre;
         private String[] director;
+        @SerializedName("genre_main")
         private String mainGenre;
 
         public Data(String[] producer, String[] author, String[] genre, String[] director, String mainGenre) {

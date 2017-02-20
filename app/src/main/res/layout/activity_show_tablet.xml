@@ -1,0 +1,297 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:fitsSystemWindows="true"
+    android:orientation="horizontal"
+    tools:context=".ShowActivity">
+
+    <ScrollView
+        android:layout_width="300dp"
+        android:layout_height="match_parent">
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical"
+            android:paddingBottom="30dp">
+
+            <ImageView
+                android:id="@+id/coverImageView"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:background="@color/blue_primary_dark"
+                android:fitsSystemWindows="true"
+                android:scaleType="fitXY"
+                android:adjustViewBounds="true"/>
+
+            <Button
+                android:id="@+id/favButton"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:drawableLeft="@drawable/ic_star_border_white"
+                android:text="Zu Favorieten hinzufügen"/>
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:orientation="vertical"
+                android:id="@+id/showDetails">
+
+                <TextView
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:paddingEnd="10dp"
+                    android:paddingLeft="20dp"
+                    android:paddingRight="10dp"
+                    android:paddingStart="20dp"
+                    android:paddingTop="10dp"
+                    android:text="Genres"
+                    android:textColor="?android:attr/textColorPrimary"/>
+
+                <TextView
+                    android:id="@+id/genresTV"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:paddingLeft="20dp"
+                    android:paddingStart="20dp"
+                    android:textColor="?android:attr/textColorSecondary"
+                    tools:text="Bla"/>
+
+                <TextView
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:paddingEnd="10dp"
+                    android:paddingLeft="20dp"
+                    android:paddingRight="10dp"
+                    android:paddingStart="20dp"
+                    android:paddingTop="10dp"
+                    android:text="Produktionsjahre"
+                    android:textColor="?android:attr/textColorPrimary"/>
+
+                <TextView
+                    android:id="@+id/yearsTV"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:paddingLeft="20dp"
+                    android:paddingStart="20dp"
+                    android:textColor="?android:attr/textColorSecondary"
+                    tools:text="Bla"/>
+
+                <!--<TextView
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:paddingEnd="10dp"
+                    android:paddingLeft="20dp"
+                    android:paddingRight="10dp"
+                    android:paddingStart="20dp"
+                    android:paddingTop="10dp"
+                    android:text="Hauptdarsteller"
+                    android:textColor="?android:attr/textColorPrimary"/>
+
+                <TextView
+                    android:id="@+id/mainActorTV"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:paddingLeft="20dp"
+                    android:paddingStart="20dp"
+                    android:textColor="?android:attr/textColorSecondary"
+                    tools:text="Bla"/>-->
+
+                <TextView
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:paddingEnd="10dp"
+                    android:paddingLeft="20dp"
+                    android:paddingRight="10dp"
+                    android:paddingStart="20dp"
+                    android:paddingTop="10dp"
+                    android:text="Produzenten"
+                    android:textColor="?android:attr/textColorPrimary"/>
+
+                <TextView
+                    android:id="@+id/producersTV"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:paddingLeft="20dp"
+                    android:paddingStart="20dp"
+                    android:textColor="?android:attr/textColorSecondary"
+                    tools:text="Bla"/>
+
+                <TextView
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:paddingEnd="10dp"
+                    android:paddingLeft="20dp"
+                    android:paddingRight="10dp"
+                    android:paddingStart="20dp"
+                    android:paddingTop="10dp"
+                    android:text="Regie"
+                    android:textColor="?android:attr/textColorPrimary"/>
+
+                <TextView
+                    android:id="@+id/directionTV"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:paddingLeft="20dp"
+                    android:paddingStart="20dp"
+                    android:textColor="?android:attr/textColorSecondary"
+                    tools:text="Bla"/>
+
+                <TextView
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:paddingEnd="10dp"
+                    android:paddingLeft="20dp"
+                    android:paddingRight="10dp"
+                    android:paddingStart="20dp"
+                    android:paddingTop="10dp"
+                    android:text="Autoren"
+                    android:textColor="?android:attr/textColorPrimary"/>
+
+                <TextView
+                    android:id="@+id/authorsTV"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:paddingLeft="20dp"
+                    android:paddingStart="20dp"
+                    android:textColor="?android:attr/textColorSecondary"
+                    tools:text="Bla"/>
+            </LinearLayout>
+
+        </LinearLayout>
+    </ScrollView>
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:gravity="center_horizontal"
+        android:orientation="vertical"
+        android:id="@+id/showContent">
+
+        <TextView
+            android:id="@+id/descriptionTV"
+            android:layout_width="600dp"
+            android:layout_height="wrap_content"
+            android:padding="10dp"
+            android:background="@drawable/list_item_background_light"
+            tools:text="Lorem ipsum dolor sit amet, consetetur sadipscing elitr, sed diam nonumy eirmod tempor invidunt ut labore et dolore magna aliquyam erat, sed diam voluptua. At vero eos et accusam et justo duo dolores et ea rebum. Stet clita kasd gubergren, no sea takimata sanctus est Lorem ipsum dolor sit amet. Lorem ipsum dolor sit amet, consetetur sadipscing elitr, sed diam nonumy eirmod tempor invidunt ut labore et dolore magna aliquyam erat, sed diam voluptua. At vero eos et accusam et justo duo dolores et ea rebum. Stet clita kasd gubergren, no sea takimata sanctus est Lorem ipsum dolor sit amet."
+            android:layout_marginBottom="20dp"
+            android:layout_marginEnd="40dp"
+            android:layout_marginLeft="40dp"
+            android:layout_marginRight="40dp"
+            android:layout_marginStart="40dp"
+            android:layout_marginTop="30dp"
+            android:textSize="15sp"/>
+
+        <View
+            android:layout_width="fill_parent"
+            android:layout_height="2px"
+            android:background="#afafaf"
+            android:layout_marginEnd="25dp"
+            android:layout_marginLeft="25dp"
+            android:layout_marginRight="25dp"
+            android:layout_marginStart="25dp"/>
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:layout_marginBottom="40dp"
+            android:layout_marginEnd="40dp"
+            android:layout_marginLeft="40dp"
+            android:layout_marginRight="40dp"
+            android:layout_marginStart="40dp"
+            android:orientation="horizontal">
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:layout_weight="1"
+                android:orientation="vertical"
+                android:padding="5dp">
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="Staffeln:"
+                    android:textAppearance="?android:attr/textAppearanceMedium"
+                    android:layout_marginBottom="16dp"
+                    android:layout_marginEnd="11dp"
+                    android:layout_marginLeft="11dp"
+                    android:layout_marginRight="11dp"
+                    android:layout_marginStart="11dp"
+                    android:layout_marginTop="11dp"/>
+
+                <ListView
+                    android:id="@+id/seasonsListView"
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"
+                    android:divider="@null"
+                    android:dividerHeight="5dp"/>
+
+            </LinearLayout>
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:layout_weight="1"
+                android:orientation="vertical"
+                android:padding="5dp">
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="Episoden:"
+                    android:textAppearance="?android:attr/textAppearanceMedium"
+                    android:layout_marginBottom="16dp"
+                    android:layout_marginEnd="11dp"
+                    android:layout_marginLeft="11dp"
+                    android:layout_marginRight="11dp"
+                    android:layout_marginStart="11dp"
+                    android:layout_marginTop="11dp"/>
+
+                <ListView
+                    android:id="@+id/episodesListView"
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"
+                    android:divider="@null"
+                    android:dividerHeight="5dp"/>
+
+            </LinearLayout>
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:layout_weight="1"
+                android:orientation="vertical"
+                android:padding="5dp">
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="Hoster:"
+                    android:textAppearance="?android:attr/textAppearanceMedium"
+                    android:layout_marginBottom="16dp"
+                    android:layout_marginEnd="11dp"
+                    android:layout_marginLeft="11dp"
+                    android:layout_marginRight="11dp"
+                    android:layout_marginStart="11dp"
+                    android:layout_marginTop="11dp"
+                    android:id="@+id/episodeName"/>
+
+                <ListView
+                    android:id="@+id/hosterListView"
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"
+                    android:divider="@null"
+                    android:dividerHeight="5dp"/>
+
+            </LinearLayout>
+
+        </LinearLayout>
+
+    </LinearLayout>
+
+</LinearLayout>

@@ -116,7 +116,7 @@ public class HosterFragment extends Fragment implements Callback<EpisodeObj> {
 
         Snackbar snackbar = Snackbar.make(rootview, "Fehler beim laden der Hoster.", Snackbar.LENGTH_SHORT);
         View snackbarView = snackbar.getView();
-        snackbarView.setBackgroundColor(ContextCompat.getColor(getContext(), R.color.colorPrimaryDark));
+        snackbarView.setBackgroundColor(ContextCompat.getColor(getContext(), theme().primaryColorDark));
         snackbar.show();
     }
 
@@ -232,31 +232,31 @@ public class HosterFragment extends Fragment implements Callback<EpisodeObj> {
                 case "1":
                     snackbar = Snackbar.make(rootview, "Hoster hat nicht geantwortet.", Snackbar.LENGTH_SHORT);
                     snackbarView = snackbar.getView();
-                    snackbarView.setBackgroundColor(ContextCompat.getColor(getContext(), R.color.colorPrimaryDark));
+                    snackbarView.setBackgroundColor(ContextCompat.getColor(getContext(), theme().primaryColorDark));
                     snackbar.show();
                     return;
                 case "2":
                     snackbar = Snackbar.make(rootview, "Video wurde wahrscheinlich gelöscht.", Snackbar.LENGTH_SHORT);
                     snackbarView = snackbar.getView();
-                    snackbarView.setBackgroundColor(ContextCompat.getColor(getContext(), R.color.colorPrimaryDark));
+                    snackbarView.setBackgroundColor(ContextCompat.getColor(getContext(), theme().primaryColorDark));
                     snackbar.show();
                     return;
                 case "3":
                     snackbar = Snackbar.make(rootview, "Fehler beim auflösen der Video URL.", Snackbar.LENGTH_SHORT);
                     snackbarView = snackbar.getView();
-                    snackbarView.setBackgroundColor(ContextCompat.getColor(getContext(), R.color.colorPrimaryDark));
+                    snackbarView.setBackgroundColor(ContextCompat.getColor(getContext(), theme().primaryColorDark));
                     snackbar.show();
                     return;
                 case "4":
                     snackbar = Snackbar.make(rootview, "Hoster hat nicht geantwortet.", Snackbar.LENGTH_SHORT);
                     snackbarView = snackbar.getView();
-                    snackbarView.setBackgroundColor(ContextCompat.getColor(getContext(), R.color.colorPrimaryDark));
+                    snackbarView.setBackgroundColor(ContextCompat.getColor(getContext(), theme().primaryColorDark));
                     snackbar.show();
                     return;
                 case "5":
                     snackbar = Snackbar.make(rootview, "Da ist etwas ganz schief gelaufen. Fehler bitte melden.", Snackbar.LENGTH_SHORT);
                     snackbarView = snackbar.getView();
-                    snackbarView.setBackgroundColor(ContextCompat.getColor(getContext(), R.color.colorPrimaryDark));
+                    snackbarView.setBackgroundColor(ContextCompat.getColor(getContext(), theme().primaryColorDark));
                     snackbar.show();
                     return;
             }

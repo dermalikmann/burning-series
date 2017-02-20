@@ -23,6 +23,7 @@ import java.util.List;
 
 import de.m4lik.burningseries.R;
 import de.m4lik.burningseries.ShowActivity;
+import de.m4lik.burningseries.TabletShowActivity;
 import de.m4lik.burningseries.api.API;
 import de.m4lik.burningseries.api.APIInterface;
 import de.m4lik.burningseries.database.MainDBHelper;
@@ -185,9 +186,9 @@ public class SeriesFragment extends Fragment {
                         db.close();
 
                     } else {
-                        Snackbar snackbar = Snackbar.make(rootView, "Die Favoriten sind nur verfügbar wenn du angemeldet bist.", 500);
+                        Snackbar snackbar = Snackbar.make(rootView, "Die Favoriten sind nur verfügbar wenn du angemeldet bist.", Snackbar.LENGTH_SHORT);
                         View snackbarView = snackbar.getView();
-                        snackbarView.setBackgroundColor(ContextCompat.getColor(getContext(), R.color.colorPrimaryDark));
+                        snackbarView.setBackgroundColor(ContextCompat.getColor(getContext(), theme().primaryColorDark));
                         snackbar.show();
                     }
                     return true;
@@ -212,6 +213,8 @@ public class SeriesFragment extends Fragment {
 
     private void showSeries(Integer id, String name, String genre) {
         Intent i = new Intent(getActivity(), ShowActivity.class);
+        if (getContext().getResources().getBoolean(R.bool.isTablet))
+            i = new Intent(getActivity(), TabletShowActivity.class);
         i.putExtra("ShowName", name);
         i.putExtra("ShowID", id);
         startActivity(i);

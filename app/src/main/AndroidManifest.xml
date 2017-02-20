@@ -57,6 +57,15 @@
                 android:value=".MainActivity"/>
         </activity>
         <activity
+            android:name=".TabletShowActivity"
+            android:label="@string/title_activity_scrolling"
+            android:parentActivityName=".MainActivity"
+            android:screenOrientation="landscape">
+            <meta-data
+                android:name="android.support.PARENT_ACTIVITY"
+                android:value=".MainActivity"/>
+        </activity>
+        <activity
             android:name=".LoginActivity"
             android:label="@string/title_activity_login"
             android:parentActivityName=".MainActivity"

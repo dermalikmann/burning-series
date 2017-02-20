@@ -28,6 +28,8 @@ public interface ActivityComponent {
 
     void inject(StatisticsActivity activity);
 
+    void inject(TabletShowActivity activity);
+
 
 
     void inject(DownloadUpdateDialog dialog);

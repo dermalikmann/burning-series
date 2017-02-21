@@ -1,5 +1,5 @@
 ext {
-    versionSupportLibrary = "25.1.0"
+    versionSupportLibrary = "25.1.1"
     versionImmutables = "2.4.1"
 }
 
@@ -9,15 +9,17 @@ dependencies {
     compile 'com.android.support:multidex:1.0.1'
 
     compile "com.android.support:appcompat-v7:$versionSupportLibrary"
+    compile "com.android.support:cardview-v7:$versionSupportLibrary"
     compile "com.android.support:customtabs:$versionSupportLibrary"
     compile "com.android.support:design:$versionSupportLibrary"
     compile "com.android.support:percent:$versionSupportLibrary"
+    compile "com.android.support:recyclerview-v7:$versionSupportLibrary"
     compile "com.android.support:support-v4:$versionSupportLibrary"
     compile 'com.android.support.constraint:constraint-layout:1.0.0-alpha8'
 
     compile 'com.devbrackets.android:exomedia:3.1.0'
 
-    compile 'com.google.android.gms:play-services-gcm:10.0.1'
+    compile 'com.google.android.gms:play-services-gcm:10.2.0'
     compile 'com.google.code.gson:gson:2.7'
     compile 'com.google.firebase:firebase-auth:10.0.1'
     compile 'com.google.firebase:firebase-core:10.0.1'

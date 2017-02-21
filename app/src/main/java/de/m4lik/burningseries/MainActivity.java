@@ -51,6 +51,7 @@ import de.m4lik.burningseries.services.SyncBroadcastReceiver;
 import de.m4lik.burningseries.ui.base.ActivityBase;
 import de.m4lik.burningseries.ui.mainFragments.FavsFragment;
 import de.m4lik.burningseries.ui.mainFragments.GenresFragment;
+import de.m4lik.burningseries.ui.mainFragments.NewsFragment;
 import de.m4lik.burningseries.ui.mainFragments.SeriesFragment;
 import de.m4lik.burningseries.util.Logger;
 import de.m4lik.burningseries.util.Settings;
@@ -276,6 +277,10 @@ public class MainActivity extends ActivityBase
                 logout();
                 break;
 
+            case R.id.nav_news:
+                setFragment("news");
+                break;
+
             case R.id.nav_stats:
                 intent = new Intent(this, StatisticsActivity.class);
                 startActivity(intent);
@@ -362,6 +367,12 @@ public class MainActivity extends ActivityBase
                 transaction.replace(R.id.fragmentContainerMain, new FavsFragment(), "favsFragment");
                 transaction.commit();
                 visibleFragment = "favorites";
+                break;
+            case "news":
+                searchItem.setVisible(false);
+                transaction.replace(R.id.fragmentContainerMain, new NewsFragment(), "newsFragment");
+                transaction.commit();
+                visibleFragment = "news";
                 break;
             default:
                 searchItem.setVisible(true);

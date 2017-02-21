@@ -31,6 +31,10 @@
     <item android:title="@string/misc">
             <menu android:checkableBehavior="single">
                 <item
+                    android:id="@+id/nav_news"
+                    android:icon="@drawable/ic_action_news"
+                    android:title="Statistiken" />
+                <item
                     android:id="@+id/nav_stats"
                     android:icon="@drawable/ic_action_pie_chart"
                     android:title="Statistiken" />

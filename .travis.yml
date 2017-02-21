@@ -3,6 +3,7 @@ android:
   components:
   - build-tools-25.0.2
   - android-25
+  - extra-google-m2repository
 
 before_install:
   - chmod +x gradlew

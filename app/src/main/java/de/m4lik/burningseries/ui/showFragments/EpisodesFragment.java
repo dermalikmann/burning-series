@@ -188,7 +188,7 @@ public class EpisodesFragment extends Fragment implements Callback<SeasonObj> {
     class episodesListAdapter extends ArrayAdapter<EpisodeListItem> {
 
         public episodesListAdapter() {
-            super(getActivity(), R.layout.list_item_episodes, episodesList);
+            super(getActivity().getApplicationContext(), R.layout.list_item_episodes, episodesList);
         }
 
         @Override

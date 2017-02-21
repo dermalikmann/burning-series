@@ -109,7 +109,7 @@ public class GenresFragment extends Fragment {
     class genresListAdapter extends ArrayAdapter<GenreListItem> {
 
         public genresListAdapter() {
-            super(getActivity(), R.layout.list_item_genres, genresList);
+            super(getActivity().getApplicationContext(), R.layout.list_item_genres, genresList);
         }
 
         @Override
@@ -204,7 +204,7 @@ public class GenresFragment extends Fragment {
         private List<ShowListItem> list;
 
         seriesListAdapter(List<ShowListItem> list) {
-            super(getActivity(), R.layout.list_item_series, seriesList);
+            super(getActivity().getApplicationContext(), R.layout.list_item_series, seriesList);
             this.list = list;
         }
 

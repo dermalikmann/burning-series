@@ -112,7 +112,7 @@ public class FavsFragment extends Fragment {
         private List<ShowListItem> list;
 
         seriesListAdapter(List<ShowListItem> list) {
-            super(getActivity(), R.layout.list_item_favorites, favs);
+            super(getActivity().getApplicationContext(), R.layout.list_item_favorites, favs);
             this.list = list;
         }
 

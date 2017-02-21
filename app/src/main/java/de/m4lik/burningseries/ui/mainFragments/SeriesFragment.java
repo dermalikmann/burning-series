@@ -225,7 +225,7 @@ public class SeriesFragment extends Fragment {
         private List<ShowListItem> list;
 
         seriesListAdapter(List<ShowListItem> list) {
-            super(getActivity(), R.layout.list_item_series, seriesList);
+            super(getActivity().getApplicationContext(), R.layout.list_item_series, seriesList);
             this.list = list;
         }
 

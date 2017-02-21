@@ -278,7 +278,7 @@ public class HosterFragment extends Fragment implements Callback<EpisodeObj> {
     class hostersListAdapter extends ArrayAdapter<HosterListItem> {
 
         hostersListAdapter() {
-            super(getActivity(), R.layout.list_item_hoster, hostersList);
+            super(getActivity().getApplicationContext(), R.layout.list_item_hoster, hostersList);
         }
 
         @Override

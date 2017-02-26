@@ -5,7 +5,7 @@ import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.preference.PreferenceManager;
 import android.support.design.widget.Snackbar;
-import android.support.v4.app.Fragment;
+import android.app.Fragment;
 import android.support.v4.content.ContextCompat;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -52,7 +52,9 @@ public class EpisodesFragment extends Fragment implements Callback<SeasonObj> {
     boolean loaded = false;
 
 
-    public EpisodesFragment() {}
+    public EpisodesFragment() {
+
+    }
 
 
     @Override
@@ -68,7 +70,7 @@ public class EpisodesFragment extends Fragment implements Callback<SeasonObj> {
         selectedShow = ((ShowActivity) getActivity()).getSelectedShow();
         selectedSeason = ((ShowActivity) getActivity()).getSelectedSeason();
 
-        SharedPreferences sharedPreferences = PreferenceManager.getDefaultSharedPreferences(getContext());
+        SharedPreferences sharedPreferences = PreferenceManager.getDefaultSharedPreferences(getActivity().getApplicationContext());
 
         userSession = sharedPreferences.getString("pref_session", "");
 

@@ -1,7 +1,7 @@
 package de.m4lik.burningseries.ui.showFragments;
 
 import android.os.Bundle;
-import android.support.v4.app.Fragment;
+import android.app.Fragment;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -34,8 +34,6 @@ public class SeasonsFragment extends Fragment {
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
         rootview = inflater.inflate(R.layout.fragment_seasons, container, false);
-
-        ((ShowActivity) getActivity()).setFragmentView(rootview);
 
 
         seasonsListView = (ListView) rootview.findViewById(R.id.seasonsListView);

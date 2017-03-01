@@ -12,7 +12,7 @@ import android.preference.PreferenceManager;
 import android.support.annotation.NonNull;
 import android.support.customtabs.CustomTabsIntent;
 import android.support.design.widget.Snackbar;
-import android.support.v4.app.Fragment;
+import android.app.Fragment;
 import android.support.v4.content.ContextCompat;
 import android.util.Log;
 import android.view.LayoutInflater;
@@ -80,7 +80,7 @@ public class HosterFragment extends Fragment implements Callback<EpisodeObj> {
         LinearLayout epicontainer = (LinearLayout) rootview.findViewById(R.id.hostercontainer);
         epicontainer.setVisibility(View.GONE);
 
-        SharedPreferences sharedPreferences = PreferenceManager.getDefaultSharedPreferences(getContext());
+        SharedPreferences sharedPreferences = PreferenceManager.getDefaultSharedPreferences(getActivity().getApplicationContext());
 
         API api = new API();
         api.setSession(sharedPreferences.getString("pref_session", ""));
@@ -116,7 +116,7 @@ public class HosterFragment extends Fragment implements Callback<EpisodeObj> {
 
         Snackbar snackbar = Snackbar.make(rootview, "Fehler beim laden der Hoster.", Snackbar.LENGTH_SHORT);
         View snackbarView = snackbar.getView();
-        snackbarView.setBackgroundColor(ContextCompat.getColor(getContext(), theme().primaryColorDark));
+        snackbarView.setBackgroundColor(ContextCompat.getColor(getActivity().getApplicationContext(), theme().primaryColorDark));
         snackbar.show();
     }
 
@@ -143,8 +143,8 @@ public class HosterFragment extends Fragment implements Callback<EpisodeObj> {
             @Override
             public void onItemClick(AdapterView<?> parent, final View view, int position, long id) {
 
-                if (Settings.of(getContext()).alarmOnMobile() &&
-                        AndroidUtility.isOnMobile(getContext())) {
+                if (Settings.of(getActivity().getApplicationContext()).alarmOnMobile() &&
+                        AndroidUtility.isOnMobile(getActivity().getApplicationContext())) {
 
                     DialogBuilder.start(getActivity())
                             .title("Mobile Daten")
@@ -170,7 +170,7 @@ public class HosterFragment extends Fragment implements Callback<EpisodeObj> {
 
     private void showVideo(Integer id) {
 
-        SharedPreferences sharedPreferences = PreferenceManager.getDefaultSharedPreferences(getContext());
+        SharedPreferences sharedPreferences = PreferenceManager.getDefaultSharedPreferences(getActivity().getApplicationContext());
 
         API api = new API();
         api.setSession(sharedPreferences.getString("pref_session", ""));
@@ -232,31 +232,31 @@ public class HosterFragment extends Fragment implements Callback<EpisodeObj> {
                 case "1":
                     snackbar = Snackbar.make(rootview, "Hoster hat nicht geantwortet.", Snackbar.LENGTH_SHORT);
                     snackbarView = snackbar.getView();
-                    snackbarView.setBackgroundColor(ContextCompat.getColor(getContext(), theme().primaryColorDark));
+                    snackbarView.setBackgroundColor(ContextCompat.getColor(getActivity().getApplicationContext(), theme().primaryColorDark));
                     snackbar.show();
                     return;
                 case "2":
                     snackbar = Snackbar.make(rootview, "Video wurde wahrscheinlich gelöscht.", Snackbar.LENGTH_SHORT);
                     snackbarView = snackbar.getView();
-                    snackbarView.setBackgroundColor(ContextCompat.getColor(getContext(), theme().primaryColorDark));
+                    snackbarView.setBackgroundColor(ContextCompat.getColor(getActivity().getApplicationContext(), theme().primaryColorDark));
                     snackbar.show();
                     return;
                 case "3":
                     snackbar = Snackbar.make(rootview, "Fehler beim auflösen der Video URL.", Snackbar.LENGTH_SHORT);
                     snackbarView = snackbar.getView();
-                    snackbarView.setBackgroundColor(ContextCompat.getColor(getContext(), theme().primaryColorDark));
+                    snackbarView.setBackgroundColor(ContextCompat.getColor(getActivity().getApplicationContext(), theme().primaryColorDark));
                     snackbar.show();
                     return;
                 case "4":
                     snackbar = Snackbar.make(rootview, "Hoster hat nicht geantwortet.", Snackbar.LENGTH_SHORT);
                     snackbarView = snackbar.getView();
-                    snackbarView.setBackgroundColor(ContextCompat.getColor(getContext(), theme().primaryColorDark));
+                    snackbarView.setBackgroundColor(ContextCompat.getColor(getActivity().getApplicationContext(), theme().primaryColorDark));
                     snackbar.show();
                     return;
                 case "5":
                     snackbar = Snackbar.make(rootview, "Da ist etwas ganz schief gelaufen. Fehler bitte melden.", Snackbar.LENGTH_SHORT);
                     snackbarView = snackbar.getView();
-                    snackbarView.setBackgroundColor(ContextCompat.getColor(getContext(), theme().primaryColorDark));
+                    snackbarView.setBackgroundColor(ContextCompat.getColor(getActivity().getApplicationContext(), theme().primaryColorDark));
                     snackbar.show();
                     return;
             }
@@ -266,8 +266,8 @@ public class HosterFragment extends Fragment implements Callback<EpisodeObj> {
                 CustomTabsIntent customTabsIntent = builder.build();
                 customTabsIntent.launchUrl(getActivity(), Uri.parse(videoObj.getFullUrl()));
             } else {
-                //Intent intent = new Intent(getContext(), BufferedVideoPlayerActivity.class);
-                Intent intent = new Intent(getContext(), FullscreenVideoActivity.class);
+                //Intent intent = new Intent(getActivity().getApplicationContext(), BufferedVideoPlayerActivity.class);
+                Intent intent = new Intent(getActivity().getApplicationContext(), FullscreenVideoActivity.class);
                 intent.putExtra("burning-series.videoURL", hosterReturn);
                 startActivity(intent);
             }
@@ -278,7 +278,7 @@ public class HosterFragment extends Fragment implements Callback<EpisodeObj> {
     class hostersListAdapter extends ArrayAdapter<HosterListItem> {
 
         hostersListAdapter() {
-            super(getActivity(), R.layout.list_item_hoster, hostersList);
+            super(getActivity().getApplicationContext(), R.layout.list_item_hoster, hostersList);
         }
 
         @Override
@@ -299,10 +299,10 @@ public class HosterFragment extends Fragment implements Callback<EpisodeObj> {
             url.setText(current.getLinkId().toString());
 
             ImageView fav = (ImageView) view.findViewById(R.id.supImgView);
-            if (!Settings.of(getContext()).themeName().contains("_DARK"))
-                fav.setImageDrawable(ContextCompat.getDrawable(getContext(), current.isSupported() ? R.drawable.ic_ondemand_video : R.drawable.ic_public));
+            if (!Settings.of(getActivity().getApplicationContext()).themeName().contains("_DARK"))
+                fav.setImageDrawable(ContextCompat.getDrawable(getActivity().getApplicationContext(), current.isSupported() ? R.drawable.ic_ondemand_video : R.drawable.ic_public));
             else
-                fav.setImageDrawable(ContextCompat.getDrawable(getContext(), current.isSupported() ? R.drawable.ic_ondemand_video_white : R.drawable.ic_public_white));
+                fav.setImageDrawable(ContextCompat.getDrawable(getActivity().getApplicationContext(), current.isSupported() ? R.drawable.ic_ondemand_video_white : R.drawable.ic_public_white));
 
             return view;
         }

@@ -5,13 +5,11 @@ buildscript {
     }
 
     dependencies {
-        classpath "me.tatarka:gradle-retrolambda:3.5.0"
         classpath "com.android.tools.build:gradle:2.2.3"
         classpath "com.neenbedankt.gradle.plugins:android-apt:1.6"
     }
 }
 
-// Required because retrolambda is on maven central
 repositories {
     mavenCentral();
     jcenter();
@@ -19,12 +17,11 @@ repositories {
 
 apply plugin: 'com.android.application'
 apply plugin: 'android-apt'
-apply plugin: 'com.android.application' //or apply plugin: 'java'
-apply plugin: 'me.tatarka.retrolambda'
+apply plugin: 'com.android.application'
 
 android {
     compileSdkVersion 25
-    buildToolsVersion "25.0.1"
+    buildToolsVersion "25.0.2"
 
     def versionPropsFile = file('version.properties')
     def versionBuild
@@ -53,9 +50,9 @@ android {
     defaultConfig {
         applicationId "de.m4lik.burningseries"
         minSdkVersion 19
-        targetSdkVersion 24
+        targetSdkVersion 25
         versionCode versionBuild
-        versionName "0.10.6"
+        versionName "0.10.7"
         vectorDrawables.useSupportLibrary = true
         multiDexEnabled true
     }
@@ -81,7 +78,7 @@ android {
 apply from: "dependencies.gradle"
 
 dependencies {
-    compile 'com.google.android.gms:play-services-gcm:10.0.1'
-    compile 'com.android.support:support-v4:25.1.1'
+    compile 'com.google.android.gms:play-services-gcm:10.2.0'
+    compile 'com.android.support:support-v4:25.2.0'
 }
 apply plugin: 'com.google.gms.google-services'

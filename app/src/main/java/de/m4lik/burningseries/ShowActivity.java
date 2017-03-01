@@ -11,9 +11,6 @@ import android.os.Bundle;
 import android.preference.PreferenceManager;
 import android.support.design.widget.FloatingActionButton;
 import android.support.design.widget.Snackbar;
-import android.support.v4.app.Fragment;
-import android.support.v4.app.FragmentManager;
-import android.support.v4.app.FragmentTransaction;
 import android.support.v4.content.ContextCompat;
 import android.support.v7.widget.Toolbar;
 import android.util.Log;
@@ -161,15 +158,11 @@ public class ShowActivity extends ActivityBase implements Callback<SeasonObj> {
 
     public void setDefaultFragment() {
 
-        Fragment fragment = new SeasonsFragment();
-        FragmentManager fragmentManager = getSupportFragmentManager();
-        FragmentTransaction transaction = fragmentManager.beginTransaction();
-        transaction.replace(R.id.fragmentContainerShow, fragment);
-        transaction.commit();
+        getFragmentManager().beginTransaction()
+                .replace(R.id.fragmentContainerShow, new SeasonsFragment())
+                .commit();
 
-        fragmentView = fragment.getView();
-
-        setVisibleFragment("seasons");
+        visibleFragment = "seasons";
     }
 
     @Override
@@ -254,55 +247,48 @@ public class ShowActivity extends ActivityBase implements Callback<SeasonObj> {
         return seasonCount;
     }
 
-    public void setVisibleFragment(String visibleFragment) {
-        this.visibleFragment = visibleFragment;
-    }
-
-    public void setFragmentView(View fragmentView) {
-        this.fragmentView = fragmentView;
-    }
-
     /*
      * Fragment transactions
      */
 
     public void switchSeasonsToEpisodes() {
 
-        FragmentManager fragmentManager = getSupportFragmentManager();
-        FragmentTransaction transaction = fragmentManager.beginTransaction();
-        transaction.replace(R.id.fragmentContainerShow, new EpisodesFragment(), "EPISODES");
-        transaction.commit();
+        getFragmentManager().beginTransaction()
+                .setCustomAnimations(R.animator.slide_in_right, R.animator.slide_out_left, 0, 0)
+                .replace(R.id.fragmentContainerShow, new EpisodesFragment())
+                .commit();
 
-        setVisibleFragment("episodes");
+        visibleFragment = "episodes";
     }
 
     public void switchEpisodesToSeasons() {
 
-        FragmentManager fragmentManager = getSupportFragmentManager();
-        FragmentTransaction transaction = fragmentManager.beginTransaction();
-        transaction.replace(R.id.fragmentContainerShow, new SeasonsFragment(), "SEASONS");
-        transaction.commit();
+        getFragmentManager().beginTransaction()
+                .setCustomAnimations(R.animator.slide_in_left, R.animator.slide_out_right, 0, 0)
+                .replace(R.id.fragmentContainerShow, new SeasonsFragment())
+                .commit();
 
-        setVisibleFragment("seasons");
+        visibleFragment = "seasons";
     }
 
     public void switchEpisodesToHosters() {
-        FragmentManager fragmentManager = getSupportFragmentManager();
-        FragmentTransaction transaction = fragmentManager.beginTransaction();
-        transaction.replace(R.id.fragmentContainerShow, new HosterFragment(), "HOSTERS");
-        transaction.commit();
 
-        setVisibleFragment("hoster");
+        getFragmentManager().beginTransaction()
+                .setCustomAnimations(R.animator.slide_in_right, R.animator.slide_out_left, 0, 0)
+                .replace(R.id.fragmentContainerShow, new HosterFragment())
+                .commit();
+
+        visibleFragment = "hoster";
     }
 
     public void switchHosterToEpisodes() {
-        Fragment fragment = new EpisodesFragment();
-        FragmentManager fragmentManager = getSupportFragmentManager();
-        FragmentTransaction transaction = fragmentManager.beginTransaction();
-        transaction.replace(R.id.fragmentContainerShow, fragment, "EPISODES");
-        transaction.commit();
 
-        setVisibleFragment("episodes");
+        getFragmentManager().beginTransaction()
+                .setCustomAnimations(R.animator.slide_in_left, R.animator.slide_out_right, 0, 0)
+                .replace(R.id.fragmentContainerShow, new EpisodesFragment())
+                .commit();
+
+        visibleFragment = "episodes";
     }
 
     private void addToFavorites() {

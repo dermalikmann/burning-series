@@ -135,11 +135,20 @@ public class Updater {
     private static void install(Context context, File apk) throws IOException {
         Log.d("BS-Updater", "Trying to install...");
         Uri uri = Uri.parse("");
+        Log.d("BS-Updater", "1");
         if (Build.VERSION.SDK_INT > Build.VERSION_CODES.M) {
+            Log.d("BS-Updater", "2");
             String provider = BuildConfig.APPLICATION_ID + ".FileProvider";
-            uri = FileProvider.getUriForFile(context, provider, apk);
+            Log.d("BS-Updater", "3");
+            try {
+                uri = FileProvider.getUriForFile(context, provider, apk);
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
         } else {
+            Log.d("BS-Updater", "5");
             File file = new File(context.getExternalCacheDir(), "update.apk");
+            Log.d("BS-Updater", "6");
 
             //TODO: FA event
             try (InputStream input = new FileInputStream(apk)) {

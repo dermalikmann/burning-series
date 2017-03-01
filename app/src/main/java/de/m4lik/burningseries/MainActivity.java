@@ -277,9 +277,9 @@ public class MainActivity extends ActivityBase
                 logout();
                 break;
 
-            case R.id.nav_news:
+            /*case R.id.nav_news:
                 setFragment("news");
-                break;
+                break;*/
 
             case R.id.nav_stats:
                 intent = new Intent(this, StatisticsActivity.class);

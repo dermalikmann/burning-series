@@ -28,7 +28,8 @@
             android:layout_height="wrap_content"
             android:layout_gravity="center_horizontal"
             android:divider="@null"
-            android:dividerHeight="0dp"/>
+            android:dividerHeight="0dp"
+            tools:listitem="@layout/list_item_episodes"/>
 
     </LinearLayout>
 

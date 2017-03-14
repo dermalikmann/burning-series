@@ -156,22 +156,14 @@ public class TabletShowActivity extends ActivityBase {
         favButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                if (!userSession.equals("")) {
-                    if (!fav) {
-                        addToFavorites();
-                        favButton.setCompoundDrawables(favStar, null, null, null);
-                        fav = !fav;
-                    } else {
-                        removeFromFavorites();
-                        favButton.setCompoundDrawables(notFavStar, null, null, null);
-                        fav = !fav;
-                    }
-
+                if (!fav) {
+                    addToFavorites();
+                    favButton.setCompoundDrawables(favStar, null, null, null);
+                    fav = !fav;
                 } else {
-                    Snackbar snackbar = Snackbar.make(findViewById(android.R.id.content), "Die Favoriten sind nur verfügbar wenn du angemeldet bist.", Snackbar.LENGTH_SHORT);
-                    View snackbarView = snackbar.getView();
-                    snackbarView.setBackgroundColor(ContextCompat.getColor(getApplicationContext(), theme().primaryColorDark));
-                    snackbar.show();
+                    removeFromFavorites();
+                    favButton.setCompoundDrawables(notFavStar, null, null, null);
+                    fav = !fav;
                 }
             }
         });
@@ -519,22 +511,24 @@ public class TabletShowActivity extends ActivityBase {
         db.close();
 
 
-        API api = new API();
-        APIInterface apiInterface = api.getInterface();
-        api.setSession(userSession);
-        api.generateToken("user/series/set/" + favs);
-        Call<ResponseBody> call = apiInterface.setFavorites(api.getToken(), api.getUserAgent(), favs, api.getSession());
-        call.enqueue(new Callback<ResponseBody>() {
-            @Override
-            public void onResponse(Call<ResponseBody> call, Response<ResponseBody> response) {
+        if (!userSession.equals("")) {
+            API api = new API();
+            APIInterface apiInterface = api.getInterface();
+            api.setSession(userSession);
+            api.generateToken("user/series/set/" + favs);
+            Call<ResponseBody> call = apiInterface.setFavorites(api.getToken(), api.getUserAgent(), favs, api.getSession());
+            call.enqueue(new Callback<ResponseBody>() {
+                @Override
+                public void onResponse(Call<ResponseBody> call, Response<ResponseBody> response) {
 
-            }
+                }
 
-            @Override
-            public void onFailure(Call<ResponseBody> call, Throwable t) {
+                @Override
+                public void onFailure(Call<ResponseBody> call, Throwable t) {
 
-            }
-        });
+                }
+            });
+        }
 
     }
 
@@ -574,21 +568,23 @@ public class TabletShowActivity extends ActivityBase {
         db.close();
 
 
-        API api = new API();
-        APIInterface apiInterface = api.getInterface();
-        api.setSession(userSession);
-        api.generateToken("user/series/set/" + favs);
-        Call<ResponseBody> call = apiInterface.setFavorites(api.getToken(), api.getUserAgent(), favs, api.getSession());
-        call.enqueue(new Callback<ResponseBody>() {
-            @Override
-            public void onResponse(Call<ResponseBody> call, Response<ResponseBody> response) {
-            }
+        if (!userSession.equals("")) {
+            API api = new API();
+            APIInterface apiInterface = api.getInterface();
+            api.setSession(userSession);
+            api.generateToken("user/series/set/" + favs);
+            Call<ResponseBody> call = apiInterface.setFavorites(api.getToken(), api.getUserAgent(), favs, api.getSession());
+            call.enqueue(new Callback<ResponseBody>() {
+                @Override
+                public void onResponse(Call<ResponseBody> call, Response<ResponseBody> response) {
+                }
 
-            @Override
-            public void onFailure(Call<ResponseBody> call, Throwable t) {
+                @Override
+                public void onFailure(Call<ResponseBody> call, Throwable t) {
 
-            }
-        });
+                }
+            });
+        }
     }
 
     class SeasonsListAdapter extends ArrayAdapter<SeasonListItem> {

@@ -90,7 +90,7 @@ public class SeasonsFragment extends Fragment {
 
     class seasonsListAdapter extends ArrayAdapter<SeasonListItem> {
 
-        public seasonsListAdapter() {
+        seasonsListAdapter() {
             super(getActivity().getApplicationContext(), R.layout.list_item_seasons, seasonsList);
         }
 

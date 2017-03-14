@@ -41,12 +41,13 @@ public class SeasonsFragment extends Fragment {
         LinearLayout seasonscontainer = (LinearLayout) rootview.findViewById(R.id.seasonscontainer);
         seasonscontainer.setVisibility(View.VISIBLE);
 
-        Integer count = ((ShowActivity) getActivity()).getSeasonCount();
         String description = ((ShowActivity) getActivity()).getDescription();
+        Integer count = ((ShowActivity) getActivity()).getSeasonCount();
+        Boolean withSpecials = ((ShowActivity) getActivity()).withSpecials();
 
         TextView descriptionView = (TextView) rootview.findViewById(R.id.descriptionTV);
         descriptionView.setText(description);
-        for (int i = 1; i <= count; i++) {
+        for (int i = withSpecials ? 0 : 1 ; i <= count; i++) {
             seasonsList.add(new SeasonListItem(i));
         }
 
@@ -104,7 +105,10 @@ public class SeasonsFragment extends Fragment {
             SeasonListItem current = seasonsList.get(pos);
 
             TextView label = (TextView) view.findViewById(R.id.seasonLabel);
-            label.setText(getString(R.string.season) + current.getSeasonId());
+            if (current.getSeasonId() == 0)
+                label.setText("Filme/Specials");
+            else
+                label.setText(getString(R.string.season) + current.getSeasonId());
 
             TextView urlText = (TextView) view.findViewById(R.id.seasonId);
             urlText.setText(current.getSeasonId().toString());

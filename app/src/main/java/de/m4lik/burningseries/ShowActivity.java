@@ -44,6 +44,7 @@ public class ShowActivity extends ActivityBase implements Callback<SeasonObj> {
     public Integer selectedSeason;
     public Integer selectedEpisode;
     public Integer seasonCount;
+    public Boolean withSpecials = false;
     public Boolean fav = false;
     public View fragmentView;
     @BindView(R.id.fab)
@@ -171,6 +172,7 @@ public class ShowActivity extends ActivityBase implements Callback<SeasonObj> {
 
         description = show.getSeries().getDescription();
         seasonCount = show.getSeries().getSeasonCount();
+        withSpecials = show.getSeries().getMovieCount() != 0;
 
         setDefaultFragment();
     }
@@ -245,6 +247,10 @@ public class ShowActivity extends ActivityBase implements Callback<SeasonObj> {
 
     public Integer getSeasonCount() {
         return seasonCount;
+    }
+
+    public Boolean withSpecials() {
+        return withSpecials;
     }
 
     /*

@@ -1,23 +1,23 @@
-buildscript {
-    repositories {
-        mavenCentral()
-        jcenter()
-    }
-
-    dependencies {
-        classpath 'com.android.tools.build:gradle:2.3.0'
-        classpath "com.neenbedankt.gradle.plugins:android-apt:1.6"
-    }
-}
+apply plugin: 'com.android.application'
+apply plugin: 'com.neenbedankt.android-apt'
 
 repositories {
     mavenCentral();
     jcenter();
 }
 
-apply plugin: 'com.android.application'
-apply plugin: 'android-apt'
-apply plugin: 'com.android.application'
+buildscript {
+    repositories {
+        jcenter()
+        mavenCentral()
+    }
+
+    dependencies {
+        classpath 'com.google.gms:google-services:3.0.0'
+        classpath 'com.android.tools.build:gradle:2.3.0'
+        classpath 'com.neenbedankt.gradle.plugins:android-apt:1.6'
+    }
+}
 
 android {
     compileSdkVersion 25
@@ -31,7 +31,7 @@ android {
         versionProps.load(new FileInputStream(versionPropsFile))
         versionBuild = versionProps['VERSION_BUILD'].toInteger()
     } else {
-        throw new GradleException("Could not read version.properties!")
+        throw new Exception("Could not read version.properties!")
     }
 
     ext.autoIncrementBuildNumber = {
@@ -43,7 +43,7 @@ android {
             versionProps['VERSION_BUILD'] = versionBuild.toString()
             versionProps.store(versionPropsFile.newWriter(), null)
         } else {
-            throw new GradleException("Could not read version.properties!")
+            throw new Exception("Could not read version.properties!")
         }
     }
 
@@ -52,15 +52,24 @@ android {
         minSdkVersion 19
         targetSdkVersion 25
         versionCode versionBuild
-        versionName "0.10.7"
+        versionName "0.10.8"
         vectorDrawables.useSupportLibrary = true
-        multiDexEnabled true
+        //multiDexEnabled true
     }
+
     buildTypes {
+        debug {
+            minifyEnabled true
+            shrinkResources true
+            proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
+            testProguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
+            versionNameSuffix ".dev"
+        }
+
         release {
             minifyEnabled true
-            proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
-            debuggable false
+            shrinkResources true
+            proguardFiles 'proguard-rules-release.pro', getDefaultProguardFile('proguard-android-optimize.txt')
         }
     }
 
@@ -73,12 +82,20 @@ android {
             autoIncrementBuildNumber()
         }
     }
+
+    packagingOptions {
+        exclude 'META-INF/NOTICE'
+        exclude 'META-INF/LICENSE'
+        exclude 'META-INF/DEPENDENCIES'
+        exclude 'META-INF/LICENSE.txt'
+        exclude 'META-INF/NOTICE.txt'
+        exclude 'META-INF/maven/com.google.guava/guava/pom.xml'
+        exclude 'META-INF/maven/com.google.guava/guava/pom.properties'
+        exclude 'META-INF/maven/com.google.dagger/dagger/pom.xml'
+        exclude 'META-INF/maven/com.google.dagger/dagger/pom.properties'
+    }
 }
 
 apply from: "dependencies.gradle"
 
-dependencies {
-    compile 'com.google.android.gms:play-services-gcm:10.2.0'
-    compile 'com.android.support:support-v4:25.2.0'
-}
 apply plugin: 'com.google.gms.google-services'

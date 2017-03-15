@@ -1,6 +1,8 @@
 ext {
-    versionSupportLibrary = "25.2.0"
+    versionSupportLibrary = "25.3.0"
+    VersionRxBinding = "1.0.0"
     versionImmutables = "2.4.1"
+    versionFirebase = "2.4.1"
 }
 
 dependencies {
@@ -21,9 +23,10 @@ dependencies {
 
     compile 'com.google.android.gms:play-services-gcm:10.2.0'
     compile 'com.google.code.gson:gson:2.7'
-    compile 'com.google.firebase:firebase-core:10.0.1'
-    compile 'com.google.firebase:firebase-crash:10.0.1'
-    compile 'com.google.firebase:firebase-messaging:10.0.1'
+    compile 'com.google.firebase:firebase-core:10.2.0'
+    compile 'com.google.firebase:firebase-config:10.2.0'
+    compile 'com.google.firebase:firebase-crash:10.2.0'
+    compile 'com.google.firebase:firebase-messaging:10.2.0'
 
     compile 'com.github.bumptech.glide:glide:3.7.0'
     compile 'com.github.nirhart:parallaxscroll:1.0'
@@ -51,6 +54,12 @@ dependencies {
     compile "com.trello:rxlifecycle:1.0"
     compile "com.trello:rxlifecycle-android:1.0"
     compile "com.trello:rxlifecycle-components:1.0"
+
+    compile "com.jakewharton.rxbinding:rxbinding:$VersionRxBinding"
+    compile "com.jakewharton.rxbinding:rxbinding-support-v4:$VersionRxBinding"
+    compile "com.jakewharton.rxbinding:rxbinding-appcompat-v7:$VersionRxBinding"
+    compile "com.jakewharton.rxbinding:rxbinding-design:$VersionRxBinding"
+    compile "com.jakewharton.rxbinding:rxbinding-recyclerview-v7:$VersionRxBinding"
 
     compile 'net.danlew:android.joda:2.9.5.1'
 

@@ -22,7 +22,7 @@ class TheVideo extends Hoster {
     static {
         filenamePattern = Pattern.compile("<input type=\"hidden\" name=\"fname\" value=\"[a-zA-Z0-9-]+\">");
         hashPattern = Pattern.compile("<input type=\"hidden\" name=\"hash\" value=\"([a-zA-Z0-9-]+)\">");
-        mpriPattern = Pattern.compile("var mpri_Key='([a-zA-Z0-9]+)'");
+        mpriPattern = Pattern.compile("var try_again='([a-zA-Z0-9]+)'");
         vtPattern = Pattern.compile("([a-zA-Z0-9]{15,})");
         hdPattern = Pattern.compile("file\":\"(https://([a-zA-Z0-9/.:]+))\",\"label\":\"720p\"");
         sdPattern = Pattern.compile("file\":\"(https://([a-zA-Z0-9/.:]+))\",\"label\":\"480p\"");
@@ -40,7 +40,7 @@ class TheVideo extends Hoster {
                 return "1";
             }
 
-            Map<String, String> dataArgs = new HashMap(10);
+            Map<String, String> dataArgs = new HashMap<>(10);
 
             Matcher hashMatcher = hashPattern.matcher(GetRequest);
 
@@ -64,7 +64,7 @@ class TheVideo extends Hoster {
             dataArgs.put("inhu", "foff");
             dataArgs.put("imhuman", "");
 
-            Map refererArgs = new HashMap(1);
+            Map<String, String> refererArgs = new HashMap<>(1);
             refererArgs.put("Referer", fullURL);
 
             Thread.sleep(5000);

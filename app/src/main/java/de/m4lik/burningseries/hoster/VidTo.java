@@ -17,11 +17,19 @@ class VidTo extends Hoster {
     private static final Pattern filenamePattern;
     private static final Pattern hashPattern;
     private static final Pattern getURLPattern;
+    protected static final Pattern hdPattern;
+    protected static final Pattern sdPattern;
+    protected static final Pattern ldPattern;
+    protected static final Pattern vldPattern;
 
     static {
         filenamePattern = Pattern.compile("<input type=\"hidden\" name=\"fname\" value=\"(.*)\">");
         hashPattern = Pattern.compile("<input type=\"hidden\" name=\"hash\" value=\"([a-zA-Z0-9-]+)\">");
         getURLPattern = Pattern.compile("',\\d+,\\d+,'");
+        hdPattern = Pattern.compile("file:\"(http://([a-zA-Z0-9/.:]+))\",label:\"720p\"");
+        sdPattern = Pattern.compile("file:\"(http://([a-zA-Z0-9/.:]+))\",label:\"480p\"");
+        ldPattern = Pattern.compile("file:\"(http://([a-zA-Z0-9/.:]+))\",label:\"360p\"");
+        vldPattern = Pattern.compile("file:\"(http://([a-zA-Z0-9/.:]+))\",label:\"240p\"");
     }
 
     public String get(String videoID) {
@@ -37,7 +45,7 @@ class VidTo extends Hoster {
                 return "2";
             }
             CharSequence GetRequest = GetRequestString(fullURL);
-            Map<String, String> dataArgs = new HashMap<String, String>(7);
+            Map<String, String> dataArgs = new HashMap<>(7);
             Matcher filenameMatcher = filenamePattern.matcher(GetRequest);
             Matcher hashMatcher = hashPattern.matcher(GetRequest);
             if (!filenameMatcher.find() || !hashMatcher.find()) {
@@ -52,13 +60,19 @@ class VidTo extends Hoster {
             dataArgs.put("hash", hashMatcher.group(1));
             dataArgs.put("imhuman", "Proceed to video");
 
-            Map<String, String> refererArgs = new HashMap<String, String>(1);
+            Map<String, String> refererArgs = new HashMap<>(1);
             refererArgs.put("Referer", fullURL);
 
             SystemClock.sleep(6500);
 
-            try {
-                String postReq = "eval(" + PostRequestString(fullURL, dataArgs, refererArgs).split("eval\\(")[1];
+            //try {
+                String postReq = PostRequestString(fullURL, dataArgs, refererArgs);
+                Log.v("BSHOSTER", postReq);
+
+
+
+
+                /*postReq = "eval(" + postReq.split("eval\\(")[1];
                 Matcher test = getURLPattern.matcher(postReq);
                 test.find();
                 String p = postReq.split("return p\\}\\('")[1].split("',\\d+,\\d+")[0];
@@ -77,17 +91,41 @@ class VidTo extends Hoster {
                     return p.split("label:\"" + quality + "\",file:\"")[1].split("\"")[0];
                 } catch (Exception e) {
                     FirebaseCrash.logcat(Log.ERROR, "HOSTER", "Error while finding video URL (" + fullURL + ")");
+                    e.printStackTrace();
                     FirebaseCrash.report(e);
                     //We ain't found shit, Sir!
                     return "3";
-                }
+                }*/
+
+                try {
+                    Matcher urlMatcher = hdPattern.matcher(postReq);
+                    if (!urlMatcher.find()) {
+                        urlMatcher = sdPattern.matcher(postReq);
+                        if (!urlMatcher.find()) {
+                            urlMatcher = ldPattern.matcher(postReq);
+                            if (!urlMatcher.find()) {
+                                urlMatcher = vldPattern.matcher(postReq);
+                                if (!urlMatcher.find()) {
+                                    //We ain't found shit, Sir!
+                                    FirebaseCrash.logcat(Log.ERROR, "HOSTER", "Error while finding video URL (" + fullURL + ")");
+                                    return "3";
+                                }
+                                return urlMatcher.group(1);
+                            }
+                            return urlMatcher.group(1);
+                        }
+                        return urlMatcher.group(1);
+                    }
+                    return urlMatcher.group(1);
             } catch (Exception e) {
                 FirebaseCrash.logcat(Log.ERROR, "HOSTER", "Error while fetching video URL (" + fullURL + ")");
+                e.printStackTrace();
                 FirebaseCrash.report(e);
                 return "4";
             }
         } catch (Exception e) {
             FirebaseCrash.logcat(Log.ERROR, "HOSTER", "Error while getting video page (" + fullURL + ")");
+            e.printStackTrace();
             FirebaseCrash.report(e);
             //Whoops... The thing broke.
             return "5";

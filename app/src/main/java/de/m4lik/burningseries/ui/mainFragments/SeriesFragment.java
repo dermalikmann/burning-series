@@ -6,7 +6,6 @@ import android.content.Intent;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.os.Bundle;
-import android.support.design.widget.Snackbar;
 import android.support.v4.app.Fragment;
 import android.support.v4.content.ContextCompat;
 import android.view.LayoutInflater;
@@ -148,8 +147,6 @@ public class SeriesFragment extends Fragment {
                 @Override
                 public boolean onItemLongClick(AdapterView<?> adapterView, View view, int position, long id) {
 
-                    if (!userSession.equals("")) {
-
                         SQLiteDatabase db = new MainDBHelper(getContext()).getReadableDatabase();
 
                         String[] projection = new String[]{
@@ -184,13 +181,6 @@ public class SeriesFragment extends Fragment {
 
                         c.close();
                         db.close();
-
-                    } else {
-                        Snackbar snackbar = Snackbar.make(rootView, "Die Favoriten sind nur verfügbar wenn du angemeldet bist.", Snackbar.LENGTH_SHORT);
-                        View snackbarView = snackbar.getView();
-                        snackbarView.setBackgroundColor(ContextCompat.getColor(getContext(), theme().primaryColorDark));
-                        snackbar.show();
-                    }
                     return true;
                 }
             });
@@ -299,23 +289,24 @@ public class SeriesFragment extends Fragment {
         db.close();
 
 
-        API api = new API();
-        APIInterface apiInterface = api.getInterface();
-        api.setSession(userSession);
-        api.generateToken("user/series/set/" + favs);
-        Call<ResponseBody> call = apiInterface.setFavorites(api.getToken(), api.getUserAgent(), favs, api.getSession());
-        call.enqueue(new Callback<ResponseBody>() {
-            @Override
-            public void onResponse(Call<ResponseBody> call, Response<ResponseBody> response) {
+        if (!userSession.equals("")) {
+            API api = new API();
+            APIInterface apiInterface = api.getInterface();
+            api.setSession(userSession);
+            api.generateToken("user/series/set/" + favs);
+            Call<ResponseBody> call = apiInterface.setFavorites(api.getToken(), api.getUserAgent(), favs, api.getSession());
+            call.enqueue(new Callback<ResponseBody>() {
+                @Override
+                public void onResponse(Call<ResponseBody> call, Response<ResponseBody> response) {
 
-            }
+                }
 
-            @Override
-            public void onFailure(Call<ResponseBody> call, Throwable t) {
+                @Override
+                public void onFailure(Call<ResponseBody> call, Throwable t) {
 
-            }
-        });
-
+                }
+            });
+        }
     }
 
     private void removeFromFavorites(Integer id) {
@@ -354,20 +345,22 @@ public class SeriesFragment extends Fragment {
         db.close();
 
 
-        API api = new API();
-        APIInterface apiInterface = api.getInterface();
-        api.setSession(userSession);
-        api.generateToken("user/series/set/" + favs);
-        Call<ResponseBody> call = apiInterface.setFavorites(api.getToken(), api.getUserAgent(), favs, api.getSession());
-        call.enqueue(new Callback<ResponseBody>() {
-            @Override
-            public void onResponse(Call<ResponseBody> call, Response<ResponseBody> response) {
-            }
+        if (!userSession.equals("")) {
+            API api = new API();
+            APIInterface apiInterface = api.getInterface();
+            api.setSession(userSession);
+            api.generateToken("user/series/set/" + favs);
+            Call<ResponseBody> call = apiInterface.setFavorites(api.getToken(), api.getUserAgent(), favs, api.getSession());
+            call.enqueue(new Callback<ResponseBody>() {
+                @Override
+                public void onResponse(Call<ResponseBody> call, Response<ResponseBody> response) {
+                }
 
-            @Override
-            public void onFailure(Call<ResponseBody> call, Throwable t) {
+                @Override
+                public void onFailure(Call<ResponseBody> call, Throwable t) {
 
-            }
-        });
+                }
+            });
+        }
     }
 }

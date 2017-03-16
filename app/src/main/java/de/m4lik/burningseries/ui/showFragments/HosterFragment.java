@@ -192,7 +192,7 @@ public class HosterFragment extends Fragment implements Callback<EpisodeObj> {
         });
     }
 
-    class getVideo extends AsyncTask<Void, Void, Void> {
+    private class getVideo extends AsyncTask<Void, Void, Void> {
 
         private VideoObj videoObj;
 
@@ -266,7 +266,6 @@ public class HosterFragment extends Fragment implements Callback<EpisodeObj> {
                 CustomTabsIntent customTabsIntent = builder.build();
                 customTabsIntent.launchUrl(getActivity(), Uri.parse(videoObj.getFullUrl()));
             } else {
-                //Intent intent = new Intent(getActivity().getApplicationContext(), BufferedVideoPlayerActivity.class);
                 Intent intent = new Intent(getActivity().getApplicationContext(), FullscreenVideoActivity.class);
                 intent.putExtra("burning-series.videoURL", hosterReturn);
                 startActivity(intent);
@@ -275,7 +274,7 @@ public class HosterFragment extends Fragment implements Callback<EpisodeObj> {
         }
     }
 
-    class hostersListAdapter extends ArrayAdapter<HosterListItem> {
+    private class hostersListAdapter extends ArrayAdapter<HosterListItem> {
 
         hostersListAdapter() {
             super(getActivity().getApplicationContext(), R.layout.list_item_hoster, hostersList);

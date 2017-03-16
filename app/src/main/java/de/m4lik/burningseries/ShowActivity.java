@@ -44,6 +44,7 @@ public class ShowActivity extends ActivityBase implements Callback<SeasonObj> {
     public Integer selectedSeason;
     public Integer selectedEpisode;
     public Integer seasonCount;
+    public Boolean withSpecials = false;
     public Boolean fav = false;
     public View fragmentView;
     @BindView(R.id.fab)
@@ -127,22 +128,14 @@ public class ShowActivity extends ActivityBase implements Callback<SeasonObj> {
         fab.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                if (!userSession.equals("")) {
-                    if (!fav) {
-                        addToFavorites();
-                        fab.setImageDrawable(ContextCompat.getDrawable(getApplicationContext(), R.drawable.ic_star_white));
-                        fav = !fav;
-                    } else {
-                        removeFromFavorites();
-                        fab.setImageDrawable(ContextCompat.getDrawable(getApplicationContext(), R.drawable.ic_star_border_white));
-                        fav = !fav;
-                    }
-
+                if (!fav) {
+                    addToFavorites();
+                    fab.setImageDrawable(ContextCompat.getDrawable(getApplicationContext(), R.drawable.ic_star_white));
+                    fav = !fav;
                 } else {
-                    Snackbar snackbar = Snackbar.make(findViewById(android.R.id.content), "Die Favoriten sind nur verfügbar wenn du angemeldet bist.", Snackbar.LENGTH_SHORT);
-                    View snackbarView = snackbar.getView();
-                    snackbarView.setBackgroundColor(ContextCompat.getColor(getApplicationContext(), theme().primaryColorDark));
-                    snackbar.show();
+                    removeFromFavorites();
+                    fab.setImageDrawable(ContextCompat.getDrawable(getApplicationContext(), R.drawable.ic_star_border_white));
+                    fav = !fav;
                 }
             }
         });
@@ -171,6 +164,7 @@ public class ShowActivity extends ActivityBase implements Callback<SeasonObj> {
 
         description = show.getSeries().getDescription();
         seasonCount = show.getSeries().getSeasonCount();
+        withSpecials = show.getSeries().getMovieCount() != 0;
 
         setDefaultFragment();
     }
@@ -245,6 +239,10 @@ public class ShowActivity extends ActivityBase implements Callback<SeasonObj> {
 
     public Integer getSeasonCount() {
         return seasonCount;
+    }
+
+    public Boolean withSpecials() {
+        return withSpecials;
     }
 
     /*
@@ -327,22 +325,24 @@ public class ShowActivity extends ActivityBase implements Callback<SeasonObj> {
         db.close();
 
 
-        API api = new API();
-        APIInterface apiInterface = api.getInterface();
-        api.setSession(userSession);
-        api.generateToken("user/series/set/" + favs);
-        Call<ResponseBody> call = apiInterface.setFavorites(api.getToken(), api.getUserAgent(), favs, api.getSession());
-        call.enqueue(new Callback<ResponseBody>() {
-            @Override
-            public void onResponse(Call<ResponseBody> call, Response<ResponseBody> response) {
+        if (!userSession.equals("")) {
+            API api = new API();
+            APIInterface apiInterface = api.getInterface();
+            api.setSession(userSession);
+            api.generateToken("user/series/set/" + favs);
+            Call<ResponseBody> call = apiInterface.setFavorites(api.getToken(), api.getUserAgent(), favs, api.getSession());
+            call.enqueue(new Callback<ResponseBody>() {
+                @Override
+                public void onResponse(Call<ResponseBody> call, Response<ResponseBody> response) {
 
-            }
+                }
 
-            @Override
-            public void onFailure(Call<ResponseBody> call, Throwable t) {
+                @Override
+                public void onFailure(Call<ResponseBody> call, Throwable t) {
 
-            }
-        });
+                }
+            });
+        }
 
     }
 
@@ -382,20 +382,22 @@ public class ShowActivity extends ActivityBase implements Callback<SeasonObj> {
         db.close();
 
 
-        API api = new API();
-        APIInterface apiInterface = api.getInterface();
-        api.setSession(userSession);
-        api.generateToken("user/series/set/" + favs);
-        Call<ResponseBody> call = apiInterface.setFavorites(api.getToken(), api.getUserAgent(), favs, api.getSession());
-        call.enqueue(new Callback<ResponseBody>() {
-            @Override
-            public void onResponse(Call<ResponseBody> call, Response<ResponseBody> response) {
-            }
+        if (!userSession.equals("")) {
+            API api = new API();
+            APIInterface apiInterface = api.getInterface();
+            api.setSession(userSession);
+            api.generateToken("user/series/set/" + favs);
+            Call<ResponseBody> call = apiInterface.setFavorites(api.getToken(), api.getUserAgent(), favs, api.getSession());
+            call.enqueue(new Callback<ResponseBody>() {
+                @Override
+                public void onResponse(Call<ResponseBody> call, Response<ResponseBody> response) {
+                }
 
-            @Override
-            public void onFailure(Call<ResponseBody> call, Throwable t) {
+                @Override
+                public void onFailure(Call<ResponseBody> call, Throwable t) {
 
-            }
-        });
+                }
+            });
+        }
     }
 }

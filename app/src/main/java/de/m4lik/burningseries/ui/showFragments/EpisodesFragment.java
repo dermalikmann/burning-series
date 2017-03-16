@@ -112,16 +112,16 @@ public class EpisodesFragment extends Fragment implements Callback<SeasonObj> {
 
         Integer numOfItems = adapter.getCount();
 
-        Integer totalItemsHeigt = 0;
+        Integer totalItemsHeight = 0;
         for (int pos = 0; pos < numOfItems; pos++) {
             View item = adapter.getView(pos, null, episodesListView);
             item.measure(0, 0);
-            totalItemsHeigt += item.getMeasuredHeight();
+            totalItemsHeight += item.getMeasuredHeight();
         }
 
         Integer totalDividersHeight = episodesListView.getDividerHeight() * (numOfItems - 1);
         ViewGroup.LayoutParams params = episodesListView.getLayoutParams();
-        params.height = totalItemsHeigt + totalDividersHeight;
+        params.height = totalItemsHeight + totalDividersHeight;
         episodesListView.setLayoutParams(params);
         episodesListView.requestLayout();
 

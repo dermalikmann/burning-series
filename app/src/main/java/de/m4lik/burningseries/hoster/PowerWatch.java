@@ -30,7 +30,7 @@ class PowerWatch extends Hoster {
                 return "1";
             }
 
-            Map dataArgs = new HashMap(7);
+            Map<String, String> dataArgs = new HashMap<>(7);
 
             Matcher matcher = filenamePattern.matcher(GetRequest);
             Matcher matcher2 = hashPattern.matcher(GetRequest);
@@ -47,7 +47,7 @@ class PowerWatch extends Hoster {
             dataArgs.put("id", videoID);
             dataArgs.put("referer", "");
             dataArgs.put("imhuman", "");
-            Map refererArgs = new HashMap(1);
+            Map<String, String> refererArgs = new HashMap<>(1);
             refererArgs.put("Referer", fullURL);
             SystemClock.sleep(5000);
             try {

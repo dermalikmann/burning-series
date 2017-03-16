@@ -1,8 +1,8 @@
 package de.m4lik.burningseries;
 
+import android.app.Application;
 import android.content.Context;
 import android.os.StrictMode;
-import android.support.multidex.MultiDexApplication;
 
 import com.google.common.base.Supplier;
 
@@ -25,7 +25,7 @@ import rx.android.plugins.RxAndroidSchedulersHook;
  * @author Malik Mann
  */
 
-public class ApplicationClass extends MultiDexApplication {
+public class ApplicationClass extends Application {
 
     private static ApplicationClass INSTANCE;
 

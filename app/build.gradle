@@ -52,7 +52,7 @@ android {
         minSdkVersion 19
         targetSdkVersion 25
         versionCode versionBuild
-        versionName "0.10.8"
+        versionName "0.10.9"
         vectorDrawables.useSupportLibrary = true
         //multiDexEnabled true
     }
@@ -64,12 +64,26 @@ android {
             proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
             testProguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
             versionNameSuffix ".dev"
+            applicationVariants.all { variant ->
+                variant.outputs.each { output ->
+                    output.outputFile = new File(output.outputFile.parent,
+                            output.outputFile.name.replace("app-debug", "bs-v" + versionName)
+                    )
+                }
+            }
         }
 
         release {
             minifyEnabled true
             shrinkResources true
             proguardFiles 'proguard-rules.pro', getDefaultProguardFile('proguard-android-optimize.txt')
+            applicationVariants.all { variant ->
+                variant.outputs.each { output ->
+                    output.outputFile = new File(output.outputFile.parent,
+                            output.outputFile.name.replace("app-release", "bs-v" + versionName)
+                    )
+                }
+            }
         }
     }
 

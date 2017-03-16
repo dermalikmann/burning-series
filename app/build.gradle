@@ -67,7 +67,7 @@ android {
             applicationVariants.all { variant ->
                 variant.outputs.each { output ->
                     output.outputFile = new File(output.outputFile.parent,
-                            output.outputFile.name.replace("app-debug", "bs-v" + versionName)
+                            output.outputFile.name.replace("app-debug", "bs-" + versionName)
                     )
                 }
             }
@@ -80,7 +80,7 @@ android {
             applicationVariants.all { variant ->
                 variant.outputs.each { output ->
                     output.outputFile = new File(output.outputFile.parent,
-                            output.outputFile.name.replace("app-release", "bs-v" + versionName)
+                            output.outputFile.name.replace("app-release", "bs-" + versionName)
                     )
                 }
             }

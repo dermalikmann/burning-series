@@ -84,6 +84,7 @@ public class Updater {
         if (betaChannel) {
             urls.add("http://bs.malikmann.de/version/beta/");
         } else {
+            urls.add("https://raw.githubusercontent.com/M4lik/burning-series/master/builds/");
             urls.add("http://bs.malikmann.de/version/stable/");
         }
 

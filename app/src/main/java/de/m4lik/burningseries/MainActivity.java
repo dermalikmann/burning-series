@@ -38,7 +38,6 @@ import java.util.Arrays;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
-import java.util.concurrent.TimeUnit;
 
 import butterknife.BindView;
 import de.m4lik.burningseries.api.API;
@@ -47,8 +46,8 @@ import de.m4lik.burningseries.api.objects.GenreMap;
 import de.m4lik.burningseries.api.objects.GenreObj;
 import de.m4lik.burningseries.api.objects.ShowObj;
 import de.m4lik.burningseries.database.MainDBHelper;
-import de.m4lik.burningseries.services.SyncBroadcastReceiver;
 import de.m4lik.burningseries.ui.base.ActivityBase;
+import de.m4lik.burningseries.ui.dialogs.UpdateDialog;
 import de.m4lik.burningseries.ui.mainFragments.FavsFragment;
 import de.m4lik.burningseries.ui.mainFragments.GenresFragment;
 import de.m4lik.burningseries.ui.mainFragments.NewsFragment;
@@ -60,7 +59,6 @@ import retrofit2.Call;
 import retrofit2.Callback;
 import retrofit2.Response;
 import rx.Observable;
-import rx.android.schedulers.AndroidSchedulers;
 import rx.functions.Action1;
 
 import static de.m4lik.burningseries.database.SeriesContract.SQL_TRUNCATE_GENRES_TABLE;
@@ -145,6 +143,15 @@ public class MainActivity extends ActivityBase
             toggle.syncState();
         }
 
+        //Update check
+        Observable.just(null)
+                .compose(RxLifecycleAndroid.bindActivity(lifecycle()))
+                .subscribe(new Action1<Object>() {
+                    @Override
+                    public void call(Object o) {
+                        UpdateDialog.checkForUpdates(MainActivity.this, false);
+                    }
+                });
 
         TextView userTextView = (TextView) navigationView.getHeaderView(0).findViewById(R.id.nav_username_text);
         userTextView.setText(userName);
@@ -179,7 +186,7 @@ public class MainActivity extends ActivityBase
 
     }
 
-    @Override
+    /*@Override
     protected void onStart() {
         super.onStart();
 
@@ -192,7 +199,7 @@ public class MainActivity extends ActivityBase
                         SyncBroadcastReceiver.syncNow(MainActivity.this);
                     }
                 });
-    }
+    }*/
 
 
     @Override

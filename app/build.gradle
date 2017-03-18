@@ -1,10 +1,6 @@
 apply plugin: 'com.android.application'
 apply plugin: 'com.neenbedankt.android-apt'
-
-repositories {
-    mavenCentral();
-    jcenter();
-}
+apply plugin: 'me.tatarka.retrolambda'
 
 buildscript {
     repositories {
@@ -15,10 +11,10 @@ buildscript {
     dependencies {
         classpath 'com.google.gms:google-services:3.0.0'
         classpath 'com.android.tools.build:gradle:2.3.0'
+        classpath 'me.tatarka:gradle-retrolambda:3.6.0'
         classpath 'com.neenbedankt.gradle.plugins:android-apt:1.6'
     }
 }
-
 android {
     compileSdkVersion 25
     buildToolsVersion "25.0.2"
@@ -108,8 +104,15 @@ android {
         exclude 'META-INF/maven/com.google.dagger/dagger/pom.xml'
         exclude 'META-INF/maven/com.google.dagger/dagger/pom.properties'
     }
+    compileOptions {
+        sourceCompatibility JavaVersion.VERSION_1_8
+        targetCompatibility JavaVersion.VERSION_1_8
+    }
 }
-
+retrolambda {
+    incremental true
+}
 apply from: "dependencies.gradle"
-
 apply plugin: 'com.google.gms.google-services'
+dependencies {
+}

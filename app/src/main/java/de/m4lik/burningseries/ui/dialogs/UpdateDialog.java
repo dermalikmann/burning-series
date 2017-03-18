@@ -20,21 +20,14 @@ import de.m4lik.burningseries.ui.base.ActivityBase;
 import de.m4lik.burningseries.ui.base.DialogBase;
 import de.m4lik.burningseries.util.Updater;
 import rx.Observable;
-import rx.Subscriber;
 import rx.functions.Action0;
-import rx.functions.Action1;
-import rx.functions.Func1;
+import rx.functions.Actions;
 
+import static de.m4lik.burningseries.ui.dialogs.BusyDialog.busyDialog;
 import static org.joda.time.Duration.standardHours;
 import static org.joda.time.Instant.now;
 
-/**
- * Created by Malik on 25.01.2017
- *
- * @author Malik Mann
- */
-
-public class UpdateDialog extends DialogBase{
+public class UpdateDialog extends DialogBase {
     @Inject
     DownloadManager downloadManager;
 
@@ -91,51 +84,33 @@ public class UpdateDialog extends DialogBase{
         }
 
         /* Action to store the last check time */
-        Action0 storeCheckTime = new Action0() {
-            @Override
-            public void call() {
+        Action0 storeCheckTime = () ->
                 shared.edit()
                         .putLong(KEY_LAST_UPDATE_CHECK, now().getMillis())
                         .apply();
-            }
-        };
-
 
 
         /* show a busy-dialog or not? */
-        /*Observable.Operator<Update, Update> busyOperator =
-                interactive ? busyDialog(activity) : NOOP;*/
+        Observable.Operator<Update, Update> busyOperator =
+                interactive ? busyDialog(activity) : NOOP;
 
         // do the check
         new Updater(activity).check()
-                .onErrorResumeNext(new Func1<Throwable, Observable<? extends Update>>() {
-                    @Override
-                    public Observable<? extends Update> call(Throwable throwable) {
-                        return null;
-                    }
-                })
+                .onErrorResumeNext(Observable.empty())
                 .defaultIfEmpty(null)
                 .compose(activity.bindUntilEventAsync(ActivityEvent.DESTROY))
-                //.lift(busyOperator)
+                .lift(busyOperator)
                 .doAfterTerminate(storeCheckTime)
-                .subscribe(new Action1<Object>() {
-                    @Override
-                    public void call(Object update) {
+                .subscribe(update -> {
                             if (interactive || update != null) {
                                 UpdateDialog dialog = newInstance((Update) update);
                                 dialog.show(activity.getSupportFragmentManager(), null);
                             }
-                    }
-                });
+                }, Actions.empty());
     }
 
     private static final String KEY_LAST_UPDATE_CHECK = "pref_last_update";
-    private static final Observable.Operator<Update, Update> NOOP = new Observable.Operator<Update, Update>() {
-        @Override
-        public Subscriber<? super Update> call(Subscriber<? super Update> subscriber) {
-            return subscriber;
-        }
-    };
+    private static final Observable.Operator<Update, Update> NOOP = subscriber -> subscriber;
 
     @Override
     protected void injectComponent(ActivityComponent activityComponent) {

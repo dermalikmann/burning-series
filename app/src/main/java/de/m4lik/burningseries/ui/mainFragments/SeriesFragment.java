@@ -6,6 +6,7 @@ import android.content.Intent;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.os.Bundle;
+import android.support.annotation.NonNull;
 import android.support.v4.app.Fragment;
 import android.support.v4.content.ContextCompat;
 import android.view.LayoutInflater;
@@ -143,46 +144,43 @@ public class SeriesFragment extends Fragment {
             ArrayAdapter<ShowListItem> adapter = new seriesListAdapter(inputList);
             getSeriesListView.setAdapter(adapter);
 
-            getSeriesListView.setOnItemLongClickListener(new AdapterView.OnItemLongClickListener() {
-                @Override
-                public boolean onItemLongClick(AdapterView<?> adapterView, View view, int position, long id) {
+            getSeriesListView.setOnItemLongClickListener((adapterView, view, position, id) -> {
 
-                        SQLiteDatabase db = new MainDBHelper(getContext()).getReadableDatabase();
+                    SQLiteDatabase db = new MainDBHelper(getContext()).getReadableDatabase();
 
-                        String[] projection = new String[]{
-                                SeriesContract.seriesTable.COLUMN_NAME_ISFAV
-                        };
+                    String[] projection = new String[]{
+                            SeriesContract.seriesTable.COLUMN_NAME_ISFAV
+                    };
 
-                        Integer selectID = Integer.parseInt(((TextView) view.findViewById(R.id.seriesId)).getText().toString());
+                    Integer selectID = Integer.parseInt(((TextView) view.findViewById(R.id.seriesId)).getText().toString());
 
 
-                        Cursor c = db.query(
-                                SeriesContract.seriesTable.TABLE_NAME,
-                                projection,
-                                SeriesContract.seriesTable.COLUMN_NAME_ID + " = ?",
-                                new String[]{selectID.toString()},
-                                null,
-                                null,
-                                null
-                        );
+                    Cursor c = db.query(
+                            SeriesContract.seriesTable.TABLE_NAME,
+                            projection,
+                            SeriesContract.seriesTable.COLUMN_NAME_ID + " = ?",
+                            new String[]{selectID.toString()},
+                            null,
+                            null,
+                            null
+                    );
 
-                        c.moveToFirst();
-                        Boolean isFav = c.getInt(c.getColumnIndex(SeriesContract.seriesTable.COLUMN_NAME_ISFAV)) == 1;
+                    c.moveToFirst();
+                    Boolean isFav = c.getInt(c.getColumnIndex(SeriesContract.seriesTable.COLUMN_NAME_ISFAV)) == 1;
 
-                        ImageView fav = (ImageView) view.findViewById(R.id.favImageView);
-                        fav.setImageDrawable(ContextCompat.getDrawable(getContext(),
-                                !isFav ? R.drawable.ic_star : R.drawable.ic_star_border)
-                        );
+                    ImageView fav = (ImageView) view.findViewById(R.id.favImageView);
+                    fav.setImageDrawable(ContextCompat.getDrawable(getContext(),
+                            !isFav ? R.drawable.ic_star : R.drawable.ic_star_border)
+                    );
 
-                        if (isFav)
-                            removeFromFavorites(selectID);
-                        else
-                            addToFavorites(selectID);
+                    if (isFav)
+                        removeFromFavorites(selectID);
+                    else
+                        addToFavorites(selectID);
 
-                        c.close();
-                        db.close();
-                    return true;
-                }
+                    c.close();
+                    db.close();
+                return true;
             });
 
             getSeriesListView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
@@ -210,7 +208,7 @@ public class SeriesFragment extends Fragment {
         startActivity(i);
     }
 
-    class seriesListAdapter extends ArrayAdapter<ShowListItem> {
+    private class seriesListAdapter extends ArrayAdapter<ShowListItem> {
 
         private List<ShowListItem> list;
 
@@ -220,7 +218,8 @@ public class SeriesFragment extends Fragment {
         }
 
         @Override
-        public View getView(int pos, View view, ViewGroup parent) {
+        @NonNull
+        public View getView(int pos, View view, @NonNull ViewGroup parent) {
             if (view == null) {
                 view = getActivity().getLayoutInflater().inflate(R.layout.list_item_series, parent, false);
             }

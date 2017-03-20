@@ -1,16 +1,16 @@
 package de.m4lik.burningseries.ui.showFragments;
 
 
+import android.app.Fragment;
 import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.preference.PreferenceManager;
+import android.support.annotation.NonNull;
 import android.support.design.widget.Snackbar;
-import android.app.Fragment;
 import android.support.v4.content.ContextCompat;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
@@ -23,10 +23,10 @@ import de.m4lik.burningseries.R;
 import de.m4lik.burningseries.ShowActivity;
 import de.m4lik.burningseries.api.API;
 import de.m4lik.burningseries.api.APIInterface;
-import de.m4lik.burningseries.ui.listitems.EpisodeListItem;
 import de.m4lik.burningseries.api.objects.EpisodeObj;
 import de.m4lik.burningseries.api.objects.SeasonObj;
 import de.m4lik.burningseries.api.objects.VideoObj;
+import de.m4lik.burningseries.ui.listitems.EpisodeListItem;
 import de.m4lik.burningseries.util.Settings;
 import retrofit2.Call;
 import retrofit2.Callback;
@@ -125,60 +125,54 @@ public class EpisodesFragment extends Fragment implements Callback<SeasonObj> {
         episodesListView.setLayoutParams(params);
         episodesListView.requestLayout();
 
-        episodesListView.setOnItemLongClickListener(new AdapterView.OnItemLongClickListener() {
-            @Override
-            public boolean onItemLongClick(AdapterView<?> adapterView, final View view, int i, long l) {
+        episodesListView.setOnItemLongClickListener((adapterView, view, i, l) -> {
 
-                final TextView idView = (TextView) view.findViewById(R.id.episodeId);
-                Integer selectedEpisode = Integer.parseInt(idView.getText().toString());
+            final TextView idView = (TextView) view.findViewById(R.id.episodeId);
+            Integer selectedEpisode = Integer.parseInt(idView.getText().toString());
 
-                final API api = new API();
-                api.setSession(userSession);
-                api.generateToken("series/" + selectedShow + "/" + selectedSeason + "/" + selectedEpisode);
-                APIInterface apii = api.getInterface();
-                Call<EpisodeObj> call = apii.getEpisode(api.getToken(), api.getUserAgent(), selectedShow, selectedSeason, selectedEpisode, api.getSession());
-                call.enqueue(new Callback<EpisodeObj>() {
-                    @Override
-                    public void onResponse(Call<EpisodeObj> call, Response<EpisodeObj> response) {
+            final API api = new API();
+            api.setSession(userSession);
+            api.generateToken("series/" + selectedShow + "/" + selectedSeason + "/" + selectedEpisode);
+            APIInterface apii = api.getInterface();
+            Call<EpisodeObj> call = apii.getEpisode(api.getToken(), api.getUserAgent(), selectedShow, selectedSeason, selectedEpisode, api.getSession());
+            call.enqueue(new Callback<EpisodeObj>() {
+                @Override
+                public void onResponse(Call<EpisodeObj> call, Response<EpisodeObj> response) {
 
-                        Integer episodeID = response.body().getEpisode().getEpisodeId();
+                    Integer episodeID = response.body().getEpisode().getEpisodeId();
 
-                        api.generateToken("unwatch/" + episodeID);
-                        APIInterface apii = api.getInterface();
-                        Call<VideoObj> ucall = apii.unwatch(api.getToken(), api.getUserAgent(), episodeID, api.getSession());
-                        ucall.enqueue(new Callback<VideoObj>() {
-                            @Override
-                            public void onResponse(Call<VideoObj> call, Response<VideoObj> response) {
+                    api.generateToken("unwatch/" + episodeID);
+                    APIInterface apii = api.getInterface();
+                    Call<VideoObj> ucall = apii.unwatch(api.getToken(), api.getUserAgent(), episodeID, api.getSession());
+                    ucall.enqueue(new Callback<VideoObj>() {
+                        @Override
+                        public void onResponse(Call<VideoObj> call, Response<VideoObj> response) {
 
-                                TextView titleGerView = (TextView) view.findViewById(R.id.episodeTitleGer);
-                                titleGerView.setTextColor(ContextCompat.getColor(getContext(), android.R.color.black));
+                            TextView titleGerView = (TextView) view.findViewById(R.id.episodeTitleGer);
+                            titleGerView.setTextColor(ContextCompat.getColor(getActivity().getApplicationContext(), android.R.color.black));
 
-                                ImageView fav = (ImageView) view.findViewById(R.id.watchedImageView);
-                                fav.setImageDrawable(null);
-                            }
+                            ImageView fav = (ImageView) view.findViewById(R.id.watchedImageView);
+                            fav.setImageDrawable(null);
+                        }
 
-                            @Override
-                            public void onFailure(Call<VideoObj> call, Throwable t) {
+                        @Override
+                        public void onFailure(Call<VideoObj> call, Throwable t) {
 
-                            }
-                        });
-                    }
+                        }
+                    });
+                }
 
-                    @Override
-                    public void onFailure(Call<EpisodeObj> call, Throwable t) {
+                @Override
+                public void onFailure(Call<EpisodeObj> call, Throwable t) {
 
-                    }
-                });
-                return true;
-            }
+                }
+            });
+            return true;
         });
 
-        episodesListView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
-            @Override
-            public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
-                TextView idView = (TextView) view.findViewById(R.id.episodeId);
-                showEpisode(Integer.parseInt(idView.getText().toString()));
-            }
+        episodesListView.setOnItemClickListener((parent, view, postion, id) -> {
+            TextView idView = (TextView) view.findViewById(R.id.episodeId);
+            showEpisode(Integer.parseInt(idView.getText().toString()));
         });
     }
 
@@ -187,14 +181,15 @@ public class EpisodesFragment extends Fragment implements Callback<SeasonObj> {
         ((ShowActivity) getActivity()).switchEpisodesToHosters();
     }
 
-    class episodesListAdapter extends ArrayAdapter<EpisodeListItem> {
+    private class episodesListAdapter extends ArrayAdapter<EpisodeListItem> {
 
-        public episodesListAdapter() {
+        episodesListAdapter() {
             super(getActivity().getApplicationContext(), R.layout.list_item_episodes, episodesList);
         }
 
         @Override
-        public View getView(int pos, View view, ViewGroup parent) {
+        @NonNull
+        public View getView(int pos, View view, @NonNull ViewGroup parent) {
             if (view == null) {
                 view = getActivity().getLayoutInflater().inflate(R.layout.list_item_episodes, parent, false);
             }

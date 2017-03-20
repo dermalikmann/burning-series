@@ -1,11 +1,11 @@
 package de.m4lik.burningseries.ui.showFragments;
 
-import android.os.Bundle;
 import android.app.Fragment;
+import android.os.Bundle;
+import android.support.annotation.NonNull;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.LinearLayout;
 import android.widget.ListView;
@@ -79,23 +79,21 @@ public class SeasonsFragment extends Fragment {
         seasonsListView.setLayoutParams(params);
         seasonsListView.requestLayout();
 
-        seasonsListView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
-            @Override
-            public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
-                TextView idView = (TextView) view.findViewById(R.id.seasonId);
-                showSeason(Integer.parseInt(idView.getText().toString()));
-            }
+        seasonsListView.setOnItemClickListener((parent, view, position, id) -> {
+            TextView idView = (TextView) view.findViewById(R.id.seasonId);
+            showSeason(Integer.parseInt(idView.getText().toString()));
         });
     }
 
-    class seasonsListAdapter extends ArrayAdapter<SeasonListItem> {
+    private class seasonsListAdapter extends ArrayAdapter<SeasonListItem> {
 
         seasonsListAdapter() {
             super(getActivity().getApplicationContext(), R.layout.list_item_seasons, seasonsList);
         }
 
+        @NonNull
         @Override
-        public View getView(int pos, View view, ViewGroup parent) {
+        public View getView(int pos, View view, @NonNull ViewGroup parent) {
             if (view == null) {
                 view = getActivity().getLayoutInflater().inflate(R.layout.list_item_seasons, parent, false);
             }

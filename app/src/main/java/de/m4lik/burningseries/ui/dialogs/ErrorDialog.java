@@ -125,11 +125,8 @@ public class ErrorDialog extends DialogFragment {
      * Creates the default error callback {@link rx.functions.Action1}
      */
     public static Action1<Throwable> defaultOnError() {
-        return new Action1<Throwable>() {
-            @Override
-            public void call(Throwable error) {
-                //processError(error, getGlobalErrorDialogHandler());
-            }
+        return error -> {
+            //processError(error, getGlobalErrorDialogHandler());
         };
     }
 }

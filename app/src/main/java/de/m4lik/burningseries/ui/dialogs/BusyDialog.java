@@ -106,7 +106,7 @@ public class BusyDialog extends DialogBase {
         }
 
         @Override
-        public Subscriber<? super T> call(final Subscriber<? super T> subscriber) {
+        public Subscriber<? super T> call(Subscriber<? super T> subscriber) {
             return new Subscriber<T>() {
                 @Override
                 public void onCompleted() {

@@ -9,7 +9,6 @@ import android.os.Handler;
 import android.support.v4.app.NavUtils;
 import android.view.MenuItem;
 import android.view.View;
-import android.view.Window;
 
 import com.devbrackets.android.exomedia.ui.widget.EMVideoView;
 
@@ -39,23 +38,15 @@ public class FullscreenVideoActivity extends ActivityBase {
                     | View.SYSTEM_UI_FLAG_HIDE_NAVIGATION);
         }
     };
-    private final Runnable mShowPart2Runnable = new Runnable() {
-        @Override
-        public void run() {
+    private final Runnable mShowPart2Runnable = () -> {
 
-            ActionBar actionBar = getActionBar();
-            if (actionBar != null) {
-                actionBar.show();
-            }
+        ActionBar actionBar = getActionBar();
+        if (actionBar != null) {
+            actionBar.show();
         }
     };
     private boolean visible;
-    private final Runnable hideUI = new Runnable() {
-        @Override
-        public void run() {
-            hide();
-        }
-    };
+    private final Runnable hideUI = this::hide;
 
     @Override
     protected void injectComponent(ActivityComponent appComponent) {
@@ -89,31 +80,16 @@ public class FullscreenVideoActivity extends ActivityBase {
         visible = true;
         mContentView = findViewById(R.id.bufferedVideoView);
 
-
-        // Set up the user interaction to manually show or hide the system UI.
-        mContentView.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                toggle();
-            }
-        });
-
-        // Upon interacting with UI controls, delay any scheduled hide()
-        // operations to prevent the jarring behavior of controls going away
-        // while interacting with the UI.
+        mContentView.setOnClickListener(view -> toggle());
 
         Intent intent = getIntent();
 
         String videoURL = intent.getStringExtra("burning-series.videoURL");
 
-        Window window = this.getWindow();
-        //window.addFlags(WindowManager.LayoutParams.FLAG_DRAWS_SYSTEM_BAR_BACKGROUNDS);
-        //window.clearFlags(WindowManager.LayoutParams.FLAG_TRANSLUCENT_STATUS);
-
         Uri uri = Uri.parse(videoURL);
 
 
-        videoView = (EMVideoView) findViewById(R.id.bufferedVideoView);
+        videoView = (EMVideoView) mContentView;
         videoView.setVideoURI(uri);
 
         videoView.start();

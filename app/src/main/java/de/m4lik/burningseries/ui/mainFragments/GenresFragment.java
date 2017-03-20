@@ -5,6 +5,7 @@ import android.content.Intent;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.os.Bundle;
+import android.support.annotation.NonNull;
 import android.support.v4.app.Fragment;
 import android.support.v4.content.ContextCompat;
 import android.view.LayoutInflater;
@@ -106,14 +107,15 @@ public class GenresFragment extends Fragment {
         });
     }
 
-    class genresListAdapter extends ArrayAdapter<GenreListItem> {
+    private class genresListAdapter extends ArrayAdapter<GenreListItem> {
 
-        public genresListAdapter() {
+         genresListAdapter() {
             super(getActivity().getApplicationContext(), R.layout.list_item_genres, genresList);
         }
 
         @Override
-        public View getView(int pos, View view, ViewGroup parent) {
+        @NonNull
+        public View getView(int pos, View view, @NonNull ViewGroup parent) {
             if (view == null) {
                 view = getActivity().getLayoutInflater().inflate(R.layout.list_item_genres, parent, false);
             }
@@ -128,9 +130,9 @@ public class GenresFragment extends Fragment {
     }
 
 
-/**
- * Show Matching Series
- **/
+    /**
+     * Show Matching Series
+     **/
 
     private void populateSeriesList(String genre) {
 
@@ -199,7 +201,7 @@ public class GenresFragment extends Fragment {
         startActivity(i);
     }
 
-    class seriesListAdapter extends ArrayAdapter<ShowListItem> {
+    private class seriesListAdapter extends ArrayAdapter<ShowListItem> {
 
         private List<ShowListItem> list;
 
@@ -209,7 +211,8 @@ public class GenresFragment extends Fragment {
         }
 
         @Override
-        public View getView(int pos, View view, ViewGroup parent) {
+        @NonNull
+        public View getView(int pos, View view, @NonNull ViewGroup parent) {
             if (view == null) {
                 view = getActivity().getLayoutInflater().inflate(R.layout.list_item_series, parent, false);
             }

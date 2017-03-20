@@ -59,7 +59,6 @@ import retrofit2.Call;
 import retrofit2.Callback;
 import retrofit2.Response;
 import rx.Observable;
-import rx.functions.Action1;
 
 import static de.m4lik.burningseries.database.SeriesContract.SQL_TRUNCATE_GENRES_TABLE;
 import static de.m4lik.burningseries.database.SeriesContract.SQL_TRUNCATE_SERIES_TABLE;
@@ -146,12 +145,7 @@ public class MainActivity extends ActivityBase
         //Update check
         Observable.just(null)
                 .compose(RxLifecycleAndroid.bindActivity(lifecycle()))
-                .subscribe(new Action1<Object>() {
-                    @Override
-                    public void call(Object o) {
-                        UpdateDialog.checkForUpdates(MainActivity.this, false);
-                    }
-                });
+                .subscribe(o -> UpdateDialog.checkForUpdates(MainActivity.this, false));
 
         TextView userTextView = (TextView) navigationView.getHeaderView(0).findViewById(R.id.nav_username_text);
         userTextView.setText(userName);
@@ -185,21 +179,6 @@ public class MainActivity extends ActivityBase
         super.onBackPressed();
 
     }
-
-    /*@Override
-    protected void onStart() {
-        super.onStart();
-
-        // schedule a sync operation every minute
-        Observable.interval(0, 1, TimeUnit.MINUTES, AndroidSchedulers.mainThread())
-                .compose(RxLifecycleAndroid.bindActivity(lifecycle()))
-                .subscribe(new Action1<Object>() {
-                    @Override
-                    public void call(Object o) {
-                        SyncBroadcastReceiver.syncNow(MainActivity.this);
-                    }
-                });
-    }*/
 
 
     @Override
@@ -467,7 +446,7 @@ public class MainActivity extends ActivityBase
         });
     }
 
-    class seriesDatabaseUpdate extends AsyncTask<Void, Void, Void> {
+    private class seriesDatabaseUpdate extends AsyncTask<Void, Void, Void> {
 
         GenreMap genreMap;
 
@@ -533,7 +512,7 @@ public class MainActivity extends ActivityBase
         }
     }
 
-    class favoritesDatabaseUpdate extends AsyncTask<Void, Void, Void> {
+    private class favoritesDatabaseUpdate extends AsyncTask<Void, Void, Void> {
 
         List<ShowObj> list;
 

@@ -52,7 +52,7 @@ public class NewsFragment extends Fragment {
     }
 
 
-    class News extends AsyncTask<Void, Void, Void> {
+    private class News extends AsyncTask<Void, Void, Void> {
 
         void fetch() {
             this.execute();
@@ -77,7 +77,7 @@ public class NewsFragment extends Fragment {
                         newsItems.add(new NewsCardItem(id, title, date, content));
                 }
 
-            } catch (Exception e) {
+            } catch (Exception ignore) {
 
             }
 

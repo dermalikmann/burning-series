@@ -14,13 +14,13 @@ import java.util.regex.Pattern;
  * Created by Malik on 04.11.2016.
  */
 class VidTo extends Hoster {
-    private static final Pattern filenamePattern;
-    private static final Pattern hashPattern;
-    private static final Pattern getURLPattern;
     protected static final Pattern hdPattern;
     protected static final Pattern sdPattern;
     protected static final Pattern ldPattern;
     protected static final Pattern vldPattern;
+    private static final Pattern filenamePattern;
+    private static final Pattern hashPattern;
+    private static final Pattern getURLPattern;
 
     static {
         filenamePattern = Pattern.compile("<input type=\"hidden\" name=\"fname\" value=\"(.*)\">");
@@ -65,58 +65,30 @@ class VidTo extends Hoster {
 
             SystemClock.sleep(6500);
 
-            //try {
-                String postReq = PostRequestString(fullURL, dataArgs, refererArgs);
-                Log.v("BSHOSTER", postReq);
+            String postReq = PostRequestString(fullURL, dataArgs, refererArgs);
+            Log.v("BSHOSTER", postReq);
 
-
-
-
-                /*postReq = "eval(" + postReq.split("eval\\(")[1];
-                Matcher test = getURLPattern.matcher(postReq);
-                test.find();
-                String p = postReq.split("return p\\}\\('")[1].split("',\\d+,\\d+")[0];
-                String[] urlMatcher1 = test.group().split(",");
-                Integer a = Integer.parseInt(urlMatcher1[1]);
-                Integer c = Integer.parseInt(urlMatcher1[2]);
-                String[] k = postReq.split("\\d+,\\d+,'")[1].split("'\\.split\\('")[0].split("\\|");
-                for (Integer i = c - 1; i >= 0; i--) {
-                    if (!k[i].isEmpty()) {
-                        String currentID = Integer.toString(i, a);
-                        p = p.replaceAll("\\b" + currentID + "\\b", k[i]);
-                    }
-                }
-                try {
-                    String quality = p.split("hd_default:\"")[1].split("\"")[0];
-                    return p.split("label:\"" + quality + "\",file:\"")[1].split("\"")[0];
-                } catch (Exception e) {
-                    FirebaseCrash.logcat(Log.ERROR, "HOSTER", "Error while finding video URL (" + fullURL + ")");
-                    e.printStackTrace();
-                    FirebaseCrash.report(e);
-                    //We ain't found shit, Sir!
-                    return "3";
-                }*/
-
-                try {
-                    Matcher urlMatcher = hdPattern.matcher(postReq);
+            try {
+                Matcher urlMatcher = hdPattern.matcher(postReq);
+                if (!urlMatcher.find()) {
+                    urlMatcher = sdPattern.matcher(postReq);
                     if (!urlMatcher.find()) {
-                        urlMatcher = sdPattern.matcher(postReq);
+                        urlMatcher = ldPattern.matcher(postReq);
                         if (!urlMatcher.find()) {
-                            urlMatcher = ldPattern.matcher(postReq);
+                            urlMatcher = vldPattern.matcher(postReq);
                             if (!urlMatcher.find()) {
-                                urlMatcher = vldPattern.matcher(postReq);
-                                if (!urlMatcher.find()) {
-                                    //We ain't found shit, Sir!
-                                    FirebaseCrash.logcat(Log.ERROR, "HOSTER", "Error while finding video URL (" + fullURL + ")");
-                                    return "3";
-                                }
-                                return urlMatcher.group(1);
+                                //We ain't found shit, Sir!
+                                FirebaseCrash.logcat(Log.ERROR, "HOSTER", "Error while finding video URL (" + fullURL + ")");
+                                return "3";
                             }
                             return urlMatcher.group(1);
                         }
                         return urlMatcher.group(1);
                     }
                     return urlMatcher.group(1);
+                }
+                return urlMatcher.group(1);
+
             } catch (Exception e) {
                 FirebaseCrash.logcat(Log.ERROR, "HOSTER", "Error while fetching video URL (" + fullURL + ")");
                 e.printStackTrace();

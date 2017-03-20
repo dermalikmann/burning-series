@@ -76,7 +76,6 @@ class TheVideo extends Hoster {
             String mpriKey = mpriMatcher.group(1);
 
 
-
             String videoTokenRequest = GetRequestString("https://thevideo.me/jwv/" + mpriKey);
 
             Matcher vtMatcher = vtPattern.matcher(videoTokenRequest);

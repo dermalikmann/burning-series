@@ -1,6 +1,5 @@
 package de.m4lik.burningseries;
 
-import android.app.Dialog;
 import android.app.ProgressDialog;
 import android.content.ContentValues;
 import android.content.Context;
@@ -153,18 +152,15 @@ public class TabletShowActivity extends ActivityBase {
         else
             favButton.setCompoundDrawables(notFavStar, null, null, null);
 
-        favButton.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                if (!fav) {
-                    addToFavorites();
-                    favButton.setCompoundDrawables(favStar, null, null, null);
-                    fav = !fav;
-                } else {
-                    removeFromFavorites();
-                    favButton.setCompoundDrawables(notFavStar, null, null, null);
-                    fav = !fav;
-                }
+        favButton.setOnClickListener(view -> {
+            if (!fav) {
+                addToFavorites();
+                favButton.setCompoundDrawables(favStar, null, null, null);
+                fav = !fav;
+            } else {
+                removeFromFavorites();
+                favButton.setCompoundDrawables(notFavStar, null, null, null);
+                fav = !fav;
             }
         });
 
@@ -232,7 +228,7 @@ public class TabletShowActivity extends ActivityBase {
                     if (!Hoster.compatibleHosters.contains(hoster.getHoster()))
                         hosterListItems.add(new HosterListItem(hoster.getLinkId(), hoster.getHoster(), hoster.getPart()));
 
-                refreshHosterList();
+                hosterListView.setAdapter(new HosterListAdpter());
             }
 
             @Override
@@ -325,97 +321,32 @@ public class TabletShowActivity extends ActivityBase {
         params.height = totalItemsHeigt + totalDividersHeight;
         episodesListView.setLayoutParams(params);
         episodesListView.requestLayout();
-
-        episodesListView.setOnItemLongClickListener(new AdapterView.OnItemLongClickListener() {
-            @Override
-            public boolean onItemLongClick(AdapterView<?> adapterView, final View view, int i, long l) {
-
-                final TextView idView = (TextView) view.findViewById(R.id.episodeId);
-                Integer selectedEpisode = Integer.parseInt(idView.getText().toString());
-
-                final API api = new API();
-                api.setSession(userSession);
-                api.generateToken("series/" + currentShow + "/" + currentSeason + "/" + selectedEpisode);
-                APIInterface apii = api.getInterface();
-                Call<EpisodeObj> call = apii.getEpisode(api.getToken(), api.getUserAgent(), currentShow, currentSeason, selectedEpisode, api.getSession());
-                call.enqueue(new Callback<EpisodeObj>() {
-                    @Override
-                    public void onResponse(Call<EpisodeObj> call, Response<EpisodeObj> response) {
-
-                        Integer episodeID = response.body().getEpisode().getEpisodeId();
-
-                        api.generateToken("unwatch/" + episodeID);
-                        APIInterface apii = api.getInterface();
-                        Call<VideoObj> ucall = apii.unwatch(api.getToken(), api.getUserAgent(), episodeID, api.getSession());
-                        ucall.enqueue(new Callback<VideoObj>() {
-                            @Override
-                            public void onResponse(Call<VideoObj> call, Response<VideoObj> response) {
-
-                                TextView titleGerView = (TextView) view.findViewById(R.id.episodeTitleGer);
-                                titleGerView.setTextColor(ContextCompat.getColor(getApplicationContext(), android.R.color.black));
-
-                                ImageView fav = (ImageView) view.findViewById(R.id.watchedImageView);
-                                fav.setImageDrawable(null);
-                            }
-
-                            @Override
-                            public void onFailure(Call<VideoObj> call, Throwable t) {
-
-                            }
-                        });
-                    }
-
-                    @Override
-                    public void onFailure(Call<EpisodeObj> call, Throwable t) {
-
-                    }
-                });
-                return true;
-            }
-        });
-
-        episodesListView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
-            @Override
-            public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
-                EpisodeListItem clickedEpisode = episodeListItems.get(position);
-                ((TextView) findViewById(R.id.episodeName)).setText(clickedEpisode.getTitleGer().equals("") ? clickedEpisode.getTitle() : clickedEpisode.getTitleGer());
-                TextView idView = (TextView) view.findViewById(R.id.episodeId);
-                showEpisode(currentSeason, Integer.parseInt(idView.getText().toString()));
-            }
-        });
     }
 
     private void refreshHosterList() {
-        ArrayAdapter<HosterListItem> adapter = new HosterListAdpter();
-        hosterListView.setAdapter(adapter);
+        hosterListView.setAdapter(new HosterListAdpter());
 
-        hosterListView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
-            @Override
-            public void onItemClick(AdapterView<?> parent, final View view, int position, long id) {
+        /*hosterListView.setOnItemClickListener((parent, view, position, id) -> {
 
-                if (Settings.of(getApplicationContext()).alarmOnMobile() &&
-                        AndroidUtility.isOnMobile(getApplicationContext())) {
+            if (Settings.of(getApplicationContext()).alarmOnMobile() &&
+                    AndroidUtility.isOnMobile(getApplicationContext())) {
 
-                    DialogBuilder.start(TabletShowActivity.this)
-                            .title("Mobile Daten")
-                            .content("Achtung! Du bist über mobile Daten im Internet. Willst du Fortfahren?")
-                            .positive("Weiter", new DialogBuilder.OnClickListener() {
-                                @Override
-                                public void onClick(Dialog dialog) {
-                                    TextView idView = (TextView) view.findViewById(R.id.linkId);
-                                    showVideo(Integer.parseInt(idView.getText().toString()));
-                                }
-                            })
-                            .negative("Abbrechen")
-                            .build()
-                            .show();
+                DialogBuilder.start(TabletShowActivity.this)
+                        .title("Mobile Daten")
+                        .content("Achtung! Du bist über mobile Daten im Internet. Willst du Fortfahren?")
+                        .positive("Weiter", dialog -> {
+                            TextView idView = (TextView) view.findViewById(R.id.linkId);
+                            showVideo(Integer.parseInt(idView.getText().toString()));
+                        })
+                        .negative("Abbrechen")
+                        .build()
+                        .show();
 
-                } else {
-                    TextView idView = (TextView) view.findViewById(R.id.linkId);
-                    showVideo(Integer.parseInt(idView.getText().toString()));
-                }
+            } else {
+                TextView idView = (TextView) view.findViewById(R.id.linkId);
+                showVideo(Integer.parseInt(idView.getText().toString()));
             }
-        });
+        });*/
     }
 
     private void showVideo(Integer id) {
@@ -520,12 +451,12 @@ public class TabletShowActivity extends ActivityBase {
             call.enqueue(new Callback<ResponseBody>() {
                 @Override
                 public void onResponse(Call<ResponseBody> call, Response<ResponseBody> response) {
-
+                    //TODO Some error handling. Just in case.
                 }
 
                 @Override
                 public void onFailure(Call<ResponseBody> call, Throwable t) {
-
+                    //TODO Some error handling. Just in case.
                 }
             });
         }
@@ -587,14 +518,15 @@ public class TabletShowActivity extends ActivityBase {
         }
     }
 
-    class SeasonsListAdapter extends ArrayAdapter<SeasonListItem> {
+    private class SeasonsListAdapter extends ArrayAdapter<SeasonListItem> {
 
-        public SeasonsListAdapter() {
+        SeasonsListAdapter() {
             super(getApplicationContext(), R.layout.list_item_seasons, seasonListItems);
         }
 
+        @NonNull
         @Override
-        public View getView(int pos, View view, ViewGroup parent) {
+        public View getView(int pos, View view, @NonNull ViewGroup parent) {
             if (view == null) {
                 view = getLayoutInflater().inflate(R.layout.list_item_seasons, parent, false);
             }
@@ -613,14 +545,16 @@ public class TabletShowActivity extends ActivityBase {
         }
     }
 
-    class EpisodesListAdapter extends ArrayAdapter<EpisodeListItem> {
+    private class EpisodesListAdapter extends ArrayAdapter<EpisodeListItem>
+            implements AdapterView.OnItemClickListener, AdapterView.OnItemLongClickListener {
 
-        public EpisodesListAdapter() {
+        EpisodesListAdapter() {
             super(getApplicationContext(), R.layout.list_item_episodes, episodeListItems);
         }
 
+        @NonNull
         @Override
-        public View getView(int pos, View view, ViewGroup parent) {
+        public View getView(int pos, View view, @NonNull ViewGroup parent) {
             if (view == null) {
                 view = getLayoutInflater().inflate(R.layout.list_item_episodes, parent, false);
             }
@@ -654,9 +588,63 @@ public class TabletShowActivity extends ActivityBase {
 
             return view;
         }
+
+        @Override
+        public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
+            EpisodeListItem clickedEpisode = episodeListItems.get(position);
+            ((TextView) findViewById(R.id.episodeName)).setText(clickedEpisode.getTitleGer().equals("") ? clickedEpisode.getTitle() : clickedEpisode.getTitleGer());
+            TextView idView = (TextView) view.findViewById(R.id.episodeId);
+            showEpisode(currentSeason, Integer.parseInt(idView.getText().toString()));
+        }
+
+        @Override
+        public boolean onItemLongClick(AdapterView<?> parent, View view, int position, long id) {
+
+            final TextView idView = (TextView) view.findViewById(R.id.episodeId);
+            Integer selectedEpisode = Integer.parseInt(idView.getText().toString());
+
+            final API api = new API();
+            api.setSession(userSession);
+            api.generateToken("series/" + currentShow + "/" + currentSeason + "/" + selectedEpisode);
+            APIInterface apii = api.getInterface();
+            Call<EpisodeObj> call = apii.getEpisode(api.getToken(), api.getUserAgent(), currentShow, currentSeason, selectedEpisode, api.getSession());
+            call.enqueue(new Callback<EpisodeObj>() {
+                @Override
+                public void onResponse(Call<EpisodeObj> call, Response<EpisodeObj> response) {
+
+                    Integer episodeID = response.body().getEpisode().getEpisodeId();
+
+                    api.generateToken("unwatch/" + episodeID);
+                    APIInterface apii = api.getInterface();
+                    Call<VideoObj> ucall = apii.unwatch(api.getToken(), api.getUserAgent(), episodeID, api.getSession());
+                    ucall.enqueue(new Callback<VideoObj>() {
+                        @Override
+                        public void onResponse(Call<VideoObj> call, Response<VideoObj> response) {
+
+                            TextView titleGerView = (TextView) view.findViewById(R.id.episodeTitleGer);
+                            titleGerView.setTextColor(ContextCompat.getColor(getApplicationContext(), android.R.color.black));
+
+                            ImageView fav1 = (ImageView) view.findViewById(R.id.watchedImageView);
+                            fav1.setImageDrawable(null);
+                        }
+
+                        @Override
+                        public void onFailure(Call<VideoObj> call, Throwable t) {
+
+                        }
+                    });
+                }
+
+                @Override
+                public void onFailure(Call<EpisodeObj> call, Throwable t) {
+
+                }
+            });
+            return true;
+        }
     }
 
-    class getVideo extends AsyncTask<Void, Void, Void> {
+    private class getVideo extends AsyncTask<Void, Void, Void> {
 
         ProgressDialog progressDialog;
         boolean externalPlayer;
@@ -749,7 +737,7 @@ public class TabletShowActivity extends ActivityBase {
         }
     }
 
-    class HosterListAdpter extends ArrayAdapter<HosterListItem> implements AdapterView.OnItemClickListener {
+    private class HosterListAdpter extends ArrayAdapter<HosterListItem> implements AdapterView.OnItemClickListener {
 
         HosterListAdpter() {
             super(getApplicationContext(), R.layout.list_item_hoster, hosterListItems);
@@ -791,12 +779,9 @@ public class TabletShowActivity extends ActivityBase {
                 DialogBuilder.start(context)
                         .title("Mobile Daten")
                         .content("Achtung! Du bist über mobile Daten im Internet. Willst du Fortfahren?")
-                        .positive("Weiter", new DialogBuilder.OnClickListener() {
-                            @Override
-                            public void onClick(Dialog dialog) {
-                                TextView idView = (TextView) view.findViewById(R.id.linkId);
-                                showVideo(Integer.parseInt(idView.getText().toString()));
-                            }
+                        .positive("Weiter", dialog -> {
+                            TextView idView = (TextView) view.findViewById(R.id.linkId);
+                            showVideo(Integer.parseInt(idView.getText().toString()));
                         })
                         .negative("Abbrechen")
                         .build()

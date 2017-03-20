@@ -4,11 +4,11 @@ import android.content.Intent;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.os.Bundle;
+import android.support.annotation.NonNull;
 import android.support.v4.app.Fragment;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.ListView;
 import android.widget.TextView;
@@ -86,13 +86,10 @@ public class FavsFragment extends Fragment {
         ArrayAdapter<ShowListItem> adapter = new seriesListAdapter(favs);
         favsListView.setAdapter(adapter);
 
-        favsListView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
-            @Override
-            public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
-                TextView idView = (TextView) view.findViewById(R.id.seriesId);
-                TextView nameView = (TextView) view.findViewById(R.id.seriesTitle);
-                showSeries(Integer.parseInt(idView.getText().toString()), nameView.getText().toString());
-            }
+        favsListView.setOnItemClickListener((parent, view, position, id) -> {
+            TextView idView = (TextView) view.findViewById(R.id.seriesId);
+            TextView nameView = (TextView) view.findViewById(R.id.seriesTitle);
+            showSeries(Integer.parseInt(idView.getText().toString()), nameView.getText().toString());
         });
 
         return rootView;
@@ -107,7 +104,7 @@ public class FavsFragment extends Fragment {
         startActivity(i);
     }
 
-    class seriesListAdapter extends ArrayAdapter<ShowListItem> {
+    private class seriesListAdapter extends ArrayAdapter<ShowListItem> {
 
         private List<ShowListItem> list;
 
@@ -117,7 +114,8 @@ public class FavsFragment extends Fragment {
         }
 
         @Override
-        public View getView(int pos, View view, ViewGroup parent) {
+        @NonNull
+        public View getView(int pos, View view, @NonNull ViewGroup parent) {
             if (view == null) {
                 view = getActivity().getLayoutInflater().inflate(R.layout.list_item_favorites, parent, false);
             }

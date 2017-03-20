@@ -15,7 +15,6 @@ import android.support.v4.content.ContextCompat;
 import android.support.v7.widget.Toolbar;
 import android.util.Log;
 import android.view.MenuItem;
-import android.view.View;
 import android.widget.ImageView;
 
 import com.bumptech.glide.Glide;
@@ -46,12 +45,10 @@ public class ShowActivity extends ActivityBase implements Callback<SeasonObj> {
     public Integer seasonCount;
     public Boolean withSpecials = false;
     public Boolean fav = false;
-    public View fragmentView;
     @BindView(R.id.fab)
     FloatingActionButton fab;
     String userSession;
     Intent i;
-    private String title;
     private String description;
     private String visibleFragment = "seasons";
 
@@ -78,7 +75,7 @@ public class ShowActivity extends ActivityBase implements Callback<SeasonObj> {
             this.setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_SENSOR_PORTRAIT);
         }
 
-        title = i.getStringExtra("ShowName");
+        String title = i.getStringExtra("ShowName");
         selectedShow = i.getIntExtra("ShowID", 60);
         Uri imageUri = Uri.parse("https://bs.to/public/img/cover/" + selectedShow + ".jpg");
         toolbar.setTitle(title);
@@ -125,18 +122,15 @@ public class ShowActivity extends ActivityBase implements Callback<SeasonObj> {
         if (fav)
             fab.setImageDrawable(ContextCompat.getDrawable(getApplicationContext(), R.drawable.ic_star_white));
 
-        fab.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                if (!fav) {
-                    addToFavorites();
-                    fab.setImageDrawable(ContextCompat.getDrawable(getApplicationContext(), R.drawable.ic_star_white));
-                    fav = !fav;
-                } else {
-                    removeFromFavorites();
-                    fab.setImageDrawable(ContextCompat.getDrawable(getApplicationContext(), R.drawable.ic_star_border_white));
-                    fav = !fav;
-                }
+        fab.setOnClickListener(view -> {
+            if (!fav) {
+                addToFavorites();
+                fab.setImageDrawable(ContextCompat.getDrawable(getApplicationContext(), R.drawable.ic_star_white));
+                fav = !fav;
+            } else {
+                removeFromFavorites();
+                fab.setImageDrawable(ContextCompat.getDrawable(getApplicationContext(), R.drawable.ic_star_border_white));
+                fav = !fav;
             }
         });
 

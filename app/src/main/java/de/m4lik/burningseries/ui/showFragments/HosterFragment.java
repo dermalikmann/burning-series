@@ -1,7 +1,7 @@
 package de.m4lik.burningseries.ui.showFragments;
 
 
-import android.app.Dialog;
+import android.app.Fragment;
 import android.app.ProgressDialog;
 import android.content.Intent;
 import android.content.SharedPreferences;
@@ -12,13 +12,11 @@ import android.preference.PreferenceManager;
 import android.support.annotation.NonNull;
 import android.support.customtabs.CustomTabsIntent;
 import android.support.design.widget.Snackbar;
-import android.app.Fragment;
 import android.support.v4.content.ContextCompat;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
@@ -139,31 +137,25 @@ public class HosterFragment extends Fragment implements Callback<EpisodeObj> {
         hostersListView.setLayoutParams(params);
         hostersListView.requestLayout();
 
-        hostersListView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
-            @Override
-            public void onItemClick(AdapterView<?> parent, final View view, int position, long id) {
+        hostersListView.setOnItemClickListener((parent, view, position, id) -> {
 
-                if (Settings.of(getActivity().getApplicationContext()).alarmOnMobile() &&
-                        AndroidUtility.isOnMobile(getActivity().getApplicationContext())) {
+            if (Settings.of(getActivity().getApplicationContext()).alarmOnMobile() &&
+                    AndroidUtility.isOnMobile(getActivity().getApplicationContext())) {
 
-                    DialogBuilder.start(getActivity())
-                            .title("Mobile Daten")
-                            .content("Achtung! Du bist über mobile Daten im Internet. Willst du Fortfahren?")
-                            .positive("Weiter", new DialogBuilder.OnClickListener() {
-                                @Override
-                                public void onClick(Dialog dialog) {
-                                    TextView idView = (TextView) view.findViewById(R.id.linkId);
-                                    showVideo(Integer.parseInt(idView.getText().toString()));
-                                }
-                            })
-                            .negative("Abbrechen")
-                            .build()
-                            .show();
+                DialogBuilder.start(getActivity())
+                        .title("Mobile Daten")
+                        .content("Achtung! Du bist über mobile Daten im Internet. Willst du Fortfahren?")
+                        .positive("Weiter", dialog -> {
+                            TextView idView = (TextView) view.findViewById(R.id.linkId);
+                            showVideo(Integer.parseInt(idView.getText().toString()));
+                        })
+                        .negative("Abbrechen")
+                        .build()
+                        .show();
 
-                } else {
-                    TextView idView = (TextView) view.findViewById(R.id.linkId);
-                    showVideo(Integer.parseInt(idView.getText().toString()));
-                }
+            } else {
+                TextView idView = (TextView) view.findViewById(R.id.linkId);
+                showVideo(Integer.parseInt(idView.getText().toString()));
             }
         });
     }

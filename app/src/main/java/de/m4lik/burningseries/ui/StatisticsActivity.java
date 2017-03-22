@@ -1,4 +1,4 @@
-package de.m4lik.burningseries;
+package de.m4lik.burningseries.ui;
 
 import android.content.Context;
 import android.content.SharedPreferences;
@@ -18,6 +18,8 @@ import org.jsoup.select.Elements;
 import java.util.ArrayList;
 import java.util.List;
 
+import de.m4lik.burningseries.ActivityComponent;
+import de.m4lik.burningseries.R;
 import de.m4lik.burningseries.ui.base.ActivityBase;
 import de.m4lik.burningseries.ui.listitems.StatsListItem;
 

@@ -1,4 +1,4 @@
-package de.m4lik.burningseries;
+package de.m4lik.burningseries.ui;
 
 import android.app.ActivityManager;
 import android.app.ProgressDialog;
@@ -40,6 +40,8 @@ import java.util.List;
 import java.util.Map;
 
 import butterknife.BindView;
+import de.m4lik.burningseries.ActivityComponent;
+import de.m4lik.burningseries.R;
 import de.m4lik.burningseries.api.API;
 import de.m4lik.burningseries.api.APIInterface;
 import de.m4lik.burningseries.api.objects.GenreMap;

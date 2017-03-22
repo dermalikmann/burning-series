@@ -1,4 +1,4 @@
-package de.m4lik.burningseries;
+package de.m4lik.burningseries.ui;
 
 import android.content.ContentValues;
 import android.content.Intent;
@@ -20,6 +20,8 @@ import android.widget.ImageView;
 import com.bumptech.glide.Glide;
 
 import butterknife.BindView;
+import de.m4lik.burningseries.ActivityComponent;
+import de.m4lik.burningseries.R;
 import de.m4lik.burningseries.api.API;
 import de.m4lik.burningseries.api.APIInterface;
 import de.m4lik.burningseries.api.objects.SeasonObj;

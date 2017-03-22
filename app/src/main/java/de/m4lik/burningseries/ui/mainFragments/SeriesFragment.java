@@ -22,8 +22,8 @@ import java.util.ArrayList;
 import java.util.List;
 
 import de.m4lik.burningseries.R;
-import de.m4lik.burningseries.ShowActivity;
-import de.m4lik.burningseries.TabletShowActivity;
+import de.m4lik.burningseries.ui.ShowActivity;
+import de.m4lik.burningseries.ui.TabletShowActivity;
 import de.m4lik.burningseries.api.API;
 import de.m4lik.burningseries.api.APIInterface;
 import de.m4lik.burningseries.database.MainDBHelper;
@@ -36,7 +36,7 @@ import retrofit2.Call;
 import retrofit2.Callback;
 import retrofit2.Response;
 
-import static de.m4lik.burningseries.MainActivity.userSession;
+import static de.m4lik.burningseries.ui.MainActivity.userSession;
 import static de.m4lik.burningseries.database.SeriesContract.seriesTable.COLUMN_NAME_GENRE;
 import static de.m4lik.burningseries.database.SeriesContract.seriesTable.COLUMN_NAME_ID;
 import static de.m4lik.burningseries.database.SeriesContract.seriesTable.COLUMN_NAME_ISFAV;

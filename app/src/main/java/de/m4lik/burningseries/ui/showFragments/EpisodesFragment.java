@@ -20,7 +20,7 @@ import android.widget.TextView;
 import java.util.ArrayList;
 
 import de.m4lik.burningseries.R;
-import de.m4lik.burningseries.ShowActivity;
+import de.m4lik.burningseries.ui.ShowActivity;
 import de.m4lik.burningseries.api.API;
 import de.m4lik.burningseries.api.APIInterface;
 import de.m4lik.burningseries.api.objects.EpisodeObj;

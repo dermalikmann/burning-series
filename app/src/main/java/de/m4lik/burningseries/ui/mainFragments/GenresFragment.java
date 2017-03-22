@@ -20,10 +20,10 @@ import android.widget.TextView;
 import java.util.ArrayList;
 import java.util.List;
 
-import de.m4lik.burningseries.MainActivity;
+import de.m4lik.burningseries.ui.MainActivity;
 import de.m4lik.burningseries.R;
-import de.m4lik.burningseries.ShowActivity;
-import de.m4lik.burningseries.TabletShowActivity;
+import de.m4lik.burningseries.ui.ShowActivity;
+import de.m4lik.burningseries.ui.TabletShowActivity;
 import de.m4lik.burningseries.database.MainDBHelper;
 import de.m4lik.burningseries.ui.listitems.GenreListItem;
 import de.m4lik.burningseries.ui.listitems.ShowListItem;

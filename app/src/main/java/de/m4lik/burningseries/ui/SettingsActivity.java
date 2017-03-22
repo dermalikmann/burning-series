@@ -1,4 +1,4 @@
-package de.m4lik.burningseries;
+package de.m4lik.burningseries.ui;
 
 import android.app.Notification;
 import android.content.Context;
@@ -15,6 +15,9 @@ import android.support.annotation.NonNull;
 import android.support.v4.app.NotificationManagerCompat;
 import android.view.MenuItem;
 
+import de.m4lik.burningseries.ActivityComponent;
+import de.m4lik.burningseries.BuildConfig;
+import de.m4lik.burningseries.R;
 import de.m4lik.burningseries.services.SyncBroadcastReceiver;
 import de.m4lik.burningseries.services.ThemeHelperService;
 import de.m4lik.burningseries.ui.base.ActivityBase;

@@ -14,7 +14,7 @@ import android.widget.TextView;
 import java.util.ArrayList;
 
 import de.m4lik.burningseries.R;
-import de.m4lik.burningseries.ShowActivity;
+import de.m4lik.burningseries.ui.ShowActivity;
 import de.m4lik.burningseries.ui.listitems.SeasonListItem;
 
 import static de.m4lik.burningseries.services.ThemeHelperService.theme;

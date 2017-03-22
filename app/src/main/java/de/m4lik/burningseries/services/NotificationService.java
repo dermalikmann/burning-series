@@ -13,7 +13,7 @@ import javax.inject.Inject;
 import javax.inject.Singleton;
 
 import de.m4lik.burningseries.R;
-import de.m4lik.burningseries.UpdateActivity;
+import de.m4lik.burningseries.ui.UpdateActivity;
 import de.m4lik.burningseries.services.objects.Update;
 import de.m4lik.burningseries.util.Settings;
 

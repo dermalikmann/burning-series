@@ -1,4 +1,4 @@
-package de.m4lik.burningseries;
+package de.m4lik.burningseries.ui;
 
 import android.annotation.SuppressLint;
 import android.app.ActionBar;
@@ -12,6 +12,8 @@ import android.view.View;
 
 import com.devbrackets.android.exomedia.ui.widget.EMVideoView;
 
+import de.m4lik.burningseries.ActivityComponent;
+import de.m4lik.burningseries.R;
 import de.m4lik.burningseries.ui.base.ActivityBase;
 
 /**

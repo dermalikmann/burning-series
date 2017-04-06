@@ -110,8 +110,8 @@ public class SettingsActivity extends ActivityBase {
 
             versionpref.setSummary(version);
 
-            userpref.setSummary(Settings.of(context).getUser().equals("") ? "Nicht angemeldet" : Settings.of(context).getUser());
-            sessionpref.setSummary(Settings.of(context).getSession().equals("") ? " " : Settings.of(context).getSession());
+            userpref.setSummary(Settings.of(context).getUserName().equals("") ? "Nicht angemeldet" : Settings.of(context).getUserName());
+            sessionpref.setSummary(Settings.of(context).getUserSession().equals("") ? " " : Settings.of(context).getUserSession());
 
             String category = getArguments().getString("category");
             if (category != null) {

@@ -4,11 +4,9 @@ package de.m4lik.burningseries.ui.showFragments;
 import android.app.Fragment;
 import android.app.ProgressDialog;
 import android.content.Intent;
-import android.content.SharedPreferences;
 import android.net.Uri;
 import android.os.AsyncTask;
 import android.os.Bundle;
-import android.preference.PreferenceManager;
 import android.support.annotation.NonNull;
 import android.support.customtabs.CustomTabsIntent;
 import android.support.design.widget.Snackbar;
@@ -25,14 +23,14 @@ import android.widget.TextView;
 
 import java.util.ArrayList;
 
-import de.m4lik.burningseries.ui.FullscreenVideoActivity;
 import de.m4lik.burningseries.R;
-import de.m4lik.burningseries.ui.ShowActivity;
 import de.m4lik.burningseries.api.API;
 import de.m4lik.burningseries.api.APIInterface;
 import de.m4lik.burningseries.api.objects.EpisodeObj;
 import de.m4lik.burningseries.api.objects.VideoObj;
 import de.m4lik.burningseries.hoster.Hoster;
+import de.m4lik.burningseries.ui.FullscreenVideoActivity;
+import de.m4lik.burningseries.ui.ShowActivity;
 import de.m4lik.burningseries.ui.dialogs.DialogBuilder;
 import de.m4lik.burningseries.ui.listitems.HosterListItem;
 import de.m4lik.burningseries.util.AndroidUtility;
@@ -53,6 +51,8 @@ public class HosterFragment extends Fragment implements Callback<EpisodeObj> {
     Integer selectedShow;
     Integer selectedSeason;
     Integer selectedEpisode;
+
+    String userSession;
 
     ProgressDialog progressDialog;
 
@@ -78,10 +78,10 @@ public class HosterFragment extends Fragment implements Callback<EpisodeObj> {
         LinearLayout epicontainer = (LinearLayout) rootview.findViewById(R.id.hostercontainer);
         epicontainer.setVisibility(View.GONE);
 
-        SharedPreferences sharedPreferences = PreferenceManager.getDefaultSharedPreferences(getActivity().getApplicationContext());
+        userSession = Settings.of(getActivity()).getUserSession();
 
         API api = new API();
-        api.setSession(sharedPreferences.getString("pref_session", ""));
+        api.setSession(userSession);
         api.generateToken("series/" + selectedShow + "/" + selectedSeason + "/" + selectedEpisode);
         APIInterface apii = api.getInterface();
         Call<EpisodeObj> call = apii.getEpisode(api.getToken(), api.getUserAgent(), selectedShow, selectedSeason, selectedEpisode, api.getSession());
@@ -162,10 +162,8 @@ public class HosterFragment extends Fragment implements Callback<EpisodeObj> {
 
     private void showVideo(Integer id) {
 
-        SharedPreferences sharedPreferences = PreferenceManager.getDefaultSharedPreferences(getActivity().getApplicationContext());
-
         API api = new API();
-        api.setSession(sharedPreferences.getString("pref_session", ""));
+        api.setSession(userSession);
         api.generateToken("watch/" + id);
         APIInterface apii = api.getInterface();
         Call<VideoObj> call = apii.watch(api.getToken(), api.getUserAgent(), id, api.getSession());

@@ -4,14 +4,12 @@ import android.app.ProgressDialog;
 import android.content.ContentValues;
 import android.content.Context;
 import android.content.Intent;
-import android.content.SharedPreferences;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.graphics.drawable.Drawable;
 import android.net.Uri;
 import android.os.AsyncTask;
 import android.os.Bundle;
-import android.preference.PreferenceManager;
 import android.support.annotation.NonNull;
 import android.support.customtabs.CustomTabsIntent;
 import android.support.design.widget.Snackbar;
@@ -140,8 +138,7 @@ public class TabletShowActivity extends ActivityBase {
         getSupportActionBar().setDisplayHomeAsUpEnabled(true);
         getSupportActionBar().setDisplayShowHomeEnabled(true);
 
-        SharedPreferences sharedPreferences = PreferenceManager.getDefaultSharedPreferences(this);
-        userSession = sharedPreferences.getString("pref_session", "");
+        userSession = Settings.of(this).getUserSession();
 
         fav = isFav();
 
@@ -353,10 +350,8 @@ public class TabletShowActivity extends ActivityBase {
 
     private void showVideo(Integer id) {
 
-        SharedPreferences sharedPreferences = PreferenceManager.getDefaultSharedPreferences(getApplicationContext());
-
         API api = new API();
-        api.setSession(sharedPreferences.getString("pref_session", ""));
+        api.setSession(userSession);
         api.generateToken("watch/" + id);
         APIInterface apii = api.getInterface();
         Call<VideoObj> call = apii.watch(api.getToken(), api.getUserAgent(), id, api.getSession());

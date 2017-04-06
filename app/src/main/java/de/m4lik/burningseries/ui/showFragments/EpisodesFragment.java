@@ -2,9 +2,7 @@ package de.m4lik.burningseries.ui.showFragments;
 
 
 import android.app.Fragment;
-import android.content.SharedPreferences;
 import android.os.Bundle;
-import android.preference.PreferenceManager;
 import android.support.annotation.NonNull;
 import android.support.design.widget.Snackbar;
 import android.support.v4.content.ContextCompat;
@@ -20,12 +18,12 @@ import android.widget.TextView;
 import java.util.ArrayList;
 
 import de.m4lik.burningseries.R;
-import de.m4lik.burningseries.ui.ShowActivity;
 import de.m4lik.burningseries.api.API;
 import de.m4lik.burningseries.api.APIInterface;
 import de.m4lik.burningseries.api.objects.EpisodeObj;
 import de.m4lik.burningseries.api.objects.SeasonObj;
 import de.m4lik.burningseries.api.objects.VideoObj;
+import de.m4lik.burningseries.ui.ShowActivity;
 import de.m4lik.burningseries.ui.listitems.EpisodeListItem;
 import de.m4lik.burningseries.util.Settings;
 import retrofit2.Call;
@@ -70,9 +68,7 @@ public class EpisodesFragment extends Fragment implements Callback<SeasonObj> {
         selectedShow = ((ShowActivity) getActivity()).getSelectedShow();
         selectedSeason = ((ShowActivity) getActivity()).getSelectedSeason();
 
-        SharedPreferences sharedPreferences = PreferenceManager.getDefaultSharedPreferences(getActivity().getApplicationContext());
-
-        userSession = sharedPreferences.getString("pref_session", "");
+        userSession = Settings.of(getActivity()).getUserSession();
 
         API api = new API();
         api.setSession(userSession);

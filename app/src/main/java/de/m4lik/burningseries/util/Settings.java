@@ -60,11 +60,11 @@ public class Settings {
         return preferences.getString("pref_startup_view", "serieslist");
     }
 
-    public String getUser() {
+    public String getUserName() {
         return preferences.getString("pref_user", "");
     }
 
-    public String getSession() {
+    public String getUserSession() {
         return preferences.getString("pref_session", "");
     }
 

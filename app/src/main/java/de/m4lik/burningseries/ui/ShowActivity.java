@@ -2,13 +2,11 @@ package de.m4lik.burningseries.ui;
 
 import android.content.ContentValues;
 import android.content.Intent;
-import android.content.SharedPreferences;
 import android.content.pm.ActivityInfo;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.net.Uri;
 import android.os.Bundle;
-import android.preference.PreferenceManager;
 import android.support.design.widget.FloatingActionButton;
 import android.support.v4.content.ContextCompat;
 import android.support.v7.widget.Toolbar;
@@ -29,6 +27,7 @@ import de.m4lik.burningseries.ui.base.ActivityBase;
 import de.m4lik.burningseries.ui.showFragments.EpisodesFragment;
 import de.m4lik.burningseries.ui.showFragments.HosterFragment;
 import de.m4lik.burningseries.ui.showFragments.SeasonsFragment;
+import de.m4lik.burningseries.util.Settings;
 import okhttp3.ResponseBody;
 import retrofit2.Call;
 import retrofit2.Callback;
@@ -89,8 +88,7 @@ public class ShowActivity extends ActivityBase {
         getSupportActionBar().setDisplayHomeAsUpEnabled(true);
         getSupportActionBar().setDisplayShowHomeEnabled(true);
 
-        SharedPreferences sharedPreferences = PreferenceManager.getDefaultSharedPreferences(this);
-        userSession = sharedPreferences.getString("pref_session", "");
+        userSession = Settings.of(getApplicationContext()).getUserSession();
 
         final MainDBHelper dbHelper = new MainDBHelper(getApplicationContext());
         final SQLiteDatabase db = dbHelper.getWritableDatabase();

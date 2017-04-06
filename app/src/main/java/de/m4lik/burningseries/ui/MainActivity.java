@@ -4,7 +4,6 @@ import android.app.ActivityManager;
 import android.app.ProgressDialog;
 import android.content.ContentValues;
 import android.content.Intent;
-import android.content.SharedPreferences;
 import android.content.pm.ActivityInfo;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
@@ -13,7 +12,6 @@ import android.graphics.BitmapFactory;
 import android.os.AsyncTask;
 import android.os.Build;
 import android.os.Bundle;
-import android.preference.PreferenceManager;
 import android.support.annotation.NonNull;
 import android.support.design.widget.NavigationView;
 import android.support.design.widget.Snackbar;
@@ -131,9 +129,9 @@ public class MainActivity extends ActivityBase
             this.setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_SENSOR_PORTRAIT);
         }
 
-        SharedPreferences sharedPreferences = PreferenceManager.getDefaultSharedPreferences(this);
-        userName = sharedPreferences.getString("pref_user", "Bitte Einloggen");
-        userSession = sharedPreferences.getString("pref_session", "");
+        Settings settings = Settings.of(this);
+        userName = settings.getUserName();
+        userSession = settings.getUserSession();
 
         navigationView.setNavigationItemSelectedListener(this);
 
@@ -276,11 +274,11 @@ public class MainActivity extends ActivityBase
 
             case R.id.nav_share:
                 String text = "Versuch mal die neue Burning-Series App. https://github.com/M4lik/burning-series/releases";
-                Intent shareintent = new Intent(Intent.ACTION_SEND);
-                shareintent.setType("text/plain");
-                shareintent.putExtra(Intent.EXTRA_SUBJECT, "Burning-Series app");
-                shareintent.putExtra(Intent.EXTRA_TEXT, text);
-                startActivity(Intent.createChooser(shareintent, getString(R.string.share_using)));
+                Intent shareIntent = new Intent(Intent.ACTION_SEND);
+                shareIntent.setType("text/plain");
+                shareIntent.putExtra(Intent.EXTRA_SUBJECT, "Burning-Series app");
+                shareIntent.putExtra(Intent.EXTRA_TEXT, text);
+                startActivity(Intent.createChooser(shareIntent, getString(R.string.share_using)));
                 break;
 
             case R.id.nav_settings:
@@ -297,9 +295,8 @@ public class MainActivity extends ActivityBase
     }
 
     public void logout() {
-        final SharedPreferences sharedPreferences = PreferenceManager.getDefaultSharedPreferences(this);
         final API api = new API();
-        api.setSession(sharedPreferences.getString("pref_session", ""));
+        api.setSession(Settings.of(getApplicationContext()).getUserName());
         api.generateToken("logout");
 
         Logger.logout(getApplicationContext());
@@ -309,7 +306,10 @@ public class MainActivity extends ActivityBase
         call.enqueue(new Callback<ResponseBody>() {
             @Override
             public void onResponse(Call<ResponseBody> call, Response<ResponseBody> response) {
-                sharedPreferences.edit().clear().apply();
+                Settings.of(getApplicationContext()).raw().edit()
+                        .remove("pref_session")
+                        .remove("pref_user")
+                        .commit();
 
                 navigationView.getMenu().findItem(R.id.logout_menu_item).setVisible(false);
                 navigationView.getMenu().findItem(R.id.login_menu_item).setVisible(true);

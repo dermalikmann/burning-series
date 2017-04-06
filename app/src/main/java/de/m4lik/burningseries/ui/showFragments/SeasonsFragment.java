@@ -59,7 +59,7 @@ public class SeasonsFragment extends Fragment implements Callback<SeasonObj>{
         Integer selectedShow = ((ShowActivity) getActivity()).getSelectedShow();
 
         String userSession = Settings.of(getActivity().getApplicationContext())
-                .getSession();
+                .getUserSession();
 
         API api = new API();
         api.setSession(userSession);

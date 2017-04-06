@@ -10,7 +10,6 @@ import android.net.Uri;
 import android.os.Bundle;
 import android.preference.PreferenceManager;
 import android.support.design.widget.FloatingActionButton;
-import android.support.design.widget.Snackbar;
 import android.support.v4.content.ContextCompat;
 import android.support.v7.widget.Toolbar;
 import android.util.Log;
@@ -24,7 +23,6 @@ import de.m4lik.burningseries.ActivityComponent;
 import de.m4lik.burningseries.R;
 import de.m4lik.burningseries.api.API;
 import de.m4lik.burningseries.api.APIInterface;
-import de.m4lik.burningseries.api.objects.SeasonObj;
 import de.m4lik.burningseries.database.MainDBHelper;
 import de.m4lik.burningseries.database.SeriesContract;
 import de.m4lik.burningseries.ui.base.ActivityBase;
@@ -39,7 +37,7 @@ import retrofit2.Response;
 import static de.m4lik.burningseries.database.SeriesContract.seriesTable;
 import static de.m4lik.burningseries.services.ThemeHelperService.theme;
 
-public class ShowActivity extends ActivityBase implements Callback<SeasonObj> {
+public class ShowActivity extends ActivityBase {
 
     public Integer selectedShow;
     public Integer selectedSeason;
@@ -117,7 +115,6 @@ public class ShowActivity extends ActivityBase implements Callback<SeasonObj> {
 
         if (c.getCount() == 1)
             fav = true;
-
         c.close();
         db.close();
 
@@ -136,13 +133,7 @@ public class ShowActivity extends ActivityBase implements Callback<SeasonObj> {
             }
         });
 
-        API api = new API();
-        api.setSession(userSession);
-        api.generateToken("series/" + selectedShow + "/1");
-        APIInterface apii = api.getInterface();
-        Call<SeasonObj> call = apii.getSeason(api.getToken(), api.getUserAgent(), selectedShow, 1, api.getSession());
-        call.enqueue(this);
-
+        setDefaultFragment();
     }
 
     public void setDefaultFragment() {
@@ -152,23 +143,6 @@ public class ShowActivity extends ActivityBase implements Callback<SeasonObj> {
                 .commit();
 
         visibleFragment = "seasons";
-    }
-
-    @Override
-    public void onResponse(Call<SeasonObj> call, Response<SeasonObj> response) {
-        SeasonObj show = response.body();
-
-        description = show.getSeries().getDescription();
-        seasonCount = show.getSeries().getSeasonCount();
-        withSpecials = show.getSeries().getMovieCount() != 0;
-
-        setDefaultFragment();
-    }
-
-    @Override
-    public void onFailure(Call<SeasonObj> call, Throwable t) {
-
-        Snackbar.make(findViewById(android.R.id.content), "Fehler beim Laden der Seriendetails", Snackbar.LENGTH_SHORT);
     }
 
     @Override

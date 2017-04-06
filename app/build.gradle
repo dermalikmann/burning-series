@@ -102,6 +102,7 @@ android {
         exclude 'META-INF/maven/com.google.dagger/dagger/pom.xml'
         exclude 'META-INF/maven/com.google.dagger/dagger/pom.properties'
     }
+    
     compileOptions {
         sourceCompatibility JavaVersion.VERSION_1_8
         targetCompatibility JavaVersion.VERSION_1_8

@@ -1,6 +1,7 @@
 ext {
-    versionSupportLibrary = "25.3.0"
-    VersionRxBinding = "1.0.1"
+    versionSupportLibrary = "25.3.1"
+    versionRxBinding = "1.0.1"
+    versionPlayServices = "10.2.1"
     versionImmutables = "2.4.1"
     versionFirebase = "2.4.1"
 }
@@ -17,16 +18,16 @@ dependencies {
     compile "com.android.support:percent:$versionSupportLibrary"
     compile "com.android.support:recyclerview-v7:$versionSupportLibrary"
     compile "com.android.support:support-v4:$versionSupportLibrary"
-    compile 'com.android.support.constraint:constraint-layout:1.0.0-alpha8'
+    compile 'com.android.support.constraint:constraint-layout:1.0.2'
 
     compile 'com.devbrackets.android:exomedia:3.1.0'
 
-    compile 'com.google.android.gms:play-services-gcm:10.2.0'
+    compile "com.google.android.gms:play-services-gcm:$versionPlayServices"
     compile 'com.google.code.gson:gson:2.7'
-    compile 'com.google.firebase:firebase-core:10.2.0'
-    compile 'com.google.firebase:firebase-config:10.2.0'
-    compile 'com.google.firebase:firebase-crash:10.2.0'
-    compile 'com.google.firebase:firebase-messaging:10.2.0'
+    compile "com.google.firebase:firebase-core:$versionPlayServices"
+    compile "com.google.firebase:firebase-config:$versionPlayServices"
+    compile "com.google.firebase:firebase-crash:$versionPlayServices"
+    compile "com.google.firebase:firebase-messaging:$versionPlayServices"
 
     compile 'com.github.bumptech.glide:glide:3.7.0'
     compile 'com.github.nirhart:parallaxscroll:1.0'
@@ -55,11 +56,11 @@ dependencies {
     compile "com.trello:rxlifecycle-android:1.0"
     compile "com.trello:rxlifecycle-components:1.0"
 
-    compile "com.jakewharton.rxbinding:rxbinding:$VersionRxBinding"
-    compile "com.jakewharton.rxbinding:rxbinding-support-v4:$VersionRxBinding"
-    compile "com.jakewharton.rxbinding:rxbinding-appcompat-v7:$VersionRxBinding"
-    compile "com.jakewharton.rxbinding:rxbinding-design:$VersionRxBinding"
-    compile "com.jakewharton.rxbinding:rxbinding-recyclerview-v7:$VersionRxBinding"
+    compile "com.jakewharton.rxbinding:rxbinding:$versionRxBinding"
+    compile "com.jakewharton.rxbinding:rxbinding-support-v4:$versionRxBinding"
+    compile "com.jakewharton.rxbinding:rxbinding-appcompat-v7:$versionRxBinding"
+    compile "com.jakewharton.rxbinding:rxbinding-design:$versionRxBinding"
+    compile "com.jakewharton.rxbinding:rxbinding-recyclerview-v7:$versionRxBinding"
 
     compile 'net.danlew:android.joda:2.9.5.1'
 

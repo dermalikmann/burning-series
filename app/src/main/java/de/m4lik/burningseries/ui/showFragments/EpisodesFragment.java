@@ -11,7 +11,6 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageView;
-import android.widget.LinearLayout;
 import android.widget.TextView;
 
 import java.util.ArrayList;
@@ -37,7 +36,7 @@ import retrofit2.Response;
  */
 public class EpisodesFragment extends Fragment implements Callback<SeasonObj> {
 
-    View rootview;
+    View rootView;
 
     Integer selectedShow;
     Integer selectedSeason;
@@ -47,11 +46,9 @@ public class EpisodesFragment extends Fragment implements Callback<SeasonObj> {
     @BindView(R.id.episodesRecyclerView)
     RecyclerView episodesRecyclerView;
 
-
     ArrayList<EpisodeListItem> episodesList = new ArrayList<>();
 
     boolean loaded = false;
-
 
     public EpisodesFragment() {
 
@@ -61,9 +58,9 @@ public class EpisodesFragment extends Fragment implements Callback<SeasonObj> {
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
-        rootview = inflater.inflate(R.layout.fragment_episodes, container, false);
+        rootView = inflater.inflate(R.layout.fragment_episodes, container, false);
 
-        ButterKnife.bind(this, rootview);
+        ButterKnife.bind(this, rootView);
 
         selectedShow = ((ShowActivity) getActivity()).getSelectedShow();
         selectedSeason = ((ShowActivity) getActivity()).getSelectedSeason();
@@ -73,11 +70,11 @@ public class EpisodesFragment extends Fragment implements Callback<SeasonObj> {
         API api = new API();
         api.setSession(userSession);
         api.generateToken("series/" + selectedShow + "/" + selectedSeason);
-        APIInterface apii = api.getInterface();
-        Call<SeasonObj> call = apii.getSeason(api.getToken(), api.getUserAgent(), selectedShow, selectedSeason, api.getSession());
+        APIInterface apiI = api.getInterface();
+        Call<SeasonObj> call = apiI.getSeason(api.getToken(), api.getUserAgent(), selectedShow, selectedSeason, api.getSession());
         call.enqueue(this);
 
-        return rootview;
+        return rootView;
     }
 
     @Override
@@ -91,15 +88,12 @@ public class EpisodesFragment extends Fragment implements Callback<SeasonObj> {
 
         loaded = true;
 
-        LinearLayout seasonscontainer = (LinearLayout) rootview.findViewById(R.id.episodescontainer);
-        seasonscontainer.setVisibility(View.VISIBLE);
-
         refreshList();
     }
 
     @Override
     public void onFailure(Call<SeasonObj> call, Throwable t) {
-        Snackbar.make(rootview, "Fehler beim Laden der Episoden", Snackbar.LENGTH_SHORT);
+        Snackbar.make(rootView, "Fehler beim Laden der Episoden", Snackbar.LENGTH_SHORT);
     }
 
     private void refreshList() {

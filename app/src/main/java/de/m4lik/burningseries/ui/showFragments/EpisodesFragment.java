@@ -3,20 +3,21 @@ package de.m4lik.burningseries.ui.showFragments;
 
 import android.app.Fragment;
 import android.os.Bundle;
-import android.support.annotation.NonNull;
 import android.support.design.widget.Snackbar;
 import android.support.v4.content.ContextCompat;
+import android.support.v7.widget.LinearLayoutManager;
+import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.ArrayAdapter;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
-import android.widget.ListView;
 import android.widget.TextView;
 
 import java.util.ArrayList;
 
+import butterknife.BindView;
+import butterknife.ButterKnife;
 import de.m4lik.burningseries.R;
 import de.m4lik.burningseries.api.API;
 import de.m4lik.burningseries.api.APIInterface;
@@ -26,11 +27,10 @@ import de.m4lik.burningseries.api.objects.VideoObj;
 import de.m4lik.burningseries.ui.ShowActivity;
 import de.m4lik.burningseries.ui.listitems.EpisodeListItem;
 import de.m4lik.burningseries.util.Settings;
+import de.m4lik.burningseries.util.listeners.RecyclerItemClickListener;
 import retrofit2.Call;
 import retrofit2.Callback;
 import retrofit2.Response;
-
-import static de.m4lik.burningseries.services.ThemeHelperService.theme;
 
 /**
  * A simple {@link Fragment} subclass.
@@ -44,7 +44,10 @@ public class EpisodesFragment extends Fragment implements Callback<SeasonObj> {
 
     String userSession;
 
-    ListView episodesListView;
+    @BindView(R.id.episodesRecyclerView)
+    RecyclerView episodesRecyclerView;
+
+
     ArrayList<EpisodeListItem> episodesList = new ArrayList<>();
 
     boolean loaded = false;
@@ -60,10 +63,7 @@ public class EpisodesFragment extends Fragment implements Callback<SeasonObj> {
                              Bundle savedInstanceState) {
         rootview = inflater.inflate(R.layout.fragment_episodes, container, false);
 
-        episodesListView = (ListView) rootview.findViewById(R.id.episodesListView);
-
-        LinearLayout epicontainer = (LinearLayout) rootview.findViewById(R.id.episodescontainer);
-        epicontainer.setVisibility(View.GONE);
+        ButterKnife.bind(this, rootview);
 
         selectedShow = ((ShowActivity) getActivity()).getSelectedShow();
         selectedSeason = ((ShowActivity) getActivity()).getSelectedSeason();
@@ -86,7 +86,7 @@ public class EpisodesFragment extends Fragment implements Callback<SeasonObj> {
         SeasonObj season = response.body();
 
         for (SeasonObj.Episode episode : season.getEpisodes()) {
-            episodesList.add(new EpisodeListItem(episode.getGermanTitle(), episode.getEnglishTitle(), episode.getEpisodeID(), episode.isWatched() == 1 ));
+            episodesList.add(new EpisodeListItem(episode.getGermanTitle(), episode.getEnglishTitle(), episode.getEpisodeID(), episode.isWatched() == 1));
         }
 
         loaded = true;
@@ -103,73 +103,69 @@ public class EpisodesFragment extends Fragment implements Callback<SeasonObj> {
     }
 
     private void refreshList() {
-        ArrayAdapter<EpisodeListItem> adapter = new episodesListAdapter();
-        episodesListView.setAdapter(adapter);
 
-        Integer numOfItems = adapter.getCount();
+        episodesRecyclerView.setAdapter(new EpisodesRecyclerAdapter(episodesList));
+        LinearLayoutManager llm = new LinearLayoutManager(getActivity());
+        llm.setOrientation(LinearLayoutManager.VERTICAL);
+        episodesRecyclerView.setLayoutManager(llm);
+        episodesRecyclerView.setHasFixedSize(true);
+        episodesRecyclerView.setNestedScrollingEnabled(false);
+        episodesRecyclerView.addOnItemTouchListener(
+                new RecyclerItemClickListener(getActivity(), episodesRecyclerView, new RecyclerItemClickListener.OnItemClickListener() {
 
-        Integer totalItemsHeight = 0;
-        for (int pos = 0; pos < numOfItems; pos++) {
-            View item = adapter.getView(pos, null, episodesListView);
-            item.measure(0, 0);
-            totalItemsHeight += item.getMeasuredHeight();
-        }
+                    @Override
+                    public void onItemClick(View view, int position) {
+                        TextView idView = (TextView) view.findViewById(R.id.episodeId);
+                        showEpisode(Integer.parseInt(idView.getText().toString()));
+                    }
 
-        Integer totalDividersHeight = episodesListView.getDividerHeight() * (numOfItems - 1);
-        ViewGroup.LayoutParams params = episodesListView.getLayoutParams();
-        params.height = totalItemsHeight + totalDividersHeight;
-        episodesListView.setLayoutParams(params);
-        episodesListView.requestLayout();
+                    @Override
+                    public void onLongItemClick(View view, int position) {
+                        final TextView idView = (TextView) view.findViewById(R.id.episodeId);
+                        Integer selectedEpisode = Integer.parseInt(idView.getText().toString());
 
-        episodesListView.setOnItemLongClickListener((adapterView, view, i, l) -> {
+                        final API api = new API();
+                        api.setSession(userSession);
+                        api.generateToken("series/" + selectedShow + "/" + selectedSeason + "/" + selectedEpisode);
+                        APIInterface apii = api.getInterface();
+                        Call<EpisodeObj> call = apii.getEpisode(api.getToken(), api.getUserAgent(), selectedShow, selectedSeason, selectedEpisode, api.getSession());
+                        call.enqueue(new Callback<EpisodeObj>() {
+                            @Override
+                            public void onResponse(Call<EpisodeObj> call, Response<EpisodeObj> response) {
 
-            final TextView idView = (TextView) view.findViewById(R.id.episodeId);
-            Integer selectedEpisode = Integer.parseInt(idView.getText().toString());
+                                Integer episodeID = response.body().getEpisode().getEpisodeId();
 
-            final API api = new API();
-            api.setSession(userSession);
-            api.generateToken("series/" + selectedShow + "/" + selectedSeason + "/" + selectedEpisode);
-            APIInterface apii = api.getInterface();
-            Call<EpisodeObj> call = apii.getEpisode(api.getToken(), api.getUserAgent(), selectedShow, selectedSeason, selectedEpisode, api.getSession());
-            call.enqueue(new Callback<EpisodeObj>() {
-                @Override
-                public void onResponse(Call<EpisodeObj> call, Response<EpisodeObj> response) {
+                                api.generateToken("unwatch/" + episodeID);
+                                APIInterface apii = api.getInterface();
+                                Call<VideoObj> ucall = apii.unwatch(api.getToken(), api.getUserAgent(), episodeID, api.getSession());
+                                ucall.enqueue(new Callback<VideoObj>() {
+                                    @Override
+                                    public void onResponse(Call<VideoObj> call, Response<VideoObj> response) {
 
-                    Integer episodeID = response.body().getEpisode().getEpisodeId();
+                                        TextView titleGerView = (TextView) view.findViewById(R.id.episodeTitleGer);
+                                        titleGerView.setTextColor(ContextCompat.getColor(getActivity().getApplicationContext(), android.R.color.black));
 
-                    api.generateToken("unwatch/" + episodeID);
-                    APIInterface apii = api.getInterface();
-                    Call<VideoObj> ucall = apii.unwatch(api.getToken(), api.getUserAgent(), episodeID, api.getSession());
-                    ucall.enqueue(new Callback<VideoObj>() {
-                        @Override
-                        public void onResponse(Call<VideoObj> call, Response<VideoObj> response) {
+                                        ImageView fav = (ImageView) view.findViewById(R.id.watchedImageView);
+                                        fav.setImageDrawable(null);
+                                    }
 
-                            TextView titleGerView = (TextView) view.findViewById(R.id.episodeTitleGer);
-                            titleGerView.setTextColor(ContextCompat.getColor(getActivity().getApplicationContext(), android.R.color.black));
+                                    @Override
+                                    public void onFailure(Call<VideoObj> call, Throwable t) {
 
-                            ImageView fav = (ImageView) view.findViewById(R.id.watchedImageView);
-                            fav.setImageDrawable(null);
-                        }
+                                    }
+                                });
+                            }
 
-                        @Override
-                        public void onFailure(Call<VideoObj> call, Throwable t) {
+                            @Override
+                            public void onFailure(Call<EpisodeObj> call, Throwable t) {
 
-                        }
-                    });
-                }
+                            }
+                        });
+                    }
+                })
+        );
 
-                @Override
-                public void onFailure(Call<EpisodeObj> call, Throwable t) {
 
-                }
-            });
-            return true;
-        });
-
-        episodesListView.setOnItemClickListener((parent, view, postion, id) -> {
-            TextView idView = (TextView) view.findViewById(R.id.episodeId);
-            showEpisode(Integer.parseInt(idView.getText().toString()));
-        });
     }
 
     private void showEpisode(Integer id) {
@@ -177,44 +173,62 @@ public class EpisodesFragment extends Fragment implements Callback<SeasonObj> {
         ((ShowActivity) getActivity()).switchEpisodesToHosters();
     }
 
-    private class episodesListAdapter extends ArrayAdapter<EpisodeListItem> {
+    private class EpisodesRecyclerAdapter extends RecyclerView.Adapter<EpisodesRecyclerAdapter.EpisodesViewHolder> {
 
-        episodesListAdapter() {
-            super(getActivity().getApplicationContext(), R.layout.list_item_episodes, episodesList);
+        ArrayList<EpisodeListItem> list;
+
+        EpisodesRecyclerAdapter(ArrayList<EpisodeListItem> list) {
+            this.list = list;
         }
 
         @Override
-        @NonNull
-        public View getView(int pos, View view, @NonNull ViewGroup parent) {
-            if (view == null) {
-                view = getActivity().getLayoutInflater().inflate(R.layout.list_item_episodes, parent, false);
-            }
+        public EpisodesViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
+            View v = LayoutInflater.from(parent.getContext())
+                    .inflate(R.layout.list_item_episodes, parent, false);
+            return new EpisodesViewHolder(v);
+        }
 
-            view.findViewById(R.id.listItemContainer).setBackground(getResources().getDrawable(theme().listItemBackground));
+        @Override
+        public void onBindViewHolder(EpisodesViewHolder holder, int position) {
+            EpisodeListItem c = list.get(position);
 
-            EpisodeListItem current = episodesList.get(pos);
+            holder.id.setText(c.getId().toString());
 
-            TextView titleGerView = (TextView) view.findViewById(R.id.episodeTitleGer);
-            titleGerView.setText( (pos + 1) + " " + current.getTitleGer());
-            if (!Settings.of(getContext()).themeName().contains("_DARK"))
-                titleGerView.setTextColor(ContextCompat.getColor(getContext() , current.isWatched()? android.R.color.darker_gray : android.R.color.black));
+            holder.titleGer.setText((position + 1) + " " + c.getTitleGer());
+            if (!Settings.of(getActivity().getApplicationContext()).themeName().contains("_DARK"))
+                holder.titleGer.setTextColor(ContextCompat.getColor(getActivity().getApplicationContext(), c.isWatched() ? android.R.color.darker_gray : android.R.color.black));
 
-            TextView titleView = (TextView) view.findViewById(R.id.episodeTitle);
-            titleView.setText(current.getTitle());
+            holder.title.setText(c.getTitle());
 
-            TextView idView = (TextView) view.findViewById(R.id.episodeId);
-            idView.setText(current.getId().toString());
-
-            ImageView fav = (ImageView) view.findViewById(R.id.watchedImageView);
-            if (current.isWatched())
-                if (!Settings.of(getContext()).themeName().contains("_DARK"))
-                    fav.setImageDrawable(ContextCompat.getDrawable(getContext(), R.drawable.ic_watched));
+            if (c.isWatched())
+                if (!Settings.of(getActivity().getApplicationContext()).themeName().contains("_DARK"))
+                    holder.watchedImg.setImageDrawable(ContextCompat.getDrawable(getActivity().getApplicationContext(), R.drawable.ic_watched));
                 else
-                    fav.setImageDrawable(ContextCompat.getDrawable(getContext(), R.drawable.ic_watched_white));
+                    holder.watchedImg.setImageDrawable(ContextCompat.getDrawable(getActivity().getApplicationContext(), R.drawable.ic_watched_white));
             else
-                fav.setImageDrawable(null);
+                holder.watchedImg.setImageDrawable(null);
+        }
 
-            return view;
+        @Override
+        public int getItemCount() {
+            return list.size();
+        }
+
+        class EpisodesViewHolder extends RecyclerView.ViewHolder {
+
+            TextView id;
+            TextView title;
+            TextView titleGer;
+            ImageView watchedImg;
+
+            EpisodesViewHolder(View itemView) {
+                super(itemView);
+
+                id = (TextView) itemView.findViewById(R.id.episodeId);
+                title = (TextView) itemView.findViewById(R.id.episodeTitle);
+                titleGer = (TextView) itemView.findViewById(R.id.episodeTitleGer);
+                watchedImg = (ImageView) itemView.findViewById(R.id.watchedImageView);
+            }
         }
     }
 

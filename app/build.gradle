@@ -1,5 +1,4 @@
 apply plugin: 'com.android.application'
-apply plugin: 'com.neenbedankt.android-apt'
 apply plugin: 'me.tatarka.retrolambda'
 
 buildscript {
@@ -10,9 +9,9 @@ buildscript {
 
     dependencies {
         classpath 'me.tatarka:gradle-retrolambda:3.6.0'
-        classpath 'com.neenbedankt.gradle.plugins:android-apt:1.6'
     }
 }
+
 android {
     compileSdkVersion 25
     buildToolsVersion "25.0.2"
@@ -108,10 +107,10 @@ android {
         targetCompatibility JavaVersion.VERSION_1_8
     }
 }
+
 retrolambda {
     incremental true
 }
+
 apply from: "dependencies.gradle"
 apply plugin: 'com.google.gms.google-services'
-dependencies {
-}

@@ -1,33 +1,38 @@
 <LinearLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
     android:orientation="vertical"
     android:layout_width="fill_parent"
     android:layout_height="fill_parent"
-    xmlns:android="http://schemas.android.com/apk/res/android"
-    android:padding="2.5dp">
+    android:paddingBottom="5dp"
+    android:paddingEnd="7dp"
+    android:paddingLeft="7dp"
+    android:paddingRight="7dp"
+    android:paddingStart="7dp"
+    android:paddingTop="5dp">
 
     <LinearLayout
         android:id="@+id/listItemContainer"
-        android:orientation="vertical"
         android:layout_width="fill_parent"
         android:layout_height="wrap_content"
         android:background="@drawable/list_item_background_light"
+        android:orientation="vertical"
         android:padding="15dp">
 
         <TextView
+            android:id="@+id/seasonLabel"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:textAppearance="?android:attr/textAppearanceMedium"
-            android:text="seasonLabel"
-            android:id="@+id/seasonLabel"
+            android:layout_gravity="center_vertical"
             android:layout_marginBottom="0dp"
             android:layout_marginLeft="5dp"
-            android:layout_gravity="center_vertical" />
+            android:text="seasonLabel"
+            android:textAppearance="?android:attr/textAppearanceMedium"/>
 
         <TextView
+            android:id="@+id/seasonId"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:id="@+id/seasonId"
-            android:visibility="gone" />
+            android:visibility="gone"/>
 
     </LinearLayout>
 

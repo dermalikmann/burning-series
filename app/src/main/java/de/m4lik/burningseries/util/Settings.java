@@ -76,4 +76,8 @@ public class Settings {
         return  preferences.getString("pref_update_channel", "stable").equals("beta");
     }
 
+    public boolean showCovers() {
+        return preferences.getBoolean("pref_show_cover_images", true);
+    }
+
 }

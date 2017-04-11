@@ -6,6 +6,7 @@ package de.m4lik.burningseries.ui.listitems;
 public class ShowListItem {
 
     private Integer id;
+    public Boolean loaded = false;
     private String title;
     private String genre;
     private boolean fav;

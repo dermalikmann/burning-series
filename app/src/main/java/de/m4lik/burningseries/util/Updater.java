@@ -81,7 +81,6 @@ public class Updater {
         if (betaChannel) {
             urls.add("http://bs.malikmann.de/version/beta/");
         } else {
-            urls.add("https://raw.githubusercontent.com/M4lik/burning-series/master/builds/");
             urls.add("http://bs.malikmann.de/version/stable/");
         }
 
@@ -101,7 +100,7 @@ public class Updater {
         // install on finish
         final Context appContext = activity.getApplicationContext();
         progress.filter(
-                status -> status.finished())
+                DownloadService.Status::finished)
                 .flatMap(status -> {
                     try {
                         install(appContext, status.file);

@@ -23,6 +23,7 @@ import de.m4lik.burningseries.api.APIInterface;
 import de.m4lik.burningseries.api.objects.EpisodeObj;
 import de.m4lik.burningseries.api.objects.SeasonObj;
 import de.m4lik.burningseries.api.objects.VideoObj;
+import de.m4lik.burningseries.databinding.ListItemEpisodesBinding;
 import de.m4lik.burningseries.ui.ShowActivity;
 import de.m4lik.burningseries.ui.listitems.EpisodeListItem;
 import de.m4lik.burningseries.util.Settings;
@@ -84,8 +85,10 @@ public class EpisodesFragment extends Fragment implements Callback<SeasonObj> {
 
         SeasonObj season = response.body();
 
+        Integer i = 1;
         for (SeasonObj.Episode episode : season.getEpisodes()) {
-            episodesList.add(new EpisodeListItem(episode.getGermanTitle(), episode.getEnglishTitle(), episode.getEpisodeID(), episode.isWatched() == 1));
+            episodesList.add(new EpisodeListItem(episode.getGermanTitle() + " " + i, episode.getEnglishTitle(), episode.getEpisodeID(), episode.isWatched() == 1));
+            i++;
         }
 
         loaded = true;
@@ -179,32 +182,15 @@ public class EpisodesFragment extends Fragment implements Callback<SeasonObj> {
 
         @Override
         public EpisodesViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
-            View v = LayoutInflater.from(parent.getContext())
-                    .inflate(R.layout.list_item_episodes, parent, false);
-            return new EpisodesViewHolder(v);
+            LayoutInflater layoutInflater = LayoutInflater.from(getActivity());
+            ListItemEpisodesBinding binding = ListItemEpisodesBinding.inflate(layoutInflater, parent, false);
+            return new EpisodesViewHolder(binding);
         }
 
         @Override
         public void onBindViewHolder(EpisodesViewHolder holder, int position) {
-            EpisodeListItem c = list.get(position);
-
-            holder.id.setText(c.getId().toString());
-
-            holder.container.setBackground(ContextCompat.getDrawable(getActivity(), theme().listItemBackground));
-
-            holder.titleGer.setText((position + 1) + " " + c.getTitleGer());
-            if (!Settings.of(getActivity()).themeName().contains("_DARK"))
-                holder.titleGer.setTextColor(ContextCompat.getColor(getActivity(), c.isWatched() ? android.R.color.darker_gray : android.R.color.black));
-
-            holder.title.setText(c.getTitle());
-
-            if (c.isWatched())
-                if (!Settings.of(getActivity()).themeName().contains("_DARK"))
-                    holder.watchedImg.setImageDrawable(ContextCompat.getDrawable(getActivity(), R.drawable.ic_watched));
-                else
-                    holder.watchedImg.setImageDrawable(ContextCompat.getDrawable(getActivity(), R.drawable.ic_watched_white));
-            else
-                holder.watchedImg.setImageDrawable(null);
+            EpisodeListItem current = list.get(position);
+            holder.bind(current);
         }
 
         @Override
@@ -214,20 +200,32 @@ public class EpisodesFragment extends Fragment implements Callback<SeasonObj> {
 
         class EpisodesViewHolder extends RecyclerView.ViewHolder {
 
-            View container;
-            TextView id;
-            TextView title;
-            TextView titleGer;
-            ImageView watchedImg;
+            ListItemEpisodesBinding binding;
 
-            EpisodesViewHolder(View itemView) {
-                super(itemView);
+            EpisodesViewHolder(ListItemEpisodesBinding binding) {
+                super(binding.getRoot());
+                this.binding = binding;
+            }
 
-                container = itemView.findViewById(R.id.listItemContainer);
-                id = (TextView) itemView.findViewById(R.id.episodeId);
-                title = (TextView) itemView.findViewById(R.id.episodeTitle);
-                titleGer = (TextView) itemView.findViewById(R.id.episodeTitleGer);
-                watchedImg = (ImageView) itemView.findViewById(R.id.watchedImageView);
+            public void bind(EpisodeListItem item) {
+                binding.setEpisode(item);
+
+                View root = binding.getRoot();
+
+                root.findViewById(R.id.listItemContainer).setBackground(ContextCompat.getDrawable(getActivity(), theme().listItemBackground));
+
+                if (!Settings.of(getActivity()).themeName().contains("_DARK"))
+                    ((TextView) root.findViewById(R.id.episodeTitle)).setTextColor(ContextCompat.getColor(getActivity(), item.isWatched() ? android.R.color.darker_gray : android.R.color.black));
+
+                if (item.isWatched())
+                    if (!Settings.of(getActivity()).themeName().contains("_DARK"))
+                        ((ImageView) root.findViewById(R.id.watchedImageView)).setImageDrawable(ContextCompat.getDrawable(getActivity(), R.drawable.ic_watched));
+                    else
+                        ((ImageView) root.findViewById(R.id.watchedImageView)).setImageDrawable(ContextCompat.getDrawable(getActivity(), R.drawable.ic_watched_white));
+                else
+                    ((ImageView) root.findViewById(R.id.watchedImageView)).setImageDrawable(null);
+
+                binding.executePendingBindings();
             }
         }
     }

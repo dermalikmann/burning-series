@@ -123,44 +123,6 @@ public class FavsFragment extends Fragment {
         startActivity(i);
     }
 
-    /*private class seriesListAdapter extends ArrayAdapter<ShowListItem> {
-
-        private List<ShowListItem> list;
-
-        seriesListAdapter(List<ShowListItem> list) {
-            super(getActivity().getApplicationContext(), R.layout.list_item_favorites, favs);
-            this.list = list;
-        }
-
-        @Override
-        @NonNull
-        public View getView(int pos, View view, @NonNull ViewGroup parent) {
-            if (view == null) {
-                view = getActivity().getLayoutInflater().inflate(R.layout.list_item_favorites, parent, false);
-            }
-
-            view.findViewById(R.id.listItemContainer).setBackground(getResources().getDrawable(theme().listItemBackground));
-
-            ShowListItem current = list.get(pos);
-
-            TextView title = (TextView) view.findViewById(R.id.seriesTitle);
-            title.setText(current.getTitle());
-
-            TextView genre = (TextView) view.findViewById(R.id.seriesGenre);
-            genre.setText(current.getGenre());
-
-            TextView id = (TextView) view.findViewById(R.id.seriesId);
-            id.setText(current.getId().toString());
-
-            return view;
-        }
-
-        @Override
-        public int getCount() {
-            return list != null ? list.size() : 0;
-        }
-    }*/
-
     private class SeriesRecyclerAdapter extends RecyclerView.Adapter<SeriesRecyclerAdapter.SeriesViewHolder> {
 
         List<ShowListItem> list;

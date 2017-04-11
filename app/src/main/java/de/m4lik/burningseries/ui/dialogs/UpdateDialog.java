@@ -45,7 +45,8 @@ public class UpdateDialog extends DialogBase {
 
     private Dialog updateAvailableDialog(final Update update) {
         return DialogBuilder.start(getActivity())
-                .content("Es ist ein neues Update verfügbar!")
+                .title("Es ist ein neues Update verfügbar!")
+                .content("Unteranderem enthalten: " + update.changelog())
                 .positive("Download", dialog -> Updater.download(getActivity(), update))
                 .negative("Ignorieren")
                 .build();

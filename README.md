@@ -13,7 +13,7 @@ Wie man sehen kann ist das Projekt noch in der Pre-Release Phase, doch denke ich
 
 ## Features
 
-Die App kann schon viel...
+Die App _kann schon viel_...
 
  - Serien direkt auf dem Smartphone oder dem Tablet gucken
  - Momentan zwei unterstützte Hoster (TheVideo und VidTo)
@@ -22,7 +22,7 @@ Die App kann schon viel...
  - Drei Themes und drei Dark/Nightmode Themes
  - Tablet-Layout
 
-... doch es ist noch mehr in Arbeit, wie z.B.
+... doch es ist noch **mehr in Arbeit**, wie z.B.
 
  - weitere Hoster
  - Serien vorladen und verwalten

@@ -31,6 +31,8 @@ import retrofit2.Call;
 import retrofit2.Callback;
 import retrofit2.Response;
 
+import static de.m4lik.burningseries.services.ThemeHelperService.theme;
+
 /**
  * A simple {@link Fragment} subclass.
  */
@@ -188,17 +190,19 @@ public class EpisodesFragment extends Fragment implements Callback<SeasonObj> {
 
             holder.id.setText(c.getId().toString());
 
+            holder.container.setBackground(ContextCompat.getDrawable(getActivity(), theme().listItemBackground));
+
             holder.titleGer.setText((position + 1) + " " + c.getTitleGer());
-            if (!Settings.of(getActivity().getApplicationContext()).themeName().contains("_DARK"))
-                holder.titleGer.setTextColor(ContextCompat.getColor(getActivity().getApplicationContext(), c.isWatched() ? android.R.color.darker_gray : android.R.color.black));
+            if (!Settings.of(getActivity()).themeName().contains("_DARK"))
+                holder.titleGer.setTextColor(ContextCompat.getColor(getActivity(), c.isWatched() ? android.R.color.darker_gray : android.R.color.black));
 
             holder.title.setText(c.getTitle());
 
             if (c.isWatched())
-                if (!Settings.of(getActivity().getApplicationContext()).themeName().contains("_DARK"))
-                    holder.watchedImg.setImageDrawable(ContextCompat.getDrawable(getActivity().getApplicationContext(), R.drawable.ic_watched));
+                if (!Settings.of(getActivity()).themeName().contains("_DARK"))
+                    holder.watchedImg.setImageDrawable(ContextCompat.getDrawable(getActivity(), R.drawable.ic_watched));
                 else
-                    holder.watchedImg.setImageDrawable(ContextCompat.getDrawable(getActivity().getApplicationContext(), R.drawable.ic_watched_white));
+                    holder.watchedImg.setImageDrawable(ContextCompat.getDrawable(getActivity(), R.drawable.ic_watched_white));
             else
                 holder.watchedImg.setImageDrawable(null);
         }
@@ -210,6 +214,7 @@ public class EpisodesFragment extends Fragment implements Callback<SeasonObj> {
 
         class EpisodesViewHolder extends RecyclerView.ViewHolder {
 
+            View container;
             TextView id;
             TextView title;
             TextView titleGer;
@@ -218,6 +223,7 @@ public class EpisodesFragment extends Fragment implements Callback<SeasonObj> {
             EpisodesViewHolder(View itemView) {
                 super(itemView);
 
+                container = itemView.findViewById(R.id.listItemContainer);
                 id = (TextView) itemView.findViewById(R.id.episodeId);
                 title = (TextView) itemView.findViewById(R.id.episodeTitle);
                 titleGer = (TextView) itemView.findViewById(R.id.episodeTitleGer);
@@ -225,5 +231,4 @@ public class EpisodesFragment extends Fragment implements Callback<SeasonObj> {
             }
         }
     }
-
 }

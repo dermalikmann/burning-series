@@ -32,6 +32,7 @@
     <com.simplecityapps.recyclerview_fastscroll.views.FastScrollRecyclerView
         android:id="@+id/seriesRecyclerView"
         android:layout_width="match_parent"
-        android:layout_height="match_parent" />
+        android:layout_height="match_parent"
+        app:fastScrollPopupBackgroundSize="50dp"/>
 
 </LinearLayout>

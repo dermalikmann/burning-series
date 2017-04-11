@@ -82,6 +82,9 @@ public class SeriesFragment extends Fragment {
         llm.setOrientation(LinearLayoutManager.VERTICAL);
         seriesRecyclerView.setLayoutManager(llm);
         seriesRecyclerView.setAdapter(seriesRecyclerAdapter);
+        ((FastScrollRecyclerView) seriesRecyclerView).setPopupBgColor(ContextCompat.getColor(getActivity(), theme().primaryColor));
+        ((FastScrollRecyclerView) seriesRecyclerView).setThumbColor(ContextCompat.getColor(getActivity(), theme().primaryColorDark));
+        ((FastScrollRecyclerView) seriesRecyclerView).setPopupTextSize(100);
         seriesRecyclerView.addOnItemTouchListener(
                 new RecyclerItemClickListener(getActivity(), seriesRecyclerView ,new RecyclerItemClickListener.OnItemClickListener() {
 

@@ -5,7 +5,6 @@ import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.net.Uri;
 import android.os.Bundle;
-import android.support.annotation.NonNull;
 import android.support.v4.app.Fragment;
 import android.support.v4.content.ContextCompat;
 import android.support.v7.widget.LinearLayoutManager;
@@ -13,10 +12,7 @@ import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.AdapterView;
-import android.widget.ArrayAdapter;
 import android.widget.ImageView;
-import android.widget.ListView;
 import android.widget.TextView;
 
 import com.bumptech.glide.Glide;
@@ -35,6 +31,7 @@ import de.m4lik.burningseries.ui.TabletShowActivity;
 import de.m4lik.burningseries.ui.listitems.GenreListItem;
 import de.m4lik.burningseries.ui.listitems.ShowListItem;
 import de.m4lik.burningseries.util.Settings;
+import de.m4lik.burningseries.util.listeners.RecyclerItemClickListener;
 
 import static de.m4lik.burningseries.database.SeriesContract.genresTable;
 import static de.m4lik.burningseries.database.SeriesContract.seriesTable;
@@ -47,7 +44,6 @@ import static de.m4lik.burningseries.services.ThemeHelperService.theme;
 public class GenresFragment extends Fragment {
 
 
-    ListView genresListView;
     List<GenreListItem> genresList = new ArrayList<>();
     List<ShowListItem> seriesList = new ArrayList<>();
 
@@ -57,6 +53,48 @@ public class GenresFragment extends Fragment {
     boolean genreShown = false;
 
     public GenresFragment() {}
+
+    private class GenresRecyclerAdapter extends RecyclerView.Adapter<GenresRecyclerAdapter.GenresViewHolder> {
+
+        List<GenreListItem> list;
+
+        GenresRecyclerAdapter(List<GenreListItem> list) {
+            this.list = list;
+        }
+
+        @Override
+        public GenresRecyclerAdapter.GenresViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
+            LayoutInflater layoutInflater = LayoutInflater.from(getActivity());
+            ListItemGenresBinding binding = ListItemGenresBinding.inflate(layoutInflater, parent, false);
+            return new GenresViewHolder(binding);
+        }
+
+        @Override
+        public void onBindViewHolder(GenresRecyclerAdapter.GenresViewHolder holder, int position) {
+            GenreListItem current = list.get(position);
+            holder.bind(current);
+        }
+        @Override
+        public int getItemCount() {
+            return list.size();
+        }
+
+        class GenresViewHolder extends RecyclerView.ViewHolder {
+
+            private final ListItemGenresBinding binding;
+
+            GenresViewHolder(ListItemGenresBinding binding) {
+                super(binding.getRoot());
+                this.binding = binding;
+            }
+
+            public void bind(GenreListItem item) {
+                binding.setGenre(item);
+                binding.getRoot().findViewById(R.id.listItemContainer).setBackground(ContextCompat.getDrawable(getActivity(), theme().listItemBackground));
+                binding.executePendingBindings();
+            }
+        }
+    }
 
     private class SeriesRecyclerAdapter extends RecyclerView.Adapter<SeriesRecyclerAdapter.SeriesViewHolder> {
 
@@ -114,47 +152,36 @@ public class GenresFragment extends Fragment {
         }
     }
 
-    private class GenresRecyclerAdapter extends RecyclerView.Adapter<GenresRecyclerAdapter.GenresViewHolder> {
-
-        List<GenreListItem> list;
-
-        GenresRecyclerAdapter(List<GenreListItem> list) {
-            this.list = list;
+    private RecyclerItemClickListener genreClickListener = new RecyclerItemClickListener(getActivity(), genresRecyclerView, new RecyclerItemClickListener.OnItemClickListener() {
+        @Override
+        public void onItemClick(View view, int position) {
+            populateSeriesList(((TextView) view.findViewById(R.id.genreLable)).getText().toString());
+            genreShown = true;
         }
 
         @Override
-        public GenresRecyclerAdapter.GenresViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
-            LayoutInflater layoutInflater = LayoutInflater.from(getActivity());
-            ListItemGenresBinding binding = ListItemGenresBinding.inflate(layoutInflater, parent, false);
-            return new GenresViewHolder(binding);
+        public void onLongItemClick(View view, int position) {
+
+        }
+    });
+
+    private RecyclerItemClickListener seriesClickListener = new RecyclerItemClickListener(getActivity(), genresRecyclerView, new RecyclerItemClickListener.OnItemClickListener() {
+        @Override
+        public void onItemClick(View view, int position) {
+            Intent i = new Intent(getActivity(), ShowActivity.class);
+            if (getContext().getResources().getBoolean(R.bool.isTablet))
+                i = new Intent(getActivity(), TabletShowActivity.class);
+            i.putExtra("ShowName", ((TextView) view.findViewById(R.id.seriesTitle)).getText().toString());
+            i.putExtra("ShowID", ((TextView) view.findViewById(R.id.seriesTitle)).getText().toString());
+            i.putExtra("ShowGenre", ((TextView) view.findViewById(R.id.seriesTitle)).getText().toString());
+            startActivity(i);
         }
 
         @Override
-        public void onBindViewHolder(GenresRecyclerAdapter.GenresViewHolder holder, int position) {
-            GenreListItem current = list.get(position);
-            holder.bind(current);
+        public void onLongItemClick(View view, int position) {
+
         }
-        @Override
-        public int getItemCount() {
-            return list.size();
-        }
-
-        class GenresViewHolder extends RecyclerView.ViewHolder {
-
-            private final ListItemGenresBinding binding;
-
-            GenresViewHolder(ListItemGenresBinding binding) {
-                super(binding.getRoot());
-                this.binding = binding;
-            }
-
-            public void bind(GenreListItem item) {
-                binding.setGenre(item);
-                binding.getRoot().findViewById(R.id.listItemContainer).setBackground(ContextCompat.getDrawable(getActivity(), theme().listItemBackground));
-                binding.executePendingBindings();
-            }
-        }
-    }
+    });
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
@@ -174,31 +201,7 @@ public class GenresFragment extends Fragment {
         llm.setOrientation(LinearLayoutManager.VERTICAL);
         genresRecyclerView.setLayoutManager(llm);
         genresRecyclerView.setAdapter(new GenresRecyclerAdapter(genresList));
-        ge
-    }
-
-    private class genresListAdapter extends ArrayAdapter<GenreListItem> {
-
-         genresListAdapter() {
-            super(getActivity().getApplicationContext(), R.layout.list_item_genres, genresList);
-        }
-
-        @Override
-        @NonNull
-        public View getView(int pos, View view, @NonNull ViewGroup parent) {
-            if (view == null) {
-                view = getActivity().getLayoutInflater().inflate(R.layout.list_item_genres, parent, false);
-            }
-
-            view.findViewById(R.id.listItemContainer).setBackground(ContextCompat.getDrawable(getActivity(), theme().listItemBackground));
-
-            GenreListItem current = genresList.get(pos);
-
-            TextView lable = (TextView) view.findViewById(R.id.genreLable);
-            lable.setText(current.getLable());
-
-            return view;
-        }
+        genresRecyclerView.addOnItemTouchListener(genreClickListener);
     }
 
     private List<GenreListItem> getGenreList() {
@@ -239,11 +242,21 @@ public class GenresFragment extends Fragment {
     }
 
 
-    /**
+    /*
      * Show Matching Series
-     **/
+     */
 
     private void populateSeriesList(String genre) {
+
+        List<ShowListItem> list = getSeriesList(genre);
+
+        genresRecyclerView.setAdapter(new SeriesRecyclerAdapter(list));
+        genresRecyclerView.removeOnItemTouchListener(genreClickListener);
+        genresRecyclerView.addOnItemTouchListener(seriesClickListener);
+    }
+
+    private List<ShowListItem> getSeriesList(String lable) {
+        List<ShowListItem> list = new ArrayList<>();
 
         MainDBHelper dbHelper = new MainDBHelper(getContext());
         SQLiteDatabase db = dbHelper.getReadableDatabase();
@@ -256,7 +269,7 @@ public class GenresFragment extends Fragment {
         };
 
         String selection = seriesTable.COLUMN_NAME_GENRE + " = ?";
-        String[] selectionArgs = {genre};
+        String[] selectionArgs = {lable};
 
         String sortOrder =
                 seriesTable.COLUMN_NAME_GENRE + " ASC";
@@ -273,7 +286,7 @@ public class GenresFragment extends Fragment {
 
         if (c.getCount() > 0)
             while (c.moveToNext()) {
-                seriesList.add(new ShowListItem(
+                list.add(new ShowListItem(
                         c.getString(c.getColumnIndex(seriesTable.COLUMN_NAME_TITLE)),
                         c.getInt(c.getColumnIndex(seriesTable.COLUMN_NAME_ID)),
                         c.getString(c.getColumnIndex(seriesTable.COLUMN_NAME_GENRE)),
@@ -282,72 +295,11 @@ public class GenresFragment extends Fragment {
             }
 
         c.close();
+        db.close();
 
-        ArrayAdapter<ShowListItem> adapter = new seriesListAdapter(seriesList);
-        genresListView.setAdapter(adapter);
-
-        genresListView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
-            @Override
-            public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
-                TextView nameView = (TextView) view.findViewById(R.id.seriesTitle);
-                TextView idView = (TextView) view.findViewById(R.id.seriesId);
-                TextView genreView = (TextView) view.findViewById(R.id.seriesGenre);
-                showSeries(Integer.parseInt(idView.getText().toString()),
-                        nameView.getText().toString(),
-                        genreView.getText().toString());
-            }
-        });
+        return list;
     }
 
-    private void showSeries(Integer id, String name, String genre) {
-        Intent i = new Intent(getActivity(), ShowActivity.class);
-        if (getContext().getResources().getBoolean(R.bool.isTablet))
-            i = new Intent(getActivity(), TabletShowActivity.class);
-        i.putExtra("ShowName", name);
-        i.putExtra("ShowID", id);
-        i.putExtra("ShowGenre", genre);
-        startActivity(i);
-    }
 
-    private class seriesListAdapter extends ArrayAdapter<ShowListItem> {
-
-        private List<ShowListItem> list;
-
-        seriesListAdapter(List<ShowListItem> list) {
-            super(getActivity().getApplicationContext(), R.layout.list_item_series, seriesList);
-            this.list = list;
-        }
-
-        @Override
-        @NonNull
-        public View getView(int pos, View view, @NonNull ViewGroup parent) {
-            if (view == null) {
-                view = getActivity().getLayoutInflater().inflate(R.layout.list_item_series, parent, false);
-            }
-
-            view.findViewById(R.id.listItemContainer).setBackground(getResources().getDrawable(theme().listItemBackground));
-
-            ShowListItem current = list.get(pos);
-
-            TextView title = (TextView) view.findViewById(R.id.seriesTitle);
-            title.setText(current.getTitle());
-
-            TextView genre = (TextView) view.findViewById(R.id.seriesGenre);
-            genre.setText(current.getGenre());
-
-            TextView id = (TextView) view.findViewById(R.id.seriesId);
-            id.setText(current.getId().toString());
-
-            ImageView fav = (ImageView) view.findViewById(R.id.favImageView);
-            fav.setImageDrawable(ContextCompat.getDrawable(getContext(), current.isFav() ? R.drawable.ic_star : R.drawable.ic_star_border));
-
-            return view;
-        }
-
-        @Override
-        public int getCount() {
-            return list != null ? list.size() : 0;
-        }
-    }
 }
 

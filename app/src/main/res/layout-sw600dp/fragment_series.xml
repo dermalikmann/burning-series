@@ -3,6 +3,7 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
     android:orientation="vertical"
     tools:context=".ui.mainFragments.SeriesFragment">
 
@@ -18,14 +19,12 @@
         android:textSize="25sp"
         android:visibility="gone"/>
 
-    <ListView
-        android:id="@+id/seriesListView"
+    <com.simplecityapps.recyclerview_fastscroll.views.FastScrollRecyclerView
+        android:id="@+id/seriesRecyclerView"
         android:layout_width="600dp"
         android:layout_height="match_parent"
+        app:fastScrollPopupBackgroundSize="50dp"
         android:layout_gravity="center_horizontal"
-        android:layout_margin="25dp"
-        android:divider="@null"
-        android:dividerHeight="10dp"
-        tools:listitem="@layout/list_item_series"/>
+        android:layout_margin="25dp"/>
 
 </LinearLayout>

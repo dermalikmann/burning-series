@@ -8,6 +8,7 @@ import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.v4.app.Fragment;
 import android.support.v4.content.ContextCompat;
+import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -23,6 +24,8 @@ import com.bumptech.glide.Glide;
 import java.util.ArrayList;
 import java.util.List;
 
+import butterknife.BindView;
+import butterknife.ButterKnife;
 import de.m4lik.burningseries.R;
 import de.m4lik.burningseries.database.MainDBHelper;
 import de.m4lik.burningseries.databinding.ListItemGenresBinding;
@@ -38,7 +41,8 @@ import static de.m4lik.burningseries.database.SeriesContract.seriesTable;
 import static de.m4lik.burningseries.services.ThemeHelperService.theme;
 
 /**
- * A simple {@link Fragment} subclass.
+ * Fragment for displaying a list of available genres.
+ * After selection of one, a list of shows with this genre shall come up.
  */
 public class GenresFragment extends Fragment {
 
@@ -46,6 +50,9 @@ public class GenresFragment extends Fragment {
     ListView genresListView;
     List<GenreListItem> genresList = new ArrayList<>();
     List<ShowListItem> seriesList = new ArrayList<>();
+
+    @BindView(R.id.genresRecyclerView)
+    RecyclerView genresRecyclerView;
 
     boolean genreShown = false;
 
@@ -143,7 +150,7 @@ public class GenresFragment extends Fragment {
 
             public void bind(GenreListItem item) {
                 binding.setGenre(item);
-
+                binding.getRoot().findViewById(R.id.listItemContainer).setBackground(ContextCompat.getDrawable(getActivity(), theme().listItemBackground));
                 binding.executePendingBindings();
             }
         }
@@ -153,37 +160,9 @@ public class GenresFragment extends Fragment {
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
         View rootView = inflater.inflate(R.layout.fragment_genres, container, false);
-        genresListView = (ListView) rootView.findViewById(R.id.genresListView);
+        ButterKnife.bind(this, rootView);
 
-
-        MainDBHelper dbHelper = new MainDBHelper(getContext());
-        SQLiteDatabase db = dbHelper.getReadableDatabase();
-
-        String[] projection = {
-                genresTable.COLUMN_NAME_ID,
-                genresTable.COLUMN_NAME_GENRE
-        };
-
-        String sortOrder =
-                genresTable.COLUMN_NAME_GENRE + " ASC";
-
-        Cursor c = db.query(
-                genresTable.TABLE_NAME,
-                projection,
-                null,
-                null,
-                null,
-                null,
-                sortOrder
-        );
-
-        while (c.moveToNext()) {
-            genresList.add(new GenreListItem(
-                    c.getInt(c.getColumnIndex(genresTable.COLUMN_NAME_ID)),
-                    c.getString(c.getColumnIndex(genresTable.COLUMN_NAME_GENRE))
-            ));
-        }
-        c.close();
+        genresList = getGenreList();
 
         populateGenreList();
 
@@ -191,9 +170,11 @@ public class GenresFragment extends Fragment {
     }
 
     private void populateGenreList() {
-        ArrayAdapter<GenreListItem> adapter = new genresListAdapter();
-        genresListView.setAdapter(adapter);
-
+        LinearLayoutManager llm = new LinearLayoutManager(getActivity());
+        llm.setOrientation(LinearLayoutManager.VERTICAL);
+        genresRecyclerView.setLayoutManager(llm);
+        genresRecyclerView.setAdapter(new GenresRecyclerAdapter(genresList));
+        ge
     }
 
     private class genresListAdapter extends ArrayAdapter<GenreListItem> {
@@ -218,6 +199,43 @@ public class GenresFragment extends Fragment {
 
             return view;
         }
+    }
+
+    private List<GenreListItem> getGenreList() {
+        List<GenreListItem> list = new ArrayList<>();
+
+        MainDBHelper dbHelper = new MainDBHelper(getContext());
+        SQLiteDatabase db = dbHelper.getReadableDatabase();
+
+        String[] projection = {
+                genresTable.COLUMN_NAME_ID,
+                genresTable.COLUMN_NAME_GENRE
+        };
+
+        String sortOrder =
+                genresTable.COLUMN_NAME_GENRE + " ASC";
+
+        Cursor c = db.query(
+                genresTable.TABLE_NAME,
+                projection,
+                null,
+                null,
+                null,
+                null,
+                sortOrder
+        );
+
+        while (c.moveToNext()) {
+            list.add(new GenreListItem(
+                    c.getInt(c.getColumnIndex(genresTable.COLUMN_NAME_ID)),
+                    c.getString(c.getColumnIndex(genresTable.COLUMN_NAME_GENRE))
+            ));
+        }
+
+        c.close();
+        db.close();
+
+        return list;
     }
 
 

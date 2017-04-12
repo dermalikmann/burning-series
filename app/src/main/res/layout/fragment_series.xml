@@ -19,16 +19,6 @@
         android:textSize="25sp"
         android:visibility="gone"/>
 
-    <!--<ListView
-        android:id="@+id/seriesListView"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_gravity="center_horizontal"
-        android:divider="@null"
-        android:dividerHeight="0dp"
-        android:visibility="gone"
-        tools:listitem="@layout/list_item_series"/>-->
-
     <com.simplecityapps.recyclerview_fastscroll.views.FastScrollRecyclerView
         android:id="@+id/seriesRecyclerView"
         android:layout_width="match_parent"

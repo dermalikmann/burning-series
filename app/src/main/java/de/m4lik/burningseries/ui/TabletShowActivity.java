@@ -14,7 +14,11 @@ import android.support.annotation.NonNull;
 import android.support.customtabs.CustomTabsIntent;
 import android.support.design.widget.Snackbar;
 import android.support.v4.content.ContextCompat;
+import android.support.v7.util.SortedList;
+import android.support.v7.widget.LinearLayoutManager;
+import android.support.v7.widget.RecyclerView;
 import android.util.Log;
+import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.AdapterView;
@@ -27,6 +31,7 @@ import android.widget.TextView;
 import com.bumptech.glide.Glide;
 
 import java.util.ArrayList;
+import java.util.List;
 
 import butterknife.BindView;
 import de.m4lik.burningseries.ActivityComponent;
@@ -38,6 +43,8 @@ import de.m4lik.burningseries.api.objects.FullShowObj;
 import de.m4lik.burningseries.api.objects.SeasonObj;
 import de.m4lik.burningseries.api.objects.VideoObj;
 import de.m4lik.burningseries.database.MainDBHelper;
+import de.m4lik.burningseries.databinding.ListItemEpisodesBinding;
+import de.m4lik.burningseries.databinding.ListItemHosterBinding;
 import de.m4lik.burningseries.hoster.Hoster;
 import de.m4lik.burningseries.ui.base.ActivityBase;
 import de.m4lik.burningseries.ui.dialogs.DialogBuilder;
@@ -46,6 +53,7 @@ import de.m4lik.burningseries.ui.listitems.HosterListItem;
 import de.m4lik.burningseries.ui.listitems.SeasonListItem;
 import de.m4lik.burningseries.util.AndroidUtility;
 import de.m4lik.burningseries.util.Settings;
+import de.m4lik.burningseries.util.listeners.RecyclerItemClickListener;
 import okhttp3.ResponseBody;
 import retrofit2.Call;
 import retrofit2.Callback;
@@ -58,8 +66,6 @@ public class TabletShowActivity extends ActivityBase {
 
     Integer currentShow;
     Integer currentSeason;
-    Integer currentEpisode;
-    Integer seasonCount;
 
     Boolean fav = false;
     Boolean loaded = false;
@@ -73,11 +79,11 @@ public class TabletShowActivity extends ActivityBase {
     @BindView(R.id.seasonsListView)
     ListView seasonsListView;
 
-    @BindView(R.id.episodesListView)
-    ListView episodesListView;
+    @BindView(R.id.episodesRecyclerView)
+    RecyclerView episodesRecyclerView;
 
-    @BindView(R.id.hosterListView)
-    ListView hosterListView;
+    @BindView(R.id.hosterRecyclerView)
+    RecyclerView hosterRecyclerView;
 
     @BindView(R.id.genresTV)
     TextView genresTV;
@@ -102,13 +108,13 @@ public class TabletShowActivity extends ActivityBase {
 
     String userSession;
 
-    ArrayList<SeasonListItem> seasonListItems = new ArrayList<>();
-    ArrayList<EpisodeListItem> episodeListItems = new ArrayList<>();
-    ArrayList<HosterListItem> hosterListItems = new ArrayList<>();
+    List<SeasonListItem> seasons = new ArrayList<>();
+    EpisodesRecyclerAdapter episodesAdapter;
+    List<EpisodeListItem> episodes = new ArrayList<>();
+    HosterRecyclerAdapter hosterAdapter;
+    List<HosterListItem> hosters = new ArrayList<>();
 
     Intent i;
-
-    private String title;
 
     @Override
     protected void injectComponent(ActivityComponent appComponent) {
@@ -125,7 +131,7 @@ public class TabletShowActivity extends ActivityBase {
 
         findViewById(R.id.descriptionTV).setBackground(getResources().getDrawable(theme().listItemBackground));
 
-        title = i.getStringExtra("ShowName");
+        String title = i.getStringExtra("ShowName");
         currentShow = i.getIntExtra("ShowID", 60);
         Uri imageUri = Uri.parse("https://bs.to/public/img/cover/" + currentShow + ".jpg");
         getSupportActionBar().setTitle(title);
@@ -163,17 +169,18 @@ public class TabletShowActivity extends ActivityBase {
             }
         });
 
-        showSeason(1);
-        showEpisode(1, 1);
+        setupEpisodeList();
+        setupHosterList();
     }
+
 
     public void showSeason(final Integer season) {
 
         API api = new API();
-        APIInterface apii = api.getInterface();
+        APIInterface apiInterface = api.getInterface();
         api.setSession(userSession);
         api.generateToken("series/" + currentShow + "/" + season);
-        Call<SeasonObj> seasonCall = apii.getSeason(api.getToken(), api.getUserAgent(), currentShow, season, api.getSession());
+        Call<SeasonObj> seasonCall = apiInterface.getSeason(api.getToken(), api.getUserAgent(), currentShow, season, api.getSession());
         seasonCall.enqueue(new Callback<SeasonObj>() {
             @Override
             public void onResponse(Call<SeasonObj> call, Response<SeasonObj> response) {
@@ -184,10 +191,12 @@ public class TabletShowActivity extends ActivityBase {
                 if (!loaded)
                     refreshSeries(season);
 
-                episodeListItems = new ArrayList<>();
+                episodes = new ArrayList<>();
 
+                int i = 1;
                 for (SeasonObj.Episode episode : season.getEpisodes()) {
-                    episodeListItems.add(new EpisodeListItem(episode.getGermanTitle(), episode.getEnglishTitle(), episode.getEpisodeID(), episode.isWatched() == 1));
+                    episodes.add(new EpisodeListItem(i + " " + episode.getGermanTitle(), episode.getEnglishTitle(), episode.getEpisodeID(), episode.isWatched() == 1));
+                    i++;
                 }
 
                 refreshEpisodesList();
@@ -218,16 +227,18 @@ public class TabletShowActivity extends ActivityBase {
             public void onResponse(Call<EpisodeObj> call, Response<EpisodeObj> response) {
                 EpisodeObj episode = response.body();
 
-                hosterListItems = new ArrayList<>();
+                hosters = new ArrayList<>();
 
                 for (EpisodeObj.Hoster hoster : episode.getHoster())
-                    if (Hoster.compatibleHosters.contains(hoster.getHoster()))
-                        hosterListItems.add(new HosterListItem(hoster.getLinkId(), hoster.getHoster(), hoster.getPart(), true));
+                    if (Hoster.compatibleHosters.contains(hoster.getHoster())) {
+                        hosters.add(new HosterListItem(hoster.getLinkId(), hoster.getHoster(), hoster.getPart(), true));
+
+                    }
                 for (EpisodeObj.Hoster hoster : episode.getHoster())
                     if (!Hoster.compatibleHosters.contains(hoster.getHoster()))
-                        hosterListItems.add(new HosterListItem(hoster.getLinkId(), hoster.getHoster(), hoster.getPart()));
+                        hosters.add(new HosterListItem(hoster.getLinkId(), hoster.getHoster(), hoster.getPart()));
 
-                hosterListView.setAdapter(new HosterListAdpter());
+                refreshHosterList();
             }
 
             @Override
@@ -243,6 +254,112 @@ public class TabletShowActivity extends ActivityBase {
             }
         });
 
+    }
+
+    private void setupEpisodeList() {
+        LinearLayoutManager llm = new LinearLayoutManager(getApplicationContext(), LinearLayoutManager.VERTICAL, false);
+        episodesRecyclerView.setLayoutManager(llm);
+        episodesAdapter = new EpisodesRecyclerAdapter();
+        episodesRecyclerView.setAdapter(episodesAdapter);
+        episodesRecyclerView.addOnItemTouchListener(
+                new RecyclerItemClickListener(getApplicationContext(), episodesRecyclerView, new RecyclerItemClickListener.OnItemClickListener() {
+                    @Override
+                    public void onItemClick(View view, int position) {
+                        EpisodeListItem clickedEpisode = episodes.get(position);
+                        ((TextView) findViewById(R.id.episodeName)).setText(clickedEpisode.getTitleGer().equals("") ? clickedEpisode.getTitle() : clickedEpisode.getTitleGer());
+                        TextView idView = (TextView) view.findViewById(R.id.episodeId);
+                        showEpisode(currentSeason, Integer.parseInt(idView.getText().toString()));
+                    }
+
+                    @Override
+                    public void onLongItemClick(View view, int position) {
+
+                        final TextView idView = (TextView) view.findViewById(R.id.episodeId);
+                        Integer selectedEpisode = Integer.parseInt(idView.getText().toString());
+
+                        final API api = new API();
+                        api.setSession(userSession);
+                        api.generateToken("series/" + currentShow + "/" + currentSeason + "/" + selectedEpisode);
+                        APIInterface apii = api.getInterface();
+                        Call<EpisodeObj> call = apii.getEpisode(api.getToken(), api.getUserAgent(), currentShow, currentSeason, selectedEpisode, api.getSession());
+                        call.enqueue(new Callback<EpisodeObj>() {
+                            @Override
+                            public void onResponse(Call<EpisodeObj> call, Response<EpisodeObj> response) {
+
+                                Integer episodeID = response.body().getEpisode().getEpisodeId();
+
+                                api.generateToken("unwatch/" + episodeID);
+                                APIInterface apii = api.getInterface();
+                                Call<VideoObj> ucall = apii.unwatch(api.getToken(), api.getUserAgent(), episodeID, api.getSession());
+                                ucall.enqueue(new Callback<VideoObj>() {
+                                    @Override
+                                    public void onResponse(Call<VideoObj> call, Response<VideoObj> response) {
+
+                                        TextView titleGerView = (TextView) view.findViewById(R.id.episodeTitleGer);
+                                        if (!Settings.of(getApplicationContext()).isDarkTheme())
+                                            titleGerView.setTextColor(ContextCompat.getColor(getApplicationContext(), android.R.color.black));
+
+                                        ImageView fav1 = (ImageView) view.findViewById(R.id.watchedImageView);
+                                        fav1.setImageDrawable(null);
+                                    }
+
+                                    @Override
+                                    public void onFailure(Call<VideoObj> call, Throwable t) {
+
+                                    }
+                                });
+                            }
+
+                            @Override
+                            public void onFailure(Call<EpisodeObj> call, Throwable t) {
+
+                            }
+                        });
+                    }
+                })
+        );
+
+        showSeason(1);
+    }
+
+    private void setupHosterList() {
+        LinearLayoutManager llm = new LinearLayoutManager(getApplicationContext(), LinearLayoutManager.VERTICAL, false);
+        hosterRecyclerView.setLayoutManager(llm);
+        hosterAdapter = new HosterRecyclerAdapter();
+        hosterRecyclerView.setAdapter(hosterAdapter);
+        hosterRecyclerView.addOnItemTouchListener(
+                new RecyclerItemClickListener(getApplicationContext(), hosterRecyclerView, new RecyclerItemClickListener.OnItemClickListener() {
+                    @Override
+                    public void onItemClick(View view, int position) {
+
+                        if (Settings.of(getApplicationContext()).alarmOnMobile() &&
+                                AndroidUtility.isOnMobile(getApplicationContext())) {
+
+                            DialogBuilder.start(TabletShowActivity.this)
+                                    .title("Mobile Daten")
+                                    .content("Achtung! Du bist über mobile Daten im Internet. Willst du Fortfahren?")
+                                    .positive("Weiter", dialog -> {
+                                        TextView idView = (TextView) view.findViewById(R.id.linkId);
+                                        showVideo(Integer.parseInt(idView.getText().toString()));
+                                    })
+                                    .negative("Abbrechen")
+                                    .build()
+                                    .show();
+
+                        } else {
+                            TextView idView = (TextView) view.findViewById(R.id.linkId);
+                            showVideo(Integer.parseInt(idView.getText().toString()));
+                        }
+                    }
+
+                    @Override
+                    public void onLongItemClick(View view, int position) {
+
+                    }
+                })
+        );
+
+        showEpisode(1, 1);
     }
 
     private void refreshSeries(SeasonObj seasonObj) {
@@ -296,79 +413,26 @@ public class TabletShowActivity extends ActivityBase {
 
 
         for (int i = 1; i <= show.getSeasonCount(); i++) {
-            seasonListItems.add(new SeasonListItem(i));
+            seasons.add(new SeasonListItem(i));
         }
 
         seasonsListView.setAdapter(new SeasonsListAdapter());
+        seasonsListView.setOnItemClickListener((parent, view, position, id) -> {
+            showSeason(Integer.parseInt(((TextView) view.findViewById(R.id.seasonId)).getText().toString()));
+        });
     }
 
     private void refreshEpisodesList() {
-        ArrayAdapter<EpisodeListItem> adapter = new EpisodesListAdapter();
-        episodesListView.setAdapter(adapter);
-
-        Integer numOfItems = adapter.getCount();
-
-        Integer totalItemsHeigt = 0;
-        for (int pos = 0; pos < numOfItems; pos++) {
-            View item = adapter.getView(pos, null, episodesListView);
-            item.measure(0, 0);
-            totalItemsHeigt += item.getMeasuredHeight();
-        }
-
-        Integer totalDividersHeight = episodesListView.getDividerHeight() * (numOfItems - 1);
-        ViewGroup.LayoutParams params = episodesListView.getLayoutParams();
-        params.height = totalItemsHeigt + totalDividersHeight;
-        episodesListView.setLayoutParams(params);
-        episodesListView.requestLayout();
+        episodesAdapter.replaceAll(episodes);
     }
 
     private void refreshHosterList() {
-        hosterListView.setAdapter(new HosterListAdpter());
-
-        /*hosterListView.setOnItemClickListener((parent, view, position, id) -> {
-
-            if (Settings.of(getApplicationContext()).alarmOnMobile() &&
-                    AndroidUtility.isOnMobile(getApplicationContext())) {
-
-                DialogBuilder.start(TabletShowActivity.this)
-                        .title("Mobile Daten")
-                        .content("Achtung! Du bist über mobile Daten im Internet. Willst du Fortfahren?")
-                        .positive("Weiter", dialog -> {
-                            TextView idView = (TextView) view.findViewById(R.id.linkId);
-                            showVideo(Integer.parseInt(idView.getText().toString()));
-                        })
-                        .negative("Abbrechen")
-                        .build()
-                        .show();
-
-            } else {
-                TextView idView = (TextView) view.findViewById(R.id.linkId);
-                showVideo(Integer.parseInt(idView.getText().toString()));
-            }
-        });*/
+        hosterAdapter.replaceAll(hosters);
     }
 
-    private void showVideo(Integer id) {
 
-        API api = new API();
-        api.setSession(userSession);
-        api.generateToken("watch/" + id);
-        APIInterface apii = api.getInterface();
-        Call<VideoObj> call = apii.watch(api.getToken(), api.getUserAgent(), id, api.getSession());
-        call.enqueue(new Callback<VideoObj>() {
-            @Override
-            public void onResponse(Call<VideoObj> call, Response<VideoObj> response) {
-                VideoObj videoObj = response.body();
 
-                new getVideo(videoObj).execute();
-            }
-
-            @Override
-            public void onFailure(Call<VideoObj> call, Throwable t) {
-
-            }
-        });
-    }
+    /* Fav functions */
 
     private boolean isFav() {
 
@@ -515,130 +579,27 @@ public class TabletShowActivity extends ActivityBase {
         }
     }
 
-    private class SeasonsListAdapter extends ArrayAdapter<SeasonListItem> {
 
-        SeasonsListAdapter() {
-            super(getApplicationContext(), R.layout.list_item_seasons, seasonListItems);
-        }
+    private void showVideo(Integer id) {
 
-        @NonNull
-        @Override
-        public View getView(int pos, View view, @NonNull ViewGroup parent) {
-            if (view == null) {
-                view = getLayoutInflater().inflate(R.layout.list_item_seasons, parent, false);
+        API api = new API();
+        api.setSession(userSession);
+        api.generateToken("watch/" + id);
+        APIInterface apii = api.getInterface();
+        Call<VideoObj> call = apii.watch(api.getToken(), api.getUserAgent(), id, api.getSession());
+        call.enqueue(new Callback<VideoObj>() {
+            @Override
+            public void onResponse(Call<VideoObj> call, Response<VideoObj> response) {
+                VideoObj videoObj = response.body();
+
+                new getVideo(videoObj).execute();
             }
 
-            view.findViewById(R.id.listItemContainer).setBackground(getResources().getDrawable(theme().listItemBackground));
+            @Override
+            public void onFailure(Call<VideoObj> call, Throwable t) {
 
-            SeasonListItem current = seasonListItems.get(pos);
-
-            TextView label = (TextView) view.findViewById(R.id.seasonLabel);
-            label.setText(getString(R.string.season) + current.getSeasonId());
-
-            TextView urlText = (TextView) view.findViewById(R.id.seasonId);
-            urlText.setText(current.getSeasonId().toString());
-
-            return view;
-        }
-    }
-
-    private class EpisodesListAdapter extends ArrayAdapter<EpisodeListItem>
-            implements AdapterView.OnItemClickListener, AdapterView.OnItemLongClickListener {
-
-        EpisodesListAdapter() {
-            super(getApplicationContext(), R.layout.list_item_episodes, episodeListItems);
-        }
-
-        @NonNull
-        @Override
-        public View getView(int pos, View view, @NonNull ViewGroup parent) {
-            if (view == null) {
-                view = getLayoutInflater().inflate(R.layout.list_item_episodes, parent, false);
             }
-
-            view.findViewById(R.id.listItemContainer).setBackground(getResources().getDrawable(theme().listItemBackground));
-
-            EpisodeListItem current = episodeListItems.get(pos);
-
-            TextView titleGerView = (TextView) view.findViewById(R.id.episodeTitleGer);
-            titleGerView.setText((pos + 1) + " " + current.getTitleGer());
-            if (!Settings.of(getContext()).themeName().contains("_DARK"))
-                titleGerView.setTextColor(ContextCompat.getColor(getContext(), current.isWatched() ? android.R.color.darker_gray : android.R.color.black));
-
-            String enTitle = current.getTitle();
-            if (enTitle.equals(""))
-                view.findViewById(R.id.episodeTitle).setVisibility(View.GONE);
-            else {
-                ((TextView) view.findViewById(R.id.episodeTitle)).setText(current.getTitle());
-            }
-
-            ((TextView) view.findViewById(R.id.episodeId)).setText(current.getId().toString());
-
-            ImageView fav = (ImageView) view.findViewById(R.id.watchedImageView);
-            if (current.isWatched())
-                if (!Settings.of(getContext()).themeName().contains("_DARK"))
-                    fav.setImageDrawable(ContextCompat.getDrawable(getContext(), R.drawable.ic_watched));
-                else
-                    fav.setImageDrawable(ContextCompat.getDrawable(getContext(), R.drawable.ic_watched_white));
-            else
-                fav.setImageDrawable(null);
-
-            return view;
-        }
-
-        @Override
-        public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
-            EpisodeListItem clickedEpisode = episodeListItems.get(position);
-            ((TextView) findViewById(R.id.episodeName)).setText(clickedEpisode.getTitleGer().equals("") ? clickedEpisode.getTitle() : clickedEpisode.getTitleGer());
-            TextView idView = (TextView) view.findViewById(R.id.episodeId);
-            showEpisode(currentSeason, Integer.parseInt(idView.getText().toString()));
-        }
-
-        @Override
-        public boolean onItemLongClick(AdapterView<?> parent, View view, int position, long id) {
-
-            final TextView idView = (TextView) view.findViewById(R.id.episodeId);
-            Integer selectedEpisode = Integer.parseInt(idView.getText().toString());
-
-            final API api = new API();
-            api.setSession(userSession);
-            api.generateToken("series/" + currentShow + "/" + currentSeason + "/" + selectedEpisode);
-            APIInterface apii = api.getInterface();
-            Call<EpisodeObj> call = apii.getEpisode(api.getToken(), api.getUserAgent(), currentShow, currentSeason, selectedEpisode, api.getSession());
-            call.enqueue(new Callback<EpisodeObj>() {
-                @Override
-                public void onResponse(Call<EpisodeObj> call, Response<EpisodeObj> response) {
-
-                    Integer episodeID = response.body().getEpisode().getEpisodeId();
-
-                    api.generateToken("unwatch/" + episodeID);
-                    APIInterface apii = api.getInterface();
-                    Call<VideoObj> ucall = apii.unwatch(api.getToken(), api.getUserAgent(), episodeID, api.getSession());
-                    ucall.enqueue(new Callback<VideoObj>() {
-                        @Override
-                        public void onResponse(Call<VideoObj> call, Response<VideoObj> response) {
-
-                            TextView titleGerView = (TextView) view.findViewById(R.id.episodeTitleGer);
-                            titleGerView.setTextColor(ContextCompat.getColor(getApplicationContext(), android.R.color.black));
-
-                            ImageView fav1 = (ImageView) view.findViewById(R.id.watchedImageView);
-                            fav1.setImageDrawable(null);
-                        }
-
-                        @Override
-                        public void onFailure(Call<VideoObj> call, Throwable t) {
-
-                        }
-                    });
-                }
-
-                @Override
-                public void onFailure(Call<EpisodeObj> call, Throwable t) {
-
-                }
-            });
-            return true;
-        }
+        });
     }
 
     private class getVideo extends AsyncTask<Void, Void, Void> {
@@ -734,59 +695,290 @@ public class TabletShowActivity extends ActivityBase {
         }
     }
 
-    private class HosterListAdpter extends ArrayAdapter<HosterListItem> implements AdapterView.OnItemClickListener {
 
-        HosterListAdpter() {
-            super(getApplicationContext(), R.layout.list_item_hoster, hosterListItems);
+
+    /* View classes */
+
+    private class SeasonsListAdapter extends ArrayAdapter<SeasonListItem> {
+
+        SeasonsListAdapter() {
+            super(getApplicationContext(), R.layout.list_item_seasons, seasons);
         }
 
-        @Override
         @NonNull
+        @Override
         public View getView(int pos, View view, @NonNull ViewGroup parent) {
             if (view == null) {
-                view = getLayoutInflater().inflate(R.layout.list_item_hoster, parent, false);
+                view = getLayoutInflater().inflate(R.layout.list_item_seasons, parent, false);
             }
 
             view.findViewById(R.id.listItemContainer).setBackground(getResources().getDrawable(theme().listItemBackground));
 
-            HosterListItem current = hosterListItems.get(pos);
+            SeasonListItem current = seasons.get(pos);
 
-            TextView lable = (TextView) view.findViewById(R.id.hosterLabel);
-            lable.setText(current.getHoster());
+            TextView label = (TextView) view.findViewById(R.id.seasonLabel);
+            label.setText(getString(R.string.season) + current.getSeasonId());
 
-            TextView url = (TextView) view.findViewById(R.id.linkId);
-            url.setText(current.getLinkId().toString());
-
-            ImageView fav = (ImageView) view.findViewById(R.id.supImgView);
-            if (!Settings.of(getContext()).themeName().contains("_DARK"))
-                fav.setImageDrawable(ContextCompat.getDrawable(getContext(), current.isSupported() ? R.drawable.ic_ondemand_video : R.drawable.ic_public));
-            else
-                fav.setImageDrawable(ContextCompat.getDrawable(getContext(), current.isSupported() ? R.drawable.ic_ondemand_video_white : R.drawable.ic_public_white));
+            TextView urlText = (TextView) view.findViewById(R.id.seasonId);
+            urlText.setText(current.getSeasonId().toString());
 
             return view;
         }
+    }
+
+    private class EpisodesRecyclerAdapter extends RecyclerView.Adapter<EpisodesRecyclerAdapter.EpisodesViewHolder> {
+
+        Context context = getApplicationContext();
+
+        private final SortedList<EpisodeListItem> list = new SortedList<EpisodeListItem>(EpisodeListItem.class, new SortedList.Callback<EpisodeListItem>() {
+
+            @Override
+            public void onInserted(int position, int count) {
+                notifyItemRangeInserted(position, count);
+            }
+
+            @Override
+            public void onRemoved(int position, int count) {
+                notifyItemRangeRemoved(position, count);
+            }
+
+            @Override
+            public void onMoved(int fromPosition, int toPosition) {
+                notifyItemMoved(fromPosition, toPosition);
+            }
+
+            @Override
+            public void onChanged(int position, int count) {
+                notifyItemRangeChanged(position, count);
+            }
+
+            @Override
+            public int compare(EpisodeListItem o1, EpisodeListItem o2) {
+                return o1.compareTo(o2);
+            }
+
+            @Override
+            public boolean areContentsTheSame(EpisodeListItem oldItem, EpisodeListItem newItem) {
+                return oldItem.getTitle().equals(newItem.getTitle());
+            }
+
+            @Override
+            public boolean areItemsTheSame(EpisodeListItem item1, EpisodeListItem item2) {
+                return item1.hashCode() == item2.hashCode();
+            }
+        });
 
         @Override
-        public void onItemClick(AdapterView<?> parent, final View view, int position, long id) {
-            Context context = getApplicationContext();
+        public EpisodesViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
+            LayoutInflater layoutInflater = LayoutInflater.from(context);
+            ListItemEpisodesBinding binding = ListItemEpisodesBinding.inflate(layoutInflater, parent, false);
+            return new EpisodesViewHolder(binding);
+        }
 
-            if (Settings.of(context).alarmOnMobile() &&
-                    AndroidUtility.isOnMobile(context)) {
+        @Override
+        public void onBindViewHolder(EpisodesViewHolder holder, int position) {
+            EpisodeListItem current = list.get(position);
+            holder.bind(current);
+        }
 
-                DialogBuilder.start(context)
-                        .title("Mobile Daten")
-                        .content("Achtung! Du bist über mobile Daten im Internet. Willst du Fortfahren?")
-                        .positive("Weiter", dialog -> {
-                            TextView idView = (TextView) view.findViewById(R.id.linkId);
-                            showVideo(Integer.parseInt(idView.getText().toString()));
-                        })
-                        .negative("Abbrechen")
-                        .build()
-                        .show();
+        @Override
+        public int getItemCount() {
+            return list.size();
+        }
 
-            } else {
-                TextView idView = (TextView) view.findViewById(R.id.linkId);
-                showVideo(Integer.parseInt(idView.getText().toString()));
+        void add(EpisodeListItem model) {
+            list.add(model);
+        }
+
+        void remove(EpisodeListItem model) {
+            list.remove(model);
+        }
+
+        void add(List<EpisodeListItem> models) {
+            list.addAll(models);
+        }
+
+        void remove(List<EpisodeListItem> models) {
+            list.beginBatchedUpdates();
+            models.forEach(list::remove);
+            list.endBatchedUpdates();
+        }
+
+        void replaceAll(List<EpisodeListItem> models) {
+            list.beginBatchedUpdates();
+            for (int i = list.size() - 1; i >= 0; i--) {
+                final EpisodeListItem model = list.get(i);
+                    list.remove(model);
+            }
+            list.addAll(models);
+            list.endBatchedUpdates();
+            Log.d("BSTV", String.valueOf(list.size()));
+        }
+
+        class EpisodesViewHolder extends RecyclerView.ViewHolder {
+
+            ListItemEpisodesBinding binding;
+
+            EpisodesViewHolder(ListItemEpisodesBinding binding) {
+                super(binding.getRoot());
+                this.binding = binding;
+            }
+
+            public void bind(EpisodeListItem item) {
+                binding.setEpisode(item);
+
+                View root = binding.getRoot();
+
+                boolean isDark = Settings.of(context).isDarkTheme();
+
+                root.findViewById(R.id.listItemContainer)
+                        .setBackground(ContextCompat.getDrawable(context, theme().listItemBackground));
+
+                if (!isDark) {
+                    ((TextView) root.findViewById(R.id.episodeTitleGer))
+                            .setTextColor(ContextCompat.getColor(context, item.isWatched() ?
+                                    android.R.color.darker_gray : android.R.color.black));
+                } else {
+                    ((TextView) root.findViewById(R.id.episodeTitleGer))
+                            .setTextColor(ContextCompat.getColor(context, android.R.color.darker_gray));
+                    ((TextView) root.findViewById(R.id.episodeTitle))
+                            .setTextColor(ContextCompat.getColor(context, android.R.color.darker_gray));
+                }
+
+
+                if (item.isWatched())
+                    ((ImageView) root.findViewById(R.id.watchedImageView))
+                            .setImageDrawable(ContextCompat.getDrawable(context, isDark ?
+                                    R.drawable.ic_watched_white : R.drawable.ic_watched));
+                else
+                    ((ImageView) root.findViewById(R.id.watchedImageView))
+                            .setImageDrawable(null);
+
+                binding.executePendingBindings();
+            }
+        }
+    }
+
+    private class HosterRecyclerAdapter extends RecyclerView.Adapter<HosterRecyclerAdapter.HosterViewHolder> {
+
+        Context context = getApplicationContext();
+
+        private final SortedList<HosterListItem> list = new SortedList<HosterListItem>(HosterListItem.class, new SortedList.Callback<HosterListItem>() {
+
+            @Override
+            public void onInserted(int position, int count) {
+                notifyItemRangeInserted(position, count);
+            }
+
+            @Override
+            public void onRemoved(int position, int count) {
+                notifyItemRangeRemoved(position, count);
+            }
+
+            @Override
+            public void onMoved(int fromPosition, int toPosition) {
+                notifyItemMoved(fromPosition, toPosition);
+            }
+
+            @Override
+            public void onChanged(int position, int count) {
+                notifyItemRangeChanged(position, count);
+            }
+
+            @Override
+            public int compare(HosterListItem o1, HosterListItem o2) {
+                return o1.compareTo(o2);
+            }
+
+            @Override
+            public boolean areContentsTheSame(HosterListItem oldItem, HosterListItem newItem) {
+                return oldItem.getHoster().equals(newItem.getHoster());
+            }
+
+            @Override
+            public boolean areItemsTheSame(HosterListItem item1, HosterListItem item2) {
+                return item1.hashCode() == item2.hashCode();
+            }
+        });
+
+        @Override
+        public HosterRecyclerAdapter.HosterViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
+            LayoutInflater layoutInflater = LayoutInflater.from(getApplicationContext());
+            ListItemHosterBinding binding = ListItemHosterBinding.inflate(layoutInflater, parent, false);
+            return new HosterViewHolder(binding);
+        }
+
+        @Override
+        public void onBindViewHolder(HosterViewHolder holder, int position) {
+            HosterListItem current = list.get(position);
+            holder.bind(current);
+        }
+
+        @Override
+        public int getItemCount() {
+            return list.size();
+        }
+
+        void add(HosterListItem model) {
+            list.add(model);
+        }
+
+        void remove(HosterListItem model) {
+            list.remove(model);
+        }
+
+        void add(List<HosterListItem> models) {
+            list.addAll(models);
+        }
+
+        void remove(List<HosterListItem> models) {
+            list.beginBatchedUpdates();
+            models.forEach(list::remove);
+            list.endBatchedUpdates();
+        }
+
+        void replaceAll(List<HosterListItem> models) {
+            list.beginBatchedUpdates();
+            for (int i = list.size() - 1; i >= 0; i--) {
+                final HosterListItem model = list.get(i);
+                list.remove(model);
+            }
+            list.addAll(models);
+            list.endBatchedUpdates();
+            Log.d("BSTV", String.valueOf(list.size()));
+        }
+
+        class HosterViewHolder extends RecyclerView.ViewHolder {
+
+            ListItemHosterBinding binding;
+
+            HosterViewHolder(ListItemHosterBinding binding) {
+                super(binding.getRoot());
+                this.binding = binding;
+            }
+
+            public void bind(HosterListItem item) {
+                binding.setHoster(item);
+
+                View root = binding.getRoot();
+                boolean isDark = Settings.of(context).isDarkTheme();
+
+                root.findViewById(R.id.listItemContainer).setBackground(ContextCompat.getDrawable(context, theme().listItemBackground));
+
+                if (isDark)
+                    ((TextView) root.findViewById(R.id.hosterLabel))
+                            .setTextColor(ContextCompat.getColor(context, android.R.color.darker_gray));
+
+                if (item.isSupported())
+                    ((ImageView) root.findViewById(R.id.supImgView))
+                            .setImageDrawable(ContextCompat.getDrawable(context, isDark ?
+                                    R.drawable.ic_ondemand_video_white : R.drawable.ic_ondemand_video));
+                else
+                    ((ImageView) root.findViewById(R.id.supImgView))
+                            .setImageDrawable(ContextCompat.getDrawable(context, isDark ?
+                                    R.drawable.ic_public_white : R.drawable.ic_public));
+
+                binding.executePendingBindings();
             }
         }
     }

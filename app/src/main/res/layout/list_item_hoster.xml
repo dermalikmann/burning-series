@@ -1,50 +1,63 @@
-<LinearLayout
-    xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:app="http://schemas.android.com/apk/res-auto"
-    android:orientation="vertical"
-    android:layout_width="fill_parent"
-    android:layout_height="fill_parent"
-    android:paddingBottom="5dp"
-    android:paddingEnd="7dp"
-    android:paddingLeft="7dp"
-    android:paddingRight="7dp"
-    android:paddingStart="7dp"
-    android:paddingTop="5dp">
+<layout xmlns:tools="http://schemas.android.com/tools">
+
+    <data>
+
+        <variable
+            name="hoster"
+            type="de.m4lik.burningseries.ui.listitems.HosterListItem"/>
+
+    </data>
 
     <LinearLayout
-        android:id="@+id/listItemContainer"
+        xmlns:android="http://schemas.android.com/apk/res/android"
+        xmlns:app="http://schemas.android.com/apk/res-auto"
         android:layout_width="fill_parent"
-        android:layout_height="wrap_content"
-        android:background="@drawable/list_item_background_light"
-        android:orientation="horizontal"
-        android:padding="15dp">
+        android:layout_height="fill_parent"
+        android:orientation="vertical"
+        android:paddingBottom="5dp"
+        android:paddingEnd="7dp"
+        android:paddingLeft="7dp"
+        android:paddingRight="7dp"
+        android:paddingStart="7dp"
+        android:paddingTop="5dp">
 
-        <ImageView
-            android:id="@+id/supImgView"
-            android:layout_width="25dp"
-            android:layout_height="25dp"
-            android:layout_gravity="center_vertical"
-            android:layout_marginEnd="10dp"
-            android:layout_marginRight="10dp"
-            app:srcCompat="@drawable/ic_ondemand_video"/>
-
-        <TextView
-            android:id="@+id/hosterLabel"
-            android:layout_width="wrap_content"
+        <LinearLayout
+            android:id="@+id/listItemContainer"
+            android:layout_width="fill_parent"
             android:layout_height="wrap_content"
-            android:layout_gravity="center_vertical"
-            android:layout_marginBottom="0dp"
-            android:layout_marginLeft="5dp"
-            android:text="seasonLabel"
-            android:textAppearance="?android:attr/textAppearanceMedium"
-            />
+            android:background="@drawable/list_item_background_light"
+            android:orientation="horizontal"
+            android:padding="15dp">
 
-        <TextView
-            android:id="@+id/linkId"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:visibility="gone"/>
+            <ImageView
+                android:id="@+id/supImgView"
+                android:layout_width="25dp"
+                android:layout_height="25dp"
+                android:layout_gravity="center_vertical"
+                android:layout_marginEnd="10dp"
+                android:layout_marginRight="10dp"
+                app:srcCompat="@drawable/ic_ondemand_video"/>
+
+            <TextView
+                android:id="@+id/hosterLabel"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_gravity="center_vertical"
+                android:layout_marginBottom="0dp"
+                android:layout_marginLeft="5dp"
+                android:text="@{hoster.hoster}"
+                android:textAppearance="?android:attr/textAppearanceMedium"
+                tools:text="Hoster Name"/>
+
+            <TextView
+                android:id="@+id/linkId"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="@{String.valueOf(hoster.linkId)}"
+                android:visibility="gone"/>
+
+        </LinearLayout>
 
     </LinearLayout>
 
-</LinearLayout>
+</layout>

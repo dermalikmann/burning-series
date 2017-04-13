@@ -18,8 +18,8 @@ public class ShowListItem {
         this.fav = fav;
     }
 
-    public static int compareTo(ShowListItem a, ShowListItem b) {
-        return a.getTitle().compareTo(b.getTitle());
+    public int compareTo(ShowListItem item) {
+        return this.getTitle().compareTo(item.getTitle());
     }
 
     public Integer getId() {

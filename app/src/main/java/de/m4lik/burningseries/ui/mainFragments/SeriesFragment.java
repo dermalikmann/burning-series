@@ -121,7 +121,7 @@ public class SeriesFragment extends Fragment {
 
                         ImageView fav = (ImageView) view.findViewById(R.id.favImageView);
 
-                        if (!Settings.of(getActivity()).themeName().contains("_DARK"))
+                        if (!Settings.of(getActivity()).isDarkTheme())
                             fav.setImageDrawable(ContextCompat.getDrawable(getActivity(),
                                     !isFav ? R.drawable.ic_star : R.drawable.ic_star_border));
                         else
@@ -423,7 +423,7 @@ public class SeriesFragment extends Fragment {
 
             @Override
             public int compare(ShowListItem o1, ShowListItem o2) {
-                return ShowListItem.compareTo(o1, o2);
+                return o1.compareTo(o2);
             }
 
             @Override
@@ -513,7 +513,7 @@ public class SeriesFragment extends Fragment {
                 }
 
                 item.loaded = true;
-                if (!Settings.of(getActivity()).themeName().contains("_DARK"))
+                if (!Settings.of(getActivity()).isDarkTheme())
                     ((ImageView) binding.getRoot().findViewById(R.id.favImageView))
                             .setImageDrawable(ContextCompat.getDrawable(getActivity(),
                                     item.isFav() ? R.drawable.ic_star : R.drawable.ic_star_border));

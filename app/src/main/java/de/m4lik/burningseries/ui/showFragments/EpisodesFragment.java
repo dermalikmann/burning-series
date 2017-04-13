@@ -215,11 +215,11 @@ public class EpisodesFragment extends Fragment implements Callback<SeasonObj> {
 
                 root.findViewById(R.id.listItemContainer).setBackground(ContextCompat.getDrawable(getActivity(), theme().listItemBackground));
 
-                if (!Settings.of(getActivity()).themeName().contains("_DARK"))
-                    ((TextView) root.findViewById(R.id.episodeTitle)).setTextColor(ContextCompat.getColor(getActivity(), item.isWatched() ? android.R.color.darker_gray : android.R.color.black));
+                if (!Settings.of(getActivity()).isDarkTheme())
+                    ((TextView) root.findViewById(R.id.episodeTitleGer)).setTextColor(ContextCompat.getColor(getActivity(), item.isWatched() ? android.R.color.darker_gray : android.R.color.black));
 
                 if (item.isWatched())
-                    if (!Settings.of(getActivity()).themeName().contains("_DARK"))
+                    if (!Settings.of(getActivity()).isDarkTheme())
                         ((ImageView) root.findViewById(R.id.watchedImageView)).setImageDrawable(ContextCompat.getDrawable(getActivity(), R.drawable.ic_watched));
                     else
                         ((ImageView) root.findViewById(R.id.watchedImageView)).setImageDrawable(ContextCompat.getDrawable(getActivity(), R.drawable.ic_watched_white));

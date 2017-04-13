@@ -36,4 +36,20 @@ public class HosterListItem {
     public Boolean isSupported() {
         return support;
     }
+
+    @Override
+    public int hashCode() {
+        int result = linkid != null ? linkid.hashCode() : 0;
+        result = 31 * result + (hoster != null ? hoster.hashCode() : 0);
+        result = 31 * result + (part != null ? part.hashCode() : 0);
+        return result;
+    }
+
+    public int compareTo(HosterListItem item) {
+        int compare = this.isSupported().compareTo(item.isSupported());
+        if (compare == 0) {
+            compare = this.getHoster().compareTo(item.getHoster());
+        }
+        return compare;
+    }
 }

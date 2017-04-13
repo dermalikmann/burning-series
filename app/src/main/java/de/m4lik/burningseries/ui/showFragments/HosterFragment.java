@@ -288,7 +288,7 @@ public class HosterFragment extends Fragment implements Callback<EpisodeObj> {
             url.setText(current.getLinkId().toString());
 
             ImageView fav = (ImageView) view.findViewById(R.id.supImgView);
-            if (!Settings.of(getActivity().getApplicationContext()).themeName().contains("_DARK"))
+            if (!Settings.of(getActivity().getApplicationContext()).isDarkTheme())
                 fav.setImageDrawable(ContextCompat.getDrawable(getActivity().getApplicationContext(), current.isSupported() ? R.drawable.ic_ondemand_video : R.drawable.ic_public));
             else
                 fav.setImageDrawable(ContextCompat.getDrawable(getActivity().getApplicationContext(), current.isSupported() ? R.drawable.ic_ondemand_video_white : R.drawable.ic_public_white));

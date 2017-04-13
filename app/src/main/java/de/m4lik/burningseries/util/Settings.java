@@ -52,6 +52,10 @@ public class Settings {
         return preferences.getString("pref_theme", Themes.BLUE.name());
     }
 
+    public boolean isDarkTheme() {
+        return themeName().contains("_DARK");
+    }
+
     public boolean alarmOnMobile() {
         return preferences.getBoolean("pref_alarm_on_mobile_data", true);
     }

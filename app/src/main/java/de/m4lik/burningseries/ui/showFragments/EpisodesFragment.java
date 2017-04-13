@@ -14,6 +14,7 @@ import android.widget.ImageView;
 import android.widget.TextView;
 
 import java.util.ArrayList;
+import java.util.List;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
@@ -49,7 +50,7 @@ public class EpisodesFragment extends Fragment implements Callback<SeasonObj> {
     @BindView(R.id.episodesRecyclerView)
     RecyclerView episodesRecyclerView;
 
-    ArrayList<EpisodeListItem> episodesList = new ArrayList<>();
+    List<EpisodeListItem> episodesList = new ArrayList<>();
 
     boolean loaded = false;
 
@@ -174,9 +175,9 @@ public class EpisodesFragment extends Fragment implements Callback<SeasonObj> {
 
     private class EpisodesRecyclerAdapter extends RecyclerView.Adapter<EpisodesRecyclerAdapter.EpisodesViewHolder> {
 
-        ArrayList<EpisodeListItem> list;
+        List<EpisodeListItem> list;
 
-        EpisodesRecyclerAdapter(ArrayList<EpisodeListItem> list) {
+        EpisodesRecyclerAdapter(List<EpisodeListItem> list) {
             this.list = list;
         }
 

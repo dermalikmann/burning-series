@@ -43,10 +43,6 @@ import static de.m4lik.burningseries.services.ThemeHelperService.theme;
  */
 public class GenresFragment extends Fragment {
 
-
-    List<GenreListItem> genresList = new ArrayList<>();
-    List<ShowListItem> seriesList = new ArrayList<>();
-
     @BindView(R.id.genresRecyclerView)
     RecyclerView genresRecyclerView;
 
@@ -189,8 +185,6 @@ public class GenresFragment extends Fragment {
         View rootView = inflater.inflate(R.layout.fragment_genres, container, false);
         ButterKnife.bind(this, rootView);
 
-        genresList = getGenreList();
-
         populateGenreList();
 
         return rootView;
@@ -200,7 +194,7 @@ public class GenresFragment extends Fragment {
         LinearLayoutManager llm = new LinearLayoutManager(getActivity());
         llm.setOrientation(LinearLayoutManager.VERTICAL);
         genresRecyclerView.setLayoutManager(llm);
-        genresRecyclerView.setAdapter(new GenresRecyclerAdapter(genresList));
+        genresRecyclerView.setAdapter(new GenresRecyclerAdapter(getGenreList()));
         genresRecyclerView.addOnItemTouchListener(genreClickListener);
     }
 
@@ -247,10 +241,7 @@ public class GenresFragment extends Fragment {
      */
 
     private void populateSeriesList(String genre) {
-
-        List<ShowListItem> list = getSeriesList(genre);
-
-        genresRecyclerView.setAdapter(new SeriesRecyclerAdapter(list));
+        genresRecyclerView.setAdapter(new SeriesRecyclerAdapter(getSeriesList(genre)));
         genresRecyclerView.removeOnItemTouchListener(genreClickListener);
         genresRecyclerView.addOnItemTouchListener(seriesClickListener);
     }

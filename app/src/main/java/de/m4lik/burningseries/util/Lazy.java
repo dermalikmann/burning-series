@@ -12,6 +12,18 @@ import com.google.common.base.Supplier;
 public abstract class Lazy<T> {
     private T value;
 
+    /**
+     * Creates a new lazy from a supplier.
+     */
+    public static <T> Lazy<T> of(final Supplier<T> supplier) {
+        return new Lazy<T>() {
+            @Override
+            protected T compute() {
+                return supplier.get();
+            }
+        };
+    }
+
     public T get() {
         T result = value;
         if (result == null) {
@@ -27,16 +39,4 @@ public abstract class Lazy<T> {
     }
 
     protected abstract T compute();
-
-    /**
-     * Creates a new lazy from a supplier.
-     */
-    public static <T> Lazy<T> of(final Supplier<T> supplier) {
-        return new Lazy<T>() {
-            @Override
-            protected T compute() {
-                return supplier.get();
-            }
-        };
-    }
 }

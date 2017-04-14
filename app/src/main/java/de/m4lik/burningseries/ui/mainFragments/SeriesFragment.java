@@ -70,6 +70,19 @@ public class SeriesFragment extends Fragment {
         // Required empty public constructor
     }
 
+    private static List<ShowListItem> filter(List<ShowListItem> models, String query) {
+        final String lowerCaseQuery = query.toLowerCase();
+
+        final List<ShowListItem> filteredModelList = new ArrayList<>();
+        for (ShowListItem model : models) {
+            final String text = model.getTitle().toLowerCase();
+            if (text.contains(lowerCaseQuery)) {
+                filteredModelList.add(model);
+            }
+        }
+        return filteredModelList;
+    }
+
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
@@ -86,16 +99,18 @@ public class SeriesFragment extends Fragment {
         ((FastScrollRecyclerView) seriesRecyclerView).setThumbColor(ContextCompat.getColor(getActivity(), theme().primaryColorDark));
         ((FastScrollRecyclerView) seriesRecyclerView).setPopupTextSize(100);
         seriesRecyclerView.addOnItemTouchListener(
-                new RecyclerItemClickListener(getActivity(), seriesRecyclerView ,new RecyclerItemClickListener.OnItemClickListener() {
+                new RecyclerItemClickListener(getActivity(), seriesRecyclerView, new RecyclerItemClickListener.OnItemClickListener() {
 
-                    @Override public void onItemClick(View view, int position) {
+                    @Override
+                    public void onItemClick(View view, int position) {
                         String nameString = ((TextView) view.findViewById(R.id.seriesTitle)).getText().toString();
                         String idString = ((TextView) view.findViewById(R.id.seriesId)).getText().toString();
                         Logger.seriesSelection(getContext(), idString, nameString);
                         showSeries(Integer.parseInt(idString), nameString);
                     }
 
-                    @Override public void onLongItemClick(View view, int position) {
+                    @Override
+                    public void onLongItemClick(View view, int position) {
 
                         SQLiteDatabase db = new MainDBHelper(getContext()).getReadableDatabase();
 
@@ -149,19 +164,6 @@ public class SeriesFragment extends Fragment {
         final List<ShowListItem> filteredModelList = filter(seriesList, query);
         seriesRecyclerAdapter.replaceAll(filteredModelList);
         seriesRecyclerView.scrollToPosition(0);
-    }
-
-    private static List<ShowListItem> filter(List<ShowListItem> models, String query) {
-        final String lowerCaseQuery = query.toLowerCase();
-
-        final List<ShowListItem> filteredModelList = new ArrayList<>();
-        for (ShowListItem model : models) {
-            final String text = model.getTitle().toLowerCase();
-            if (text.contains(lowerCaseQuery)) {
-                filteredModelList.add(model);
-            }
-        }
-        return filteredModelList;
     }
 
     private void fillList() {

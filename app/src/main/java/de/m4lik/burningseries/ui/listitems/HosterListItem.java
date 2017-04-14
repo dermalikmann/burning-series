@@ -10,7 +10,7 @@ public class HosterListItem {
     private Integer part;
     private Boolean support;
 
-    public HosterListItem (Integer linkid, String hoster, Integer part, Boolean support) {
+    public HosterListItem(Integer linkid, String hoster, Integer part, Boolean support) {
         this.linkid = linkid;
         this.hoster = hoster;
         this.part = part;

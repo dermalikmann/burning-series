@@ -97,15 +97,17 @@ public class FavsFragment extends Fragment {
         favsRecyclerView.setLayoutManager(llm);
         favsRecyclerView.setAdapter(new SeriesRecyclerAdapter(favs));
         favsRecyclerView.addOnItemTouchListener(
-                new RecyclerItemClickListener(getActivity(), favsRecyclerView,new RecyclerItemClickListener.OnItemClickListener() {
+                new RecyclerItemClickListener(getActivity(), favsRecyclerView, new RecyclerItemClickListener.OnItemClickListener() {
 
-                    @Override public void onItemClick(View view, int position) {
+                    @Override
+                    public void onItemClick(View view, int position) {
                         TextView idView = (TextView) view.findViewById(R.id.seriesId);
                         TextView nameView = (TextView) view.findViewById(R.id.seriesTitle);
                         showSeries(Integer.parseInt(idView.getText().toString()), nameView.getText().toString());
                     }
 
-                    @Override public void onLongItemClick(View view, int position) {
+                    @Override
+                    public void onLongItemClick(View view, int position) {
 
                     }
                 })
@@ -143,6 +145,7 @@ public class FavsFragment extends Fragment {
             ShowListItem current = list.get(position);
             holder.bind(current);
         }
+
         @Override
         public int getItemCount() {
             return list.size();

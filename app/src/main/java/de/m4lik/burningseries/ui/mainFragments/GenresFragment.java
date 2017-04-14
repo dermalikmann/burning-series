@@ -47,107 +47,23 @@ public class GenresFragment extends Fragment {
     RecyclerView genresRecyclerView;
 
     boolean genreShown = false;
-
-    public GenresFragment() {}
-
-    private class GenresRecyclerAdapter extends RecyclerView.Adapter<GenresRecyclerAdapter.GenresViewHolder> {
-
-        List<GenreListItem> list;
-
-        GenresRecyclerAdapter(List<GenreListItem> list) {
-            this.list = list;
+    private RecyclerItemClickListener seriesClickListener = new RecyclerItemClickListener(getActivity(), genresRecyclerView, new RecyclerItemClickListener.OnItemClickListener() {
+        @Override
+        public void onItemClick(View view, int position) {
+            Intent i = new Intent(getActivity(), ShowActivity.class);
+            if (getContext().getResources().getBoolean(R.bool.isTablet))
+                i = new Intent(getActivity(), TabletShowActivity.class);
+            i.putExtra("ShowName", ((TextView) view.findViewById(R.id.seriesTitle)).getText().toString());
+            i.putExtra("ShowID", ((TextView) view.findViewById(R.id.seriesId)).getText().toString());
+            i.putExtra("ShowGenre", ((TextView) view.findViewById(R.id.seriesGenre)).getText().toString());
+            startActivity(i);
         }
 
         @Override
-        public GenresRecyclerAdapter.GenresViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
-            LayoutInflater layoutInflater = LayoutInflater.from(getActivity());
-            ListItemGenresBinding binding = ListItemGenresBinding.inflate(layoutInflater, parent, false);
-            return new GenresViewHolder(binding);
+        public void onLongItemClick(View view, int position) {
+
         }
-
-        @Override
-        public void onBindViewHolder(GenresRecyclerAdapter.GenresViewHolder holder, int position) {
-            GenreListItem current = list.get(position);
-            holder.bind(current);
-        }
-        @Override
-        public int getItemCount() {
-            return list.size();
-        }
-
-        class GenresViewHolder extends RecyclerView.ViewHolder {
-
-            private final ListItemGenresBinding binding;
-
-            GenresViewHolder(ListItemGenresBinding binding) {
-                super(binding.getRoot());
-                this.binding = binding;
-            }
-
-            public void bind(GenreListItem item) {
-                binding.setGenre(item);
-                binding.getRoot().findViewById(R.id.listItemContainer).setBackground(ContextCompat.getDrawable(getActivity(), theme().listItemBackground));
-                binding.executePendingBindings();
-            }
-        }
-    }
-
-    private class SeriesRecyclerAdapter extends RecyclerView.Adapter<SeriesRecyclerAdapter.SeriesViewHolder> {
-
-        List<ShowListItem> list;
-
-        SeriesRecyclerAdapter(List<ShowListItem> list) {
-            this.list = list;
-        }
-
-        @Override
-        public SeriesRecyclerAdapter.SeriesViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
-            LayoutInflater layoutInflater = LayoutInflater.from(getActivity());
-            ListItemSeriesBinding binding = ListItemSeriesBinding.inflate(layoutInflater, parent, false);
-            return new SeriesViewHolder(binding);
-        }
-
-        @Override
-        public void onBindViewHolder(SeriesRecyclerAdapter.SeriesViewHolder holder, int position) {
-            ShowListItem current = list.get(position);
-            holder.bind(current);
-        }
-        @Override
-        public int getItemCount() {
-            return list.size();
-        }
-
-        class SeriesViewHolder extends RecyclerView.ViewHolder {
-
-            private final ListItemSeriesBinding binding;
-
-            SeriesViewHolder(ListItemSeriesBinding binding) {
-                super(binding.getRoot());
-                this.binding = binding;
-            }
-
-            public void bind(ShowListItem item) {
-                binding.setShow(item);
-                binding.getRoot().findViewById(R.id.listItemContainer).setBackground(ContextCompat.getDrawable(getActivity(), theme().listItemBackground));
-
-                if (!item.loaded && Settings.of(getActivity()).showCovers())
-                    Glide.with(getActivity())
-                            .load(Uri.parse("https://bs.to/public/img/cover/" + item.getId() + ".jpg"))
-                            .into((ImageView) binding.getRoot().findViewById(R.id.coverImage));
-
-                if (!Settings.of(getActivity()).showCovers()) {
-                    binding.getRoot().findViewById(R.id.coverImage).setVisibility(View.GONE);
-                }
-
-                item.loaded = true;
-
-                binding.getRoot().findViewById(R.id.favImageView).setVisibility(View.GONE);
-
-                binding.executePendingBindings();
-            }
-        }
-    }
-
+    });
     private RecyclerItemClickListener genreClickListener = new RecyclerItemClickListener(getActivity(), genresRecyclerView, new RecyclerItemClickListener.OnItemClickListener() {
         @Override
         public void onItemClick(View view, int position) {
@@ -161,23 +77,7 @@ public class GenresFragment extends Fragment {
         }
     });
 
-    private RecyclerItemClickListener seriesClickListener = new RecyclerItemClickListener(getActivity(), genresRecyclerView, new RecyclerItemClickListener.OnItemClickListener() {
-        @Override
-        public void onItemClick(View view, int position) {
-            Intent i = new Intent(getActivity(), ShowActivity.class);
-            if (getContext().getResources().getBoolean(R.bool.isTablet))
-                i = new Intent(getActivity(), TabletShowActivity.class);
-            i.putExtra("ShowName", ((TextView) view.findViewById(R.id.seriesTitle)).getText().toString());
-            i.putExtra("ShowID", ((TextView) view.findViewById(R.id.seriesTitle)).getText().toString());
-            i.putExtra("ShowGenre", ((TextView) view.findViewById(R.id.seriesTitle)).getText().toString());
-            startActivity(i);
-        }
-
-        @Override
-        public void onLongItemClick(View view, int position) {
-
-        }
-    });
+    public GenresFragment() {}
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
@@ -235,11 +135,6 @@ public class GenresFragment extends Fragment {
         return list;
     }
 
-
-    /*
-     * Show Matching Series
-     */
-
     private void populateSeriesList(String genre) {
         genresRecyclerView.setAdapter(new SeriesRecyclerAdapter(getSeriesList(genre)));
         genresRecyclerView.removeOnItemTouchListener(genreClickListener);
@@ -289,6 +184,111 @@ public class GenresFragment extends Fragment {
         db.close();
 
         return list;
+    }
+
+
+    /*
+     * Show Matching Series
+     */
+
+    private class GenresRecyclerAdapter extends RecyclerView.Adapter<GenresRecyclerAdapter.GenresViewHolder> {
+
+        List<GenreListItem> list;
+
+        GenresRecyclerAdapter(List<GenreListItem> list) {
+            this.list = list;
+        }
+
+        @Override
+        public GenresRecyclerAdapter.GenresViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
+            LayoutInflater layoutInflater = LayoutInflater.from(getActivity());
+            ListItemGenresBinding binding = ListItemGenresBinding.inflate(layoutInflater, parent, false);
+            return new GenresViewHolder(binding);
+        }
+
+        @Override
+        public void onBindViewHolder(GenresRecyclerAdapter.GenresViewHolder holder, int position) {
+            GenreListItem current = list.get(position);
+            holder.bind(current);
+        }
+
+        @Override
+        public int getItemCount() {
+            return list.size();
+        }
+
+        class GenresViewHolder extends RecyclerView.ViewHolder {
+
+            private final ListItemGenresBinding binding;
+
+            GenresViewHolder(ListItemGenresBinding binding) {
+                super(binding.getRoot());
+                this.binding = binding;
+            }
+
+            public void bind(GenreListItem item) {
+                binding.setGenre(item);
+                binding.getRoot().findViewById(R.id.listItemContainer).setBackground(ContextCompat.getDrawable(getActivity(), theme().listItemBackground));
+                binding.executePendingBindings();
+            }
+        }
+    }
+
+    private class SeriesRecyclerAdapter extends RecyclerView.Adapter<SeriesRecyclerAdapter.SeriesViewHolder> {
+
+        List<ShowListItem> list;
+
+        SeriesRecyclerAdapter(List<ShowListItem> list) {
+            this.list = list;
+        }
+
+        @Override
+        public SeriesRecyclerAdapter.SeriesViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
+            LayoutInflater layoutInflater = LayoutInflater.from(getActivity());
+            ListItemSeriesBinding binding = ListItemSeriesBinding.inflate(layoutInflater, parent, false);
+            return new SeriesViewHolder(binding);
+        }
+
+        @Override
+        public void onBindViewHolder(SeriesRecyclerAdapter.SeriesViewHolder holder, int position) {
+            ShowListItem current = list.get(position);
+            holder.bind(current);
+        }
+
+        @Override
+        public int getItemCount() {
+            return list.size();
+        }
+
+        class SeriesViewHolder extends RecyclerView.ViewHolder {
+
+            private final ListItemSeriesBinding binding;
+
+            SeriesViewHolder(ListItemSeriesBinding binding) {
+                super(binding.getRoot());
+                this.binding = binding;
+            }
+
+            public void bind(ShowListItem item) {
+                binding.setShow(item);
+                binding.getRoot().findViewById(R.id.listItemContainer).setBackground(ContextCompat.getDrawable(getActivity(), theme().listItemBackground));
+
+                if (!item.loaded && Settings.of(getActivity()).showCovers())
+                    Glide.with(getActivity())
+                            .load(Uri.parse("https://bs.to/public/img/cover/" + item.getId() + ".jpg"))
+                            .into((ImageView) binding.getRoot().findViewById(R.id.coverImage));
+
+                if (!Settings.of(getActivity()).showCovers()) {
+                    binding.getRoot().findViewById(R.id.coverImage).setVisibility(View.GONE);
+                }
+
+                item.loaded = true;
+
+                binding.getRoot().findViewById(R.id.favImageView).setVisibility(View.GONE);
+
+                binding.executePendingBindings();
+            }
+        }
     }
 
 

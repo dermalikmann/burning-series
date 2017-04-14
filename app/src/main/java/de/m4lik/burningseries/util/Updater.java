@@ -193,14 +193,14 @@ public class Updater {
 
     public Observable<Update> check() {
         return Observable.from(endpoints)
-                .flatMap( ep -> check(ep)
-                                    .doOnError(err -> {
-                                        //logger.warn("Could not check for update at {}: {}", ep, err.toString());
-                                        FirebaseCrash.logcat(Log.ERROR, "BSUD", "Error while checking for new version.");
-                                        err.printStackTrace();
-                                        //FirebaseCrash.report(err);
-                                    })
-                                    .onErrorResumeNext(Observable.empty())
+                .flatMap(ep -> check(ep)
+                        .doOnError(err -> {
+                            //logger.warn("Could not check for update at {}: {}", ep, err.toString());
+                            FirebaseCrash.logcat(Log.ERROR, "BSUD", "Error while checking for new version.");
+                            err.printStackTrace();
+                            //FirebaseCrash.report(err);
+                        })
+                        .onErrorResumeNext(Observable.empty())
                 )
                 .take(1);
     }

@@ -97,35 +97,25 @@ public enum Themes {
 
     @StringRes
     public final int title;
-
-    private final String rName;
-
     @ColorRes
     public final int primaryColor;
-
     @ColorRes
     public final int primaryColorDark;
-
     @StyleRes
     public final int basic;
-
     @StyleRes
     public final int noActionBar;
-
     @StyleRes
     public final int fullscreen;
-
     @StyleRes
     public final int translucentStatus;
-
     @StyleRes
     public final int whiteAccent;
-
     @DrawableRes
     public final int gradient;
-
     @DrawableRes
     public final int listItemBackground;
+    private final String rName;
 
     Themes(@StringRes int title,
            String rName,

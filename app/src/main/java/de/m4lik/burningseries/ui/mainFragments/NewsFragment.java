@@ -48,7 +48,7 @@ public class NewsFragment extends Fragment {
 
         new News().fetch();
 
-        return  rootView;
+        return rootView;
     }
 
 
@@ -92,21 +92,6 @@ public class NewsFragment extends Fragment {
 
     class CardViewAdapter extends RecyclerView.Adapter<CardViewAdapter.NewsViewHolder> {
 
-        public class NewsViewHolder extends RecyclerView.ViewHolder {
-
-            CardView cardView;
-            TextView newsTitle;
-            TextView newsDate;
-            TextView newsContent;
-
-            NewsViewHolder(View itemView) {
-                super(itemView);
-                newsTitle = (TextView) itemView.findViewById(R.id.newsTitle);
-                newsDate = (TextView) itemView.findViewById(R.id.newsDate);
-                newsContent = (TextView) itemView.findViewById(R.id.newsContent);
-            }
-        }
-
         @Override
         public int getItemCount() {
             return newsItems.size();
@@ -128,6 +113,21 @@ public class NewsFragment extends Fragment {
         @Override
         public void onAttachedToRecyclerView(RecyclerView recyclerView) {
             super.onAttachedToRecyclerView(recyclerView);
+        }
+
+        public class NewsViewHolder extends RecyclerView.ViewHolder {
+
+            CardView cardView;
+            TextView newsTitle;
+            TextView newsDate;
+            TextView newsContent;
+
+            NewsViewHolder(View itemView) {
+                super(itemView);
+                newsTitle = (TextView) itemView.findViewById(R.id.newsTitle);
+                newsDate = (TextView) itemView.findViewById(R.id.newsDate);
+                newsContent = (TextView) itemView.findViewById(R.id.newsContent);
+            }
         }
     }
 }

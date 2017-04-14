@@ -15,10 +15,17 @@ import retrofit2.converter.gson.GsonConverterFactory;
 
 /**
  * Object class for the API. Used to authorize and starting the API calls.
+ *
  * @author Malik Mann
  */
 
 public class API {
+
+    private static final char[] hexArray;
+
+    static {
+        hexArray = "0123456789abcdef".toCharArray();
+    }
 
     private String session;
     private String token;
@@ -26,14 +33,7 @@ public class API {
     private String userAgent;
     private String pubKey;
     private String verify;
-
-    private static final char[] hexArray;
-
     private APIInterface apiInterface;
-
-    static {
-        hexArray = "0123456789abcdef".toCharArray();
-    }
 
     public API() {
         session = "";
@@ -44,6 +44,22 @@ public class API {
         verify = "FSOGiKFVdaJmJH1axROzqcS8s8jhV3UT";
 
         buildRetrofit();
+    }
+
+    /**
+     * Block encryption via an byte array
+     *
+     * @param byteArray
+     * @return encryptedString
+     */
+    private static String encryption(byte[] byteArray) {
+        char[] cArr = new char[(byteArray.length * 2)];
+        for (int i = 0; i < byteArray.length; i++) {
+            int i2 = byteArray[i] & 255;
+            cArr[i * 2] = hexArray[i2 >>> 4];
+            cArr[(i * 2) + 1] = hexArray[i2 & 15];
+        }
+        return new String(cArr);
     }
 
     /**
@@ -67,6 +83,7 @@ public class API {
     /**
      * Generates a valid token for the current API request.
      * URI has to be without session.
+     *
      * @param uri
      */
     public void generateToken(String uri) {
@@ -86,6 +103,7 @@ public class API {
 
     /**
      * Creates the Hmac Key for the token and encrypts it
+     *
      * @param timestamp
      * @param uri
      * @return encryptedHmacString
@@ -102,21 +120,6 @@ public class API {
         }
     }
 
-    /**
-     * Block encryption via an byte array
-     * @param byteArray
-     * @return encryptedString
-     */
-    private static String encryption(byte[] byteArray) {
-        char[] cArr = new char[(byteArray.length * 2)];
-        for (int i = 0; i < byteArray.length; i++) {
-            int i2 = byteArray[i] & 255;
-            cArr[i * 2] = hexArray[i2 >>> 4];
-            cArr[(i * 2) + 1] = hexArray[i2 & 15];
-        }
-        return new String(cArr);
-    }
-
     /*
      * Getter & Setter
      */
@@ -125,8 +128,16 @@ public class API {
         return session;
     }
 
+    public void setSession(String session) {
+        this.session = session;
+    }
+
     public String getToken() {
         return token;
+    }
+
+    private void setToken(String token) {
+        this.token = token;
     }
 
     public APIInterface getInterface() {
@@ -135,13 +146,5 @@ public class API {
 
     public String getUserAgent() {
         return userAgent;
-    }
-
-    public void setSession(String session) {
-        this.session = session;
-    }
-
-    private void setToken(String token) {
-        this.token = token;
     }
 }

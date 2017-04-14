@@ -26,13 +26,10 @@ public class SingleShotService {
 
     private static final String KEY_ACTIONS = "SingleShotService.actions";
     private static final String KEY_MAP_ACTIONS = "SingleShotService.mapActions";
-
-    private final Gson gson = new Gson();
     final SharedPreferences preferences;
-
-    Map<String, String> timeStringMap;
-
     final Object lock = new Object();
+    private final Gson gson = new Gson();
+    Map<String, String> timeStringMap;
 
 
     @Inject

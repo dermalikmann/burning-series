@@ -22,6 +22,7 @@ import rx.subscriptions.Subscriptions;
  */
 
 public class LooperScheduler extends Scheduler {
+    public static final Scheduler MAIN = new LooperScheduler(Looper.getMainLooper());
     private final Handler handler;
 
     private LooperScheduler(Looper looper) {
@@ -132,6 +133,4 @@ public class LooperScheduler extends Scheduler {
             return unsubscribed;
         }
     }
-
-    public static final Scheduler MAIN = new LooperScheduler(Looper.getMainLooper());
 }

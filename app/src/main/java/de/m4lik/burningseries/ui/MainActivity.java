@@ -123,7 +123,7 @@ public class MainActivity extends ActivityBase
         }
         setSupportActionBar(toolbar);
 
-        if (getApplicationContext().getResources().getBoolean(R.bool.isTablet)){
+        if (getApplicationContext().getResources().getBoolean(R.bool.isTablet)) {
             this.setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_SENSOR_LANDSCAPE);
             isTablet = true;
         } else {
@@ -399,7 +399,7 @@ public class MainActivity extends ActivityBase
                 db.execSQL(SQL_TRUNCATE_GENRES_TABLE);
                 db.close();
 
-                new seriesDatabaseUpdate(response.body()).execute();
+                new SeriesDatabaseUpdate(response.body()).execute();
             }
 
             @Override
@@ -453,11 +453,11 @@ public class MainActivity extends ActivityBase
         });
     }
 
-    private class seriesDatabaseUpdate extends AsyncTask<Void, Void, Void> {
+    private class SeriesDatabaseUpdate extends AsyncTask<Void, Void, Void> {
 
         GenreMap genreMap;
 
-        seriesDatabaseUpdate(GenreMap genreMap) {
+        SeriesDatabaseUpdate(GenreMap genreMap) {
             this.genreMap = genreMap;
         }
 

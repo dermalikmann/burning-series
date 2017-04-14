@@ -34,6 +34,28 @@ public class BusyDialog extends DialogBase {
     @BindView(R.id.text)
     TextView message;
 
+    static public <T> BusyDialogOperator<T> busyDialog(Fragment fragment) {
+        return new BusyDialogOperator<>(fragment.getFragmentManager(), null, null);
+    }
+
+    static public <T> BusyDialogOperator<T> busyDialog(Fragment fragment, String text) {
+        return new BusyDialogOperator<>(fragment.getFragmentManager(), text, null);
+    }
+
+    public static <T> BusyDialogOperator<T> busyDialog(FragmentActivity activity) {
+        return new BusyDialogOperator<>(activity.getSupportFragmentManager(), null, null);
+    }
+
+    public static <T> BusyDialogOperator<T> busyDialog(FragmentActivity activity, String text) {
+        return new BusyDialogOperator<>(activity.getSupportFragmentManager(), text, null);
+    }
+
+    public static <T> BusyDialogOperator<T> busyDialog(FragmentActivity activity, String text,
+                                                       Func1<T, Float> progressMapper) {
+
+        return new BusyDialogOperator<>(activity.getSupportFragmentManager(), text, progressMapper);
+    }
+
     @NonNull
     @Override
     public Dialog onCreateDialog(Bundle savedInstanceState) {
@@ -146,27 +168,5 @@ public class BusyDialog extends DialogBase {
                 }
             };
         }
-    }
-
-    static public <T> BusyDialogOperator<T> busyDialog(Fragment fragment) {
-        return new BusyDialogOperator<>(fragment.getFragmentManager(), null, null);
-    }
-
-    static public <T> BusyDialogOperator<T> busyDialog(Fragment fragment, String text) {
-        return new BusyDialogOperator<>(fragment.getFragmentManager(), text, null);
-    }
-
-    public static <T> BusyDialogOperator<T> busyDialog(FragmentActivity activity) {
-        return new BusyDialogOperator<>(activity.getSupportFragmentManager(), null, null);
-    }
-
-    public static <T> BusyDialogOperator<T> busyDialog(FragmentActivity activity, String text) {
-        return new BusyDialogOperator<>(activity.getSupportFragmentManager(), text, null);
-    }
-
-    public static <T> BusyDialogOperator<T> busyDialog(FragmentActivity activity, String text,
-                                                       Func1<T, Float> progressMapper) {
-
-        return new BusyDialogOperator<>(activity.getSupportFragmentManager(), text, progressMapper);
     }
 }

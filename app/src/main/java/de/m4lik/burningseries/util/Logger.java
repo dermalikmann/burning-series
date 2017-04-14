@@ -14,24 +14,18 @@ import com.google.firebase.analytics.FirebaseAnalytics;
 
 public class Logger {
 
-    private static FirebaseAnalytics firebaseAnalytics;
-
     private static final String EVENT_SERIES_SELECTED = "series_selected";
     private static final String EVENT_GENRE_SELECTED = "genre_selected";
     private static final String EVENT_LOGIN = "login";
     private static final String EVENT_LOGOUT = "logout";
     private static final String EVENT_HOSTER_TIMEOUT = "hoster_timeout";
     private static final String EVENT_VIDEO_NOT_FOUND = "video_not_found";
-
-
-
     private static final String SERIES_ID;
     private static final String SERIES_NAME;
-
     private static final String GENRE_NAME;
-
     private static final String HOSTER_NAME;
     private static final String VIDEO_URL;
+    private static FirebaseAnalytics firebaseAnalytics;
 
     static {
         SERIES_ID = "seriesID";
@@ -39,10 +33,6 @@ public class Logger {
         GENRE_NAME = "genreName";
         HOSTER_NAME = "hosterName";
         VIDEO_URL = "videoURL";
-    }
-
-    public void seriesSelection(Context context, Integer id, String name) {
-        seriesSelection(context, id.toString(), name);
     }
 
     public static void genreSelection(Context context, String genre) {
@@ -71,5 +61,9 @@ public class Logger {
     public static void logout(Context context) {
         firebaseAnalytics = FirebaseAnalytics.getInstance(context);
         firebaseAnalytics.logEvent(EVENT_LOGOUT, new Bundle());
+    }
+
+    public void seriesSelection(Context context, Integer id, String name) {
+        seriesSelection(context, id.toString(), name);
     }
 }

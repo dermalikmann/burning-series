@@ -17,10 +17,6 @@ public class Settings {
 
     private final SharedPreferences preferences;
 
-    public static void initialize(Context context) {
-        PreferenceManager.setDefaultValues(context, R.xml.preferences, false);
-    }
-
     public Settings(Context context) {
         this(PreferenceManager.getDefaultSharedPreferences(context));
     }
@@ -29,12 +25,8 @@ public class Settings {
         this.preferences = preferences;
     }
 
-    public SharedPreferences raw() {
-        return preferences;
-    }
-
-    public SharedPreferences.Editor edit() {
-        return preferences.edit();
+    public static void initialize(Context context) {
+        PreferenceManager.setDefaultValues(context, R.xml.preferences, false);
     }
 
     public static Settings of(Context context) {
@@ -43,6 +35,14 @@ public class Settings {
 
     public static Settings of(SharedPreferences preferences) {
         return new Settings(preferences);
+    }
+
+    public SharedPreferences raw() {
+        return preferences;
+    }
+
+    public SharedPreferences.Editor edit() {
+        return preferences.edit();
     }
 
 
@@ -77,7 +77,7 @@ public class Settings {
     }
 
     public boolean isBetaChannel() {
-        return  preferences.getString("pref_update_channel", "stable").equals("beta");
+        return preferences.getString("pref_update_channel", "stable").equals("beta");
     }
 
     public boolean showCovers() {

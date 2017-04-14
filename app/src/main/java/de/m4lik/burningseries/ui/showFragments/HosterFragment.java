@@ -164,7 +164,7 @@ public class HosterFragment extends Fragment implements Callback<EpisodeObj> {
             public void onResponse(Call<VideoObj> call, Response<VideoObj> response) {
                 VideoObj videoObj = response.body();
 
-                new getVideo(videoObj).execute();
+                new GetVideo(videoObj).execute();
             }
 
             @Override
@@ -174,11 +174,11 @@ public class HosterFragment extends Fragment implements Callback<EpisodeObj> {
         });
     }
 
-    private class getVideo extends AsyncTask<Void, Void, Void> {
+    private class GetVideo extends AsyncTask<Void, Void, Void> {
 
         private VideoObj videoObj;
 
-        getVideo(VideoObj videoObj) {
+        GetVideo(VideoObj videoObj) {
             this.videoObj = videoObj;
         }
 

@@ -21,7 +21,6 @@ import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.ImageView;
@@ -592,7 +591,7 @@ public class TabletShowActivity extends ActivityBase {
             public void onResponse(Call<VideoObj> call, Response<VideoObj> response) {
                 VideoObj videoObj = response.body();
 
-                new getVideo(videoObj).execute();
+                new GetVideo(videoObj).execute();
             }
 
             @Override
@@ -602,18 +601,18 @@ public class TabletShowActivity extends ActivityBase {
         });
     }
 
-    private class getVideo extends AsyncTask<Void, Void, Void> {
+    private class GetVideo extends AsyncTask<Void, Void, Void> {
 
         ProgressDialog progressDialog;
         boolean externalPlayer;
         String hosterReturn;
         private VideoObj videoObj;
 
-        getVideo(VideoObj videoObj) {
+        GetVideo(VideoObj videoObj) {
             this(videoObj, false);
         }
 
-        getVideo(VideoObj videoObj, boolean externalPlayer) {
+        GetVideo(VideoObj videoObj, boolean externalPlayer) {
             this.videoObj = videoObj;
             this.externalPlayer = externalPlayer;
         }
@@ -728,8 +727,6 @@ public class TabletShowActivity extends ActivityBase {
 
     private class EpisodesRecyclerAdapter extends RecyclerView.Adapter<EpisodesRecyclerAdapter.EpisodesViewHolder> {
 
-        Context context = getApplicationContext();
-
         private final SortedList<EpisodeListItem> list = new SortedList<EpisodeListItem>(EpisodeListItem.class, new SortedList.Callback<EpisodeListItem>() {
 
             @Override
@@ -767,6 +764,7 @@ public class TabletShowActivity extends ActivityBase {
                 return item1.hashCode() == item2.hashCode();
             }
         });
+        Context context = getApplicationContext();
 
         @Override
         public EpisodesViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
@@ -808,7 +806,7 @@ public class TabletShowActivity extends ActivityBase {
             list.beginBatchedUpdates();
             for (int i = list.size() - 1; i >= 0; i--) {
                 final EpisodeListItem model = list.get(i);
-                    list.remove(model);
+                list.remove(model);
             }
             list.addAll(models);
             list.endBatchedUpdates();
@@ -861,8 +859,6 @@ public class TabletShowActivity extends ActivityBase {
 
     private class HosterRecyclerAdapter extends RecyclerView.Adapter<HosterRecyclerAdapter.HosterViewHolder> {
 
-        Context context = getApplicationContext();
-
         private final SortedList<HosterListItem> list = new SortedList<HosterListItem>(HosterListItem.class, new SortedList.Callback<HosterListItem>() {
 
             @Override
@@ -900,6 +896,7 @@ public class TabletShowActivity extends ActivityBase {
                 return item1.hashCode() == item2.hashCode();
             }
         });
+        Context context = getApplicationContext();
 
         @Override
         public HosterRecyclerAdapter.HosterViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {

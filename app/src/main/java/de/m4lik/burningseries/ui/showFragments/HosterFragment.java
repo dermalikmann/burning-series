@@ -1,44 +1,44 @@
 package de.m4lik.burningseries.ui.showFragments;
 
 
-import android.app.Dialog;
+import android.app.Fragment;
 import android.app.ProgressDialog;
+import android.content.Context;
 import android.content.Intent;
-import android.content.SharedPreferences;
 import android.net.Uri;
 import android.os.AsyncTask;
 import android.os.Bundle;
-import android.preference.PreferenceManager;
-import android.support.annotation.NonNull;
 import android.support.customtabs.CustomTabsIntent;
 import android.support.design.widget.Snackbar;
-import android.app.Fragment;
 import android.support.v4.content.ContextCompat;
+import android.support.v7.widget.LinearLayoutManager;
+import android.support.v7.widget.RecyclerView;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.AdapterView;
-import android.widget.ArrayAdapter;
 import android.widget.ImageView;
-import android.widget.LinearLayout;
-import android.widget.ListView;
 import android.widget.TextView;
 
 import java.util.ArrayList;
+import java.util.List;
 
-import de.m4lik.burningseries.FullscreenVideoActivity;
+import butterknife.BindView;
+import butterknife.ButterKnife;
 import de.m4lik.burningseries.R;
-import de.m4lik.burningseries.ShowActivity;
 import de.m4lik.burningseries.api.API;
 import de.m4lik.burningseries.api.APIInterface;
 import de.m4lik.burningseries.api.objects.EpisodeObj;
 import de.m4lik.burningseries.api.objects.VideoObj;
+import de.m4lik.burningseries.databinding.ListItemHosterBinding;
 import de.m4lik.burningseries.hoster.Hoster;
+import de.m4lik.burningseries.ui.FullscreenVideoActivity;
+import de.m4lik.burningseries.ui.ShowActivity;
 import de.m4lik.burningseries.ui.dialogs.DialogBuilder;
 import de.m4lik.burningseries.ui.listitems.HosterListItem;
 import de.m4lik.burningseries.util.AndroidUtility;
 import de.m4lik.burningseries.util.Settings;
+import de.m4lik.burningseries.util.listeners.RecyclerItemClickListener;
 import retrofit2.Call;
 import retrofit2.Callback;
 import retrofit2.Response;
@@ -50,17 +50,21 @@ import static de.m4lik.burningseries.services.ThemeHelperService.theme;
  */
 public class HosterFragment extends Fragment implements Callback<EpisodeObj> {
 
-    View rootview;
+    View rootView;
 
     Integer selectedShow;
     Integer selectedSeason;
     Integer selectedEpisode;
 
+    String userSession;
+
     ProgressDialog progressDialog;
 
-    ListView hostersListView;
     ArrayList<HosterListItem> hostersList = new ArrayList<>();
     String hosterReturn;
+
+    @BindView(R.id.hosterRecyclerView)
+    RecyclerView hosterRecyclerView;
 
 
     public HosterFragment() {
@@ -71,42 +75,36 @@ public class HosterFragment extends Fragment implements Callback<EpisodeObj> {
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
-        rootview = inflater.inflate(R.layout.fragment_hoster, container, false);
+        rootView = inflater.inflate(R.layout.fragment_hoster, container, false);
+
+        ButterKnife.bind(this, rootView);
 
         selectedShow = ((ShowActivity) getActivity()).getSelectedShow();
         selectedSeason = ((ShowActivity) getActivity()).getSelectedSeason();
         selectedEpisode = ((ShowActivity) getActivity()).getSelectedEpisode();
 
-        LinearLayout epicontainer = (LinearLayout) rootview.findViewById(R.id.hostercontainer);
-        epicontainer.setVisibility(View.GONE);
-
-        SharedPreferences sharedPreferences = PreferenceManager.getDefaultSharedPreferences(getActivity().getApplicationContext());
+        userSession = Settings.of(getActivity()).getUserSession();
 
         API api = new API();
-        api.setSession(sharedPreferences.getString("pref_session", ""));
+        api.setSession(userSession);
         api.generateToken("series/" + selectedShow + "/" + selectedSeason + "/" + selectedEpisode);
         APIInterface apii = api.getInterface();
         Call<EpisodeObj> call = apii.getEpisode(api.getToken(), api.getUserAgent(), selectedShow, selectedSeason, selectedEpisode, api.getSession());
         call.enqueue(this);
 
-
-        hostersListView = (ListView) rootview.findViewById(R.id.hosterListView);
-
-
-        return rootview;
+        return rootView;
     }
 
     @Override
     public void onResponse(Call<EpisodeObj> call, Response<EpisodeObj> response) {
         EpisodeObj episode = response.body();
 
-        LinearLayout epicontainer = (LinearLayout) rootview.findViewById(R.id.hostercontainer);
-        epicontainer.setVisibility(View.VISIBLE);
-
         for (EpisodeObj.Hoster hoster : episode.getHoster())
-            if (Hoster.compatibleHosters.contains(hoster.getHoster())) hostersList.add(new HosterListItem(hoster.getLinkId(), hoster.getHoster(), hoster.getPart(), true));
+            if (Hoster.compatibleHosters.contains(hoster.getHoster()))
+                hostersList.add(new HosterListItem(hoster.getLinkId(), hoster.getHoster(), hoster.getPart(), true));
         for (EpisodeObj.Hoster hoster : episode.getHoster())
-            if (!Hoster.compatibleHosters.contains(hoster.getHoster())) hostersList.add(new HosterListItem(hoster.getLinkId(), hoster.getHoster(), hoster.getPart()));
+            if (!Hoster.compatibleHosters.contains(hoster.getHoster()))
+                hostersList.add(new HosterListItem(hoster.getLinkId(), hoster.getHoster(), hoster.getPart()));
 
         refreshList();
     }
@@ -114,66 +112,50 @@ public class HosterFragment extends Fragment implements Callback<EpisodeObj> {
     @Override
     public void onFailure(Call<EpisodeObj> call, Throwable t) {
 
-        Snackbar snackbar = Snackbar.make(rootview, "Fehler beim laden der Hoster.", Snackbar.LENGTH_SHORT);
+        Snackbar snackbar = Snackbar.make(rootView, "Fehler beim laden der Hoster.", Snackbar.LENGTH_SHORT);
         View snackbarView = snackbar.getView();
         snackbarView.setBackgroundColor(ContextCompat.getColor(getActivity().getApplicationContext(), theme().primaryColorDark));
         snackbar.show();
     }
 
     private void refreshList() {
-        ArrayAdapter<HosterListItem> adapter = new hostersListAdapter();
-        hostersListView.setAdapter(adapter);
 
-        Integer numOfItems = adapter.getCount();
+        hosterRecyclerView.setLayoutManager(new LinearLayoutManager(getActivity(), LinearLayoutManager.VERTICAL, false));
+        hosterRecyclerView.setAdapter(new HosterRecyclerAdapter(hostersList));
+        hosterRecyclerView.addOnItemTouchListener(
+                new RecyclerItemClickListener(getActivity(), hosterRecyclerView, new RecyclerItemClickListener.OnItemClickListener() {
+                    @Override
+                    public void onItemClick(View view, int position) {
+                        if (Settings.of(getActivity()).alarmOnMobile() &&
+                                AndroidUtility.isOnMobile(getActivity())) {
 
-        Integer totalItemsHeigt = 0;
-        for (int pos = 0; pos < numOfItems; pos++) {
-            View item = adapter.getView(pos, null, hostersListView);
-            item.measure(0, 0);
-            totalItemsHeigt += item.getMeasuredHeight();
-        }
+                            DialogBuilder.start(getActivity())
+                                    .title("Mobile Daten")
+                                    .content("Achtung! Du bist über mobile Daten im Internet. Willst du Fortfahren?")
+                                    .positive("Weiter", dialog -> {
+                                        TextView idView = (TextView) view.findViewById(R.id.linkId);
+                                        showVideo(Integer.parseInt(idView.getText().toString()));
+                                    })
+                                    .negative("Abbrechen")
+                                    .build()
+                                    .show();
 
-        Integer totalDividersHeight = hostersListView.getDividerHeight() * (numOfItems - 1);
-        ViewGroup.LayoutParams params = hostersListView.getLayoutParams();
-        params.height = totalItemsHeigt + totalDividersHeight;
-        hostersListView.setLayoutParams(params);
-        hostersListView.requestLayout();
+                        } else {
+                            TextView idView = (TextView) view.findViewById(R.id.linkId);
+                            showVideo(Integer.parseInt(idView.getText().toString()));
+                        }
+                    }
 
-        hostersListView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
-            @Override
-            public void onItemClick(AdapterView<?> parent, final View view, int position, long id) {
-
-                if (Settings.of(getActivity().getApplicationContext()).alarmOnMobile() &&
-                        AndroidUtility.isOnMobile(getActivity().getApplicationContext())) {
-
-                    DialogBuilder.start(getActivity())
-                            .title("Mobile Daten")
-                            .content("Achtung! Du bist über mobile Daten im Internet. Willst du Fortfahren?")
-                            .positive("Weiter", new DialogBuilder.OnClickListener() {
-                                @Override
-                                public void onClick(Dialog dialog) {
-                                    TextView idView = (TextView) view.findViewById(R.id.linkId);
-                                    showVideo(Integer.parseInt(idView.getText().toString()));
-                                }
-                            })
-                            .negative("Abbrechen")
-                            .build()
-                            .show();
-
-                } else {
-                    TextView idView = (TextView) view.findViewById(R.id.linkId);
-                    showVideo(Integer.parseInt(idView.getText().toString()));
-                }
-            }
-        });
+                    @Override
+                    public void onLongItemClick(View view, int position) {}
+                })
+        );
     }
 
     private void showVideo(Integer id) {
 
-        SharedPreferences sharedPreferences = PreferenceManager.getDefaultSharedPreferences(getActivity().getApplicationContext());
-
         API api = new API();
-        api.setSession(sharedPreferences.getString("pref_session", ""));
+        api.setSession(userSession);
         api.generateToken("watch/" + id);
         APIInterface apii = api.getInterface();
         Call<VideoObj> call = apii.watch(api.getToken(), api.getUserAgent(), id, api.getSession());
@@ -182,7 +164,7 @@ public class HosterFragment extends Fragment implements Callback<EpisodeObj> {
             public void onResponse(Call<VideoObj> call, Response<VideoObj> response) {
                 VideoObj videoObj = response.body();
 
-                new getVideo(videoObj).execute();
+                new GetVideo(videoObj).execute();
             }
 
             @Override
@@ -192,11 +174,11 @@ public class HosterFragment extends Fragment implements Callback<EpisodeObj> {
         });
     }
 
-    private class getVideo extends AsyncTask<Void, Void, Void> {
+    private class GetVideo extends AsyncTask<Void, Void, Void> {
 
         private VideoObj videoObj;
 
-        getVideo(VideoObj videoObj) {
+        GetVideo(VideoObj videoObj) {
             this.videoObj = videoObj;
         }
 
@@ -230,31 +212,31 @@ public class HosterFragment extends Fragment implements Callback<EpisodeObj> {
 
             switch (hosterReturn) {
                 case "1":
-                    snackbar = Snackbar.make(rootview, "Hoster hat nicht geantwortet.", Snackbar.LENGTH_SHORT);
+                    snackbar = Snackbar.make(rootView, "Hoster hat nicht geantwortet.", Snackbar.LENGTH_SHORT);
                     snackbarView = snackbar.getView();
                     snackbarView.setBackgroundColor(ContextCompat.getColor(getActivity().getApplicationContext(), theme().primaryColorDark));
                     snackbar.show();
                     return;
                 case "2":
-                    snackbar = Snackbar.make(rootview, "Video wurde wahrscheinlich gelöscht.", Snackbar.LENGTH_SHORT);
+                    snackbar = Snackbar.make(rootView, "Video wurde wahrscheinlich gelöscht.", Snackbar.LENGTH_SHORT);
                     snackbarView = snackbar.getView();
                     snackbarView.setBackgroundColor(ContextCompat.getColor(getActivity().getApplicationContext(), theme().primaryColorDark));
                     snackbar.show();
                     return;
                 case "3":
-                    snackbar = Snackbar.make(rootview, "Fehler beim auflösen der Video URL.", Snackbar.LENGTH_SHORT);
+                    snackbar = Snackbar.make(rootView, "Fehler beim auflösen der Video URL.", Snackbar.LENGTH_SHORT);
                     snackbarView = snackbar.getView();
                     snackbarView.setBackgroundColor(ContextCompat.getColor(getActivity().getApplicationContext(), theme().primaryColorDark));
                     snackbar.show();
                     return;
                 case "4":
-                    snackbar = Snackbar.make(rootview, "Hoster hat nicht geantwortet.", Snackbar.LENGTH_SHORT);
+                    snackbar = Snackbar.make(rootView, "Hoster hat nicht geantwortet.", Snackbar.LENGTH_SHORT);
                     snackbarView = snackbar.getView();
                     snackbarView.setBackgroundColor(ContextCompat.getColor(getActivity().getApplicationContext(), theme().primaryColorDark));
                     snackbar.show();
                     return;
                 case "5":
-                    snackbar = Snackbar.make(rootview, "Da ist etwas ganz schief gelaufen. Fehler bitte melden.", Snackbar.LENGTH_SHORT);
+                    snackbar = Snackbar.make(rootView, "Da ist etwas ganz schief gelaufen. Fehler bitte melden.", Snackbar.LENGTH_SHORT);
                     snackbarView = snackbar.getView();
                     snackbarView.setBackgroundColor(ContextCompat.getColor(getActivity().getApplicationContext(), theme().primaryColorDark));
                     snackbar.show();
@@ -274,37 +256,66 @@ public class HosterFragment extends Fragment implements Callback<EpisodeObj> {
         }
     }
 
-    private class hostersListAdapter extends ArrayAdapter<HosterListItem> {
+    private class HosterRecyclerAdapter extends RecyclerView.Adapter<HosterRecyclerAdapter.HosterViewHolder> {
 
-        hostersListAdapter() {
-            super(getActivity().getApplicationContext(), R.layout.list_item_hoster, hostersList);
+        Context context = getActivity();
+
+        List<HosterListItem> list = new ArrayList<>();
+
+        HosterRecyclerAdapter(List<HosterListItem> list) {
+            this.list = list;
         }
 
         @Override
-        @NonNull
-        public View getView(int pos, View view, @NonNull ViewGroup parent) {
-            if (view == null) {
-                view = getActivity().getLayoutInflater().inflate(R.layout.list_item_hoster, parent, false);
+        public HosterRecyclerAdapter.HosterViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
+            LayoutInflater layoutInflater = LayoutInflater.from(getActivity());
+            ListItemHosterBinding binding = ListItemHosterBinding.inflate(layoutInflater, parent, false);
+            return new HosterViewHolder(binding);
+        }
+
+        @Override
+        public void onBindViewHolder(HosterViewHolder holder, int position) {
+            HosterListItem current = list.get(position);
+            holder.bind(current);
+        }
+
+        @Override
+        public int getItemCount() {
+            return list.size();
+        }
+
+        class HosterViewHolder extends RecyclerView.ViewHolder {
+
+            ListItemHosterBinding binding;
+
+            HosterViewHolder(ListItemHosterBinding binding) {
+                super(binding.getRoot());
+                this.binding = binding;
             }
 
-            view.findViewById(R.id.listItemContainer).setBackground(getResources().getDrawable(theme().listItemBackground));
+            public void bind(HosterListItem item) {
+                binding.setHoster(item);
 
-            HosterListItem current = hostersList.get(pos);
+                View root = binding.getRoot();
+                boolean isDark = Settings.of(context).isDarkTheme();
 
-            TextView lable = (TextView) view.findViewById(R.id.hosterLabel);
-            lable.setText(current.getHoster());
+                root.findViewById(R.id.listItemContainer).setBackground(ContextCompat.getDrawable(context, theme().listItemBackground));
 
-            TextView url = (TextView) view.findViewById(R.id.linkId);
-            url.setText(current.getLinkId().toString());
+                if (isDark)
+                    ((TextView) root.findViewById(R.id.hosterLabel))
+                            .setTextColor(ContextCompat.getColor(context, android.R.color.darker_gray));
 
-            ImageView fav = (ImageView) view.findViewById(R.id.supImgView);
-            if (!Settings.of(getActivity().getApplicationContext()).themeName().contains("_DARK"))
-                fav.setImageDrawable(ContextCompat.getDrawable(getActivity().getApplicationContext(), current.isSupported() ? R.drawable.ic_ondemand_video : R.drawable.ic_public));
-            else
-                fav.setImageDrawable(ContextCompat.getDrawable(getActivity().getApplicationContext(), current.isSupported() ? R.drawable.ic_ondemand_video_white : R.drawable.ic_public_white));
+                if (item.isSupported())
+                    ((ImageView) root.findViewById(R.id.supImgView))
+                            .setImageDrawable(ContextCompat.getDrawable(context, isDark ?
+                                    R.drawable.ic_ondemand_video_white : R.drawable.ic_ondemand_video));
+                else
+                    ((ImageView) root.findViewById(R.id.supImgView))
+                            .setImageDrawable(ContextCompat.getDrawable(context, isDark ?
+                                    R.drawable.ic_public_white : R.drawable.ic_public));
 
-            return view;
+                binding.executePendingBindings();
+            }
         }
     }
-
 }

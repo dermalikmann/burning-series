@@ -3,25 +3,34 @@ package de.m4lik.burningseries.ui.mainFragments;
 import android.content.Intent;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
+import android.net.Uri;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
+import android.support.v4.content.ContextCompat;
+import android.support.v7.widget.LinearLayoutManager;
+import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.AdapterView;
-import android.widget.ArrayAdapter;
-import android.widget.ListView;
+import android.widget.ImageView;
 import android.widget.TextView;
+
+import com.bumptech.glide.Glide;
 
 import java.util.ArrayList;
 import java.util.List;
 
+import butterknife.BindView;
+import butterknife.ButterKnife;
 import de.m4lik.burningseries.R;
-import de.m4lik.burningseries.ShowActivity;
-import de.m4lik.burningseries.TabletShowActivity;
 import de.m4lik.burningseries.database.MainDBHelper;
 import de.m4lik.burningseries.database.SeriesContract;
+import de.m4lik.burningseries.databinding.ListItemSeriesBinding;
+import de.m4lik.burningseries.ui.ShowActivity;
+import de.m4lik.burningseries.ui.TabletShowActivity;
 import de.m4lik.burningseries.ui.listitems.ShowListItem;
+import de.m4lik.burningseries.util.Settings;
+import de.m4lik.burningseries.util.listeners.RecyclerItemClickListener;
 
 import static de.m4lik.burningseries.database.SeriesContract.seriesTable.COLUMN_NAME_ISFAV;
 import static de.m4lik.burningseries.database.SeriesContract.seriesTable.COLUMN_NAME_TITLE;
@@ -33,6 +42,9 @@ import static de.m4lik.burningseries.services.ThemeHelperService.theme;
  */
 public class FavsFragment extends Fragment {
 
+    @BindView(R.id.favsRecyclerView)
+    RecyclerView favsRecyclerView;
+
     List<ShowListItem> favs = new ArrayList<>();
 
     public FavsFragment() {}
@@ -42,16 +54,13 @@ public class FavsFragment extends Fragment {
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
         View rootView = inflater.inflate(R.layout.fragment_favs, container, false);
-
-        ListView favsListView = (ListView) rootView.findViewById(R.id.favsListView);
+        ButterKnife.bind(this, rootView);
 
         favs.clear();
 
         MainDBHelper dbHelper = new MainDBHelper(getContext());
         SQLiteDatabase db = dbHelper.getReadableDatabase();
 
-        // Define a projection that specifies which columns from the database
-        // you will actually use after this query.
         String[] projection = {
                 SeriesContract.seriesTable.COLUMN_NAME_ID,
                 COLUMN_NAME_TITLE,
@@ -83,17 +92,26 @@ public class FavsFragment extends Fragment {
 
         c.close();
 
-        ArrayAdapter<ShowListItem> adapter = new seriesListAdapter(favs);
-        favsListView.setAdapter(adapter);
+        LinearLayoutManager llm = new LinearLayoutManager(getActivity());
+        llm.setOrientation(LinearLayoutManager.VERTICAL);
+        favsRecyclerView.setLayoutManager(llm);
+        favsRecyclerView.setAdapter(new SeriesRecyclerAdapter(favs));
+        favsRecyclerView.addOnItemTouchListener(
+                new RecyclerItemClickListener(getActivity(), favsRecyclerView, new RecyclerItemClickListener.OnItemClickListener() {
 
-        favsListView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
-            @Override
-            public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
-                TextView idView = (TextView) view.findViewById(R.id.seriesId);
-                TextView nameView = (TextView) view.findViewById(R.id.seriesTitle);
-                showSeries(Integer.parseInt(idView.getText().toString()), nameView.getText().toString());
-            }
-        });
+                    @Override
+                    public void onItemClick(View view, int position) {
+                        TextView idView = (TextView) view.findViewById(R.id.seriesId);
+                        TextView nameView = (TextView) view.findViewById(R.id.seriesTitle);
+                        showSeries(Integer.parseInt(idView.getText().toString()), nameView.getText().toString());
+                    }
+
+                    @Override
+                    public void onLongItemClick(View view, int position) {
+
+                    }
+                })
+        );
 
         return rootView;
     }
@@ -107,40 +125,60 @@ public class FavsFragment extends Fragment {
         startActivity(i);
     }
 
-    class seriesListAdapter extends ArrayAdapter<ShowListItem> {
+    private class SeriesRecyclerAdapter extends RecyclerView.Adapter<SeriesRecyclerAdapter.SeriesViewHolder> {
 
-        private List<ShowListItem> list;
+        List<ShowListItem> list;
 
-        seriesListAdapter(List<ShowListItem> list) {
-            super(getActivity().getApplicationContext(), R.layout.list_item_favorites, favs);
+        SeriesRecyclerAdapter(List<ShowListItem> list) {
             this.list = list;
         }
 
         @Override
-        public View getView(int pos, View view, ViewGroup parent) {
-            if (view == null) {
-                view = getActivity().getLayoutInflater().inflate(R.layout.list_item_favorites, parent, false);
-            }
-
-            view.findViewById(R.id.listItemContainer).setBackground(getResources().getDrawable(theme().listItemBackground));
-
-            ShowListItem current = list.get(pos);
-
-            TextView title = (TextView) view.findViewById(R.id.seriesTitle);
-            title.setText(current.getTitle());
-
-            TextView genre = (TextView) view.findViewById(R.id.seriesGenre);
-            genre.setText(current.getGenre());
-
-            TextView id = (TextView) view.findViewById(R.id.seriesId);
-            id.setText(current.getId().toString());
-
-            return view;
+        public SeriesRecyclerAdapter.SeriesViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
+            LayoutInflater layoutInflater = LayoutInflater.from(getActivity());
+            ListItemSeriesBinding binding = ListItemSeriesBinding.inflate(layoutInflater, parent, false);
+            return new SeriesViewHolder(binding);
         }
 
         @Override
-        public int getCount() {
-            return list != null ? list.size() : 0;
+        public void onBindViewHolder(SeriesRecyclerAdapter.SeriesViewHolder holder, int position) {
+            ShowListItem current = list.get(position);
+            holder.bind(current);
+        }
+
+        @Override
+        public int getItemCount() {
+            return list.size();
+        }
+
+        class SeriesViewHolder extends RecyclerView.ViewHolder {
+
+            private final ListItemSeriesBinding binding;
+
+            SeriesViewHolder(ListItemSeriesBinding binding) {
+                super(binding.getRoot());
+                this.binding = binding;
+            }
+
+            public void bind(ShowListItem item) {
+                binding.setShow(item);
+                binding.getRoot().findViewById(R.id.listItemContainer).setBackground(ContextCompat.getDrawable(getActivity(), theme().listItemBackground));
+
+                if (!item.loaded && Settings.of(getActivity()).showCovers())
+                    Glide.with(getActivity())
+                            .load(Uri.parse("https://bs.to/public/img/cover/" + item.getId() + ".jpg"))
+                            .into((ImageView) binding.getRoot().findViewById(R.id.coverImage));
+
+                if (!Settings.of(getActivity()).showCovers()) {
+                    binding.getRoot().findViewById(R.id.coverImage).setVisibility(View.GONE);
+                }
+
+                item.loaded = true;
+
+                binding.getRoot().findViewById(R.id.favImageView).setVisibility(View.GONE);
+
+                binding.executePendingBindings();
+            }
         }
     }
 }

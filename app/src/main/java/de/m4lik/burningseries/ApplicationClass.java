@@ -4,8 +4,6 @@ import android.app.Application;
 import android.content.Context;
 import android.os.StrictMode;
 
-import com.google.common.base.Supplier;
-
 import net.danlew.android.joda.JodaTimeAndroid;
 
 import butterknife.ButterKnife;
@@ -39,15 +37,10 @@ public class ApplicationClass extends Application {
     }
 
     final Lazy<AppComponent> appComponent = Lazy.of(
-            new Supplier<AppComponent>() {
-                @Override
-                public AppComponent get() {
-                    return DaggerAppComponent.builder()
-                            .appModule(new AppModule(ApplicationClass.this))
-                            .httpModule(new HttpModule())
-                            .build();
-                }
-            });
+            () -> DaggerAppComponent.builder()
+                    .appModule(new AppModule(ApplicationClass.this))
+                    .httpModule(new HttpModule())
+                    .build());
 
     public ApplicationClass() {
         INSTANCE = this;

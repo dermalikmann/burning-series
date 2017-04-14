@@ -21,6 +21,7 @@ import java.util.Random;
 
 /**
  * Class to manage the implemented hoster.
+ *
  * @author Malik Mann
  */
 
@@ -28,7 +29,6 @@ public class Hoster {
 
     public static final List<String> compatibleHosters = new ArrayList<>();
     private static final String[] userAgents;
-    private int userAgentID;
 
     static {
         compatibleHosters.add("PowerWatch");
@@ -71,6 +71,8 @@ public class Hoster {
                 "Opera/12.80 (Windows NT 5.1; U; en) Presto/2.10.289 Version/12.02"
         };
     }
+
+    private int userAgentID;
 
     public Hoster() {
         userAgentID = -1;

@@ -24,28 +24,6 @@ public class SyncBroadcastReceiver extends WakefulBroadcastReceiver {
 
     private static final long DEFAULT_SYNC_DELAY = standardMinutes(10).getMillis();
 
-    @Override
-    public void onReceive(Context context, Intent intent) {
-
-        Log.d("BSBG", "System says, we shall sync now");
-
-        long syncTime;
-        if (!Settings.of(context).isLoggedIn())
-            syncTime = SystemClock.elapsedRealtime() + standardHours(6).getMillis();
-        else
-            syncTime = getNextSyncTime(context);
-
-        try {
-            scheduleNextSync(context, syncTime);
-        } catch (Exception err) {
-            FirebaseCrash.logcat(Log.ERROR, "BSBG", "YELP!");
-            FirebaseCrash.report(err);
-        }
-
-        Intent service = new Intent(context, SyncIntentService.class);
-        startWakefulService(context, service);
-    }
-
     private static void scheduleNextSync(Context context, long syncTime) {
         AlarmManager alarmManager = (AlarmManager) context.getSystemService(Context.ALARM_SERVICE);
 
@@ -83,5 +61,27 @@ public class SyncBroadcastReceiver extends WakefulBroadcastReceiver {
 
     static SharedPreferences getSyncPrefs(Context context) {
         return context.getSharedPreferences("sync", Context.MODE_PRIVATE);
+    }
+
+    @Override
+    public void onReceive(Context context, Intent intent) {
+
+        Log.d("BSBG", "System says, we shall sync now");
+
+        long syncTime;
+        if (!Settings.of(context).isLoggedIn())
+            syncTime = SystemClock.elapsedRealtime() + standardHours(6).getMillis();
+        else
+            syncTime = getNextSyncTime(context);
+
+        try {
+            scheduleNextSync(context, syncTime);
+        } catch (Exception err) {
+            FirebaseCrash.logcat(Log.ERROR, "BSBG", "YELP!");
+            FirebaseCrash.report(err);
+        }
+
+        Intent service = new Intent(context, SyncIntentService.class);
+        startWakefulService(context, service);
     }
 }

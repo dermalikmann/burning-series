@@ -9,10 +9,11 @@ import android.support.v4.app.FragmentManager;
 
 import java.lang.ref.WeakReference;
 
-//import de.m4lik.burningseries.util.ErrorFormatting;
 import rx.functions.Action1;
 
 import static de.m4lik.burningseries.util.AndroidUtility.checkMainThread;
+
+//import de.m4lik.burningseries.util.ErrorFormatting;
 
 /**
  * Created by Malik on 29.01.2017
@@ -24,17 +25,6 @@ public class ErrorDialog extends DialogFragment {
 
     private static WeakReference<OnErrorDialogHandler> GLOBAL_ERROR_DIALOG_HANDLER;
     private static WeakReference<Throwable> PREVIOUS_ERROR = new WeakReference<>(null);
-
-    public interface OnErrorDialogHandler {
-        /**
-         */
-        //void showErrorDialog(Throwable error, ErrorFormatting.Formatter<?> formatter);
-    }
-
-    public static void setGlobalErrorDialogHandler(OnErrorDialogHandler handler) {
-        checkMainThread();
-        GLOBAL_ERROR_DIALOG_HANDLER = new WeakReference<>(handler);
-    }
 
     public static void unsetGlobalErrorDialogHandler(OnErrorDialogHandler handler) {
         checkMainThread();
@@ -51,6 +41,11 @@ public class ErrorDialog extends DialogFragment {
             return null;
 
         return GLOBAL_ERROR_DIALOG_HANDLER.get();
+    }
+
+    public static void setGlobalErrorDialogHandler(OnErrorDialogHandler handler) {
+        checkMainThread();
+        GLOBAL_ERROR_DIALOG_HANDLER = new WeakReference<>(handler);
     }
 
     @SuppressWarnings("ThrowableResultOfMethodCallIgnored")
@@ -74,16 +69,6 @@ public class ErrorDialog extends DialogFragment {
         } catch (Throwable thr) {
             //TODO: FA/FC event
         }*/
-    }
-
-    @NonNull
-    @Override
-    public Dialog onCreateDialog(Bundle savedInstanceState) {
-        Bundle args = getArguments();
-        return DialogBuilder.start(getActivity())
-                .content(args.getString("content"))
-                .positive()
-                .build();
     }
 
     public static void showErrorString(FragmentManager fragmentManager, String message) {
@@ -125,11 +110,24 @@ public class ErrorDialog extends DialogFragment {
      * Creates the default error callback {@link rx.functions.Action1}
      */
     public static Action1<Throwable> defaultOnError() {
-        return new Action1<Throwable>() {
-            @Override
-            public void call(Throwable error) {
-                //processError(error, getGlobalErrorDialogHandler());
-            }
+        return error -> {
+            //processError(error, getGlobalErrorDialogHandler());
         };
+    }
+
+    @NonNull
+    @Override
+    public Dialog onCreateDialog(Bundle savedInstanceState) {
+        Bundle args = getArguments();
+        return DialogBuilder.start(getActivity())
+                .content(args.getString("content"))
+                .positive()
+                .build();
+    }
+
+    public interface OnErrorDialogHandler {
+        /**
+         */
+        //void showErrorDialog(Throwable error, ErrorFormatting.Formatter<?> formatter);
     }
 }

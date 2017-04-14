@@ -1,11 +1,12 @@
 package de.m4lik.burningseries.ui.showFragments;
 
-import android.os.Bundle;
 import android.app.Fragment;
+import android.os.Bundle;
+import android.support.annotation.NonNull;
+import android.support.design.widget.Snackbar;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.LinearLayout;
 import android.widget.ListView;
@@ -13,17 +14,31 @@ import android.widget.TextView;
 
 import java.util.ArrayList;
 
+import butterknife.BindView;
+import butterknife.ButterKnife;
 import de.m4lik.burningseries.R;
-import de.m4lik.burningseries.ShowActivity;
+import de.m4lik.burningseries.api.API;
+import de.m4lik.burningseries.api.APIInterface;
+import de.m4lik.burningseries.api.objects.SeasonObj;
+import de.m4lik.burningseries.ui.ShowActivity;
 import de.m4lik.burningseries.ui.listitems.SeasonListItem;
+import de.m4lik.burningseries.util.Settings;
+import retrofit2.Call;
+import retrofit2.Callback;
+import retrofit2.Response;
 
 import static de.m4lik.burningseries.services.ThemeHelperService.theme;
 
-public class SeasonsFragment extends Fragment {
+public class SeasonsFragment extends Fragment implements Callback<SeasonObj> {
 
-    View rootview;
+    View rootView;
 
+    @BindView(R.id.seasonsListView)
     ListView seasonsListView;
+
+    @BindView(R.id.descriptionTV)
+    TextView descriptionView;
+
     ArrayList<SeasonListItem> seasonsList = new ArrayList<>();
 
     Boolean loaded = false;
@@ -33,21 +48,38 @@ public class SeasonsFragment extends Fragment {
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
-        rootview = inflater.inflate(R.layout.fragment_seasons, container, false);
+        rootView = inflater.inflate(R.layout.fragment_seasons, container, false);
+        ButterKnife.bind(this, rootView);
 
+        seasonsListView = (ListView) rootView.findViewById(R.id.seasonsListView);
 
-        seasonsListView = (ListView) rootview.findViewById(R.id.seasonsListView);
+        LinearLayout seasonsContainer = (LinearLayout) rootView.findViewById(R.id.seasonscontainer);
+        seasonsContainer.setVisibility(View.VISIBLE);
 
-        LinearLayout seasonscontainer = (LinearLayout) rootview.findViewById(R.id.seasonscontainer);
-        seasonscontainer.setVisibility(View.VISIBLE);
+        Integer selectedShow = ((ShowActivity) getActivity()).getSelectedShow();
 
-        String description = ((ShowActivity) getActivity()).getDescription();
-        Integer count = ((ShowActivity) getActivity()).getSeasonCount();
-        Boolean withSpecials = ((ShowActivity) getActivity()).withSpecials();
+        String userSession = Settings.of(getActivity().getApplicationContext())
+                .getUserSession();
 
-        TextView descriptionView = (TextView) rootview.findViewById(R.id.descriptionTV);
-        descriptionView.setText(description);
-        for (int i = withSpecials ? 0 : 1 ; i <= count; i++) {
+        API api = new API();
+        api.setSession(userSession);
+        api.generateToken("series/" + selectedShow + "/1");
+        APIInterface apii = api.getInterface();
+        Call<SeasonObj> call = apii.getSeason(api.getToken(), api.getUserAgent(), selectedShow, 1, api.getSession());
+        call.enqueue(this);
+
+        return rootView;
+    }
+
+    @Override
+    public void onResponse(Call<SeasonObj> call, Response<SeasonObj> response) {
+        SeasonObj show = response.body();
+
+        descriptionView.setText(show.getSeries().getDescription());
+        Integer seasonCount = show.getSeries().getSeasonCount();
+        Boolean withSpecials = show.getSeries().getMovieCount() != 0;
+
+        for (int i = withSpecials ? 0 : 1; i <= seasonCount; i++) {
             seasonsList.add(new SeasonListItem(i));
         }
 
@@ -55,13 +87,17 @@ public class SeasonsFragment extends Fragment {
             refreshList();
             loaded = true;
         }
+    }
 
-        return rootview;
+    @Override
+    public void onFailure(Call<SeasonObj> call, Throwable t) {
+
+        Snackbar.make(rootView.findViewById(android.R.id.content), "Fehler beim Laden der Seriendetails", Snackbar.LENGTH_SHORT);
     }
 
 
     private void refreshList() {
-        ArrayAdapter<SeasonListItem> adapter = new seasonsListAdapter();
+        ArrayAdapter<SeasonListItem> adapter = new SeasonsListAdapter();
         seasonsListView.setAdapter(adapter);
 
         Integer numOfItems = adapter.getCount();
@@ -79,23 +115,26 @@ public class SeasonsFragment extends Fragment {
         seasonsListView.setLayoutParams(params);
         seasonsListView.requestLayout();
 
-        seasonsListView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
-            @Override
-            public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
-                TextView idView = (TextView) view.findViewById(R.id.seasonId);
-                showSeason(Integer.parseInt(idView.getText().toString()));
-            }
+        seasonsListView.setOnItemClickListener((parent, view, position, id) -> {
+            TextView idView = (TextView) view.findViewById(R.id.seasonId);
+            showSeason(Integer.parseInt(idView.getText().toString()));
         });
     }
 
-    class seasonsListAdapter extends ArrayAdapter<SeasonListItem> {
+    private void showSeason(Integer id) {
+        ((ShowActivity) getActivity()).setSelectedSeason(id);
+        ((ShowActivity) getActivity()).switchSeasonsToEpisodes();
+    }
 
-        seasonsListAdapter() {
+    private class SeasonsListAdapter extends ArrayAdapter<SeasonListItem> {
+
+        SeasonsListAdapter() {
             super(getActivity().getApplicationContext(), R.layout.list_item_seasons, seasonsList);
         }
 
+        @NonNull
         @Override
-        public View getView(int pos, View view, ViewGroup parent) {
+        public View getView(int pos, View view, @NonNull ViewGroup parent) {
             if (view == null) {
                 view = getActivity().getLayoutInflater().inflate(R.layout.list_item_seasons, parent, false);
             }
@@ -115,10 +154,5 @@ public class SeasonsFragment extends Fragment {
 
             return view;
         }
-    }
-
-    private void showSeason(Integer id) {
-        ((ShowActivity) getActivity()).setSelectedSeason(id);
-        ((ShowActivity) getActivity()).switchSeasonsToEpisodes();
     }
 }

@@ -9,6 +9,7 @@ import de.m4lik.burningseries.modules.HttpModule;
 import de.m4lik.burningseries.services.DownloadService;
 import de.m4lik.burningseries.services.NotificationService;
 import de.m4lik.burningseries.services.SyncIntentService;
+import de.m4lik.burningseries.ui.SettingsActivity;
 
 /**
  * Created by Malik on 28.01.2017

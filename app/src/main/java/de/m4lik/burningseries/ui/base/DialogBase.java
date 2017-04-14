@@ -28,7 +28,7 @@ public abstract class DialogBase extends RxAppCompatDialogFragment {
     private Unbinder unbinder;
 
     public final <T> LifecycleTransformer<T> bindToLifecycleAsync() {
-        return (LifecycleTransformer<T>) new AsyncLifecycleTransformer<>(bindToLifecycle());
+        return new AsyncLifecycleTransformer<>(bindToLifecycle());
     }
 
     @Override

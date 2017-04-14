@@ -13,8 +13,8 @@ import javax.inject.Inject;
 import javax.inject.Singleton;
 
 import de.m4lik.burningseries.R;
-import de.m4lik.burningseries.UpdateActivity;
 import de.m4lik.burningseries.services.objects.Update;
+import de.m4lik.burningseries.ui.UpdateActivity;
 import de.m4lik.burningseries.util.Settings;
 
 /**
@@ -38,6 +38,13 @@ public class NotificationService {
         this.context = context;
         this.settings = Settings.of(context);
         this.nm = NotificationManagerCompat.from(context);
+    }
+
+    /**
+     * Creates a new v7 notification buidler
+     */
+    private static NotificationCompat.Builder newNotificationBuilder(Context context) {
+        return new android.support.v7.app.NotificationCompat.Builder(context);
     }
 
     public void showUpdateNotification(Update update) {
@@ -71,16 +78,7 @@ public class NotificationService {
                 .getPendingIntent(0, PendingIntent.FLAG_UPDATE_CURRENT);
     }
 
-
     public void cancelForUpdate() {
         nm.cancel(NOTIFICATION_UPDATE_ID);
-    }
-
-
-    /**
-     * Creates a new v7 notification buidler
-     */
-    private static NotificationCompat.Builder newNotificationBuilder(Context context) {
-        return new android.support.v7.app.NotificationCompat.Builder(context);
     }
 }

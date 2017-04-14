@@ -1,4 +1,4 @@
-package de.m4lik.burningseries;
+package de.m4lik.burningseries.ui;
 
 import android.app.Notification;
 import android.content.Context;
@@ -15,6 +15,9 @@ import android.support.annotation.NonNull;
 import android.support.v4.app.NotificationManagerCompat;
 import android.view.MenuItem;
 
+import de.m4lik.burningseries.ActivityComponent;
+import de.m4lik.burningseries.BuildConfig;
+import de.m4lik.burningseries.R;
 import de.m4lik.burningseries.services.SyncBroadcastReceiver;
 import de.m4lik.burningseries.services.ThemeHelperService;
 import de.m4lik.burningseries.ui.base.ActivityBase;
@@ -41,7 +44,7 @@ public class SettingsActivity extends ActivityBase {
         getSupportActionBar().setDisplayHomeAsUpEnabled(true);
         getSupportActionBar().setDisplayShowHomeEnabled(true);
 
-        if (getApplicationContext().getResources().getBoolean(R.bool.isTablet)){
+        if (getApplicationContext().getResources().getBoolean(R.bool.isTablet)) {
             this.setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_SENSOR_LANDSCAPE);
         } else {
             this.setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_SENSOR_PORTRAIT);
@@ -81,6 +84,10 @@ public class SettingsActivity extends ActivityBase {
     public static class SettingsFragment extends PreferenceFragment
             implements SharedPreferences.OnSharedPreferenceChangeListener {
 
+        private static android.support.v4.app.NotificationCompat.Builder newNotificationBuilder(Context context) {
+            return new android.support.v7.app.NotificationCompat.Builder(context);
+        }
+
         @Override
         public void onCreate(Bundle savedInstanceState) {
             super.onCreate(savedInstanceState);
@@ -107,8 +114,8 @@ public class SettingsActivity extends ActivityBase {
 
             versionpref.setSummary(version);
 
-            userpref.setSummary(Settings.of(context).getUser().equals("") ? "Nicht angemeldet" : Settings.of(context).getUser());
-            sessionpref.setSummary(Settings.of(context).getSession().equals("") ? " " : Settings.of(context).getSession());
+            userpref.setSummary(Settings.of(context).getUserName().equals("") ? "Nicht angemeldet" : Settings.of(context).getUserName());
+            sessionpref.setSummary(Settings.of(context).getUserSession().equals("") ? " " : Settings.of(context).getUserSession());
 
             String category = getArguments().getString("category");
             if (category != null) {
@@ -207,10 +214,6 @@ public class SettingsActivity extends ActivityBase {
                     .unregisterOnSharedPreferenceChangeListener(this);
 
             super.onPause();
-        }
-
-        private static android.support.v4.app.NotificationCompat.Builder newNotificationBuilder(Context context) {
-            return new android.support.v7.app.NotificationCompat.Builder(context);
         }
     }
 }

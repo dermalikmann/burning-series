@@ -26,7 +26,7 @@
 
             <intent
                 android:action="preference://prefcat_behaviour"
-                android:targetClass="de.m4lik.burningseries.SettingsActivity"
+                android:targetClass="de.m4lik.burningseries.ui.SettingsActivity"
                 android:targetPackage="@string/app_id" />
 
             <PreferenceCategory
@@ -54,6 +54,13 @@
                     android:summary="@string/pref_startup_view_summary"
                     android:title="@string/pref_startup_view" />
 
+                <CheckBoxPreference
+                    android:defaultValue="true"
+                    android:key="pref_show_cover_images"
+                    android:summaryOn="@string/pref_show_cover_images_summary_on"
+                    android:summaryOff="@string/pref_show_cover_images_summary_off"
+                    android:title="@string/pref_show_cover_images_title" />
+
             </PreferenceCategory>
 
         </PreferenceScreen>
@@ -66,7 +73,7 @@
 
             <intent
                 android:action="preference://prefcat_update"
-                android:targetClass="de.m4lik.burningseries.SettingsActivity"
+                android:targetClass="de.m4lik.burningseries.ui.SettingsActivity"
                 android:targetPackage="@string/app_id" />
 
             <PreferenceCategory

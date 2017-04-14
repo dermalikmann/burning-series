@@ -1,10 +1,11 @@
-package de.m4lik.burningseries;
+package de.m4lik.burningseries.ui;
 
 import android.os.Bundle;
 import android.support.v4.app.DialogFragment;
 
 import com.f2prateek.dart.InjectExtra;
 
+import de.m4lik.burningseries.ActivityComponent;
 import de.m4lik.burningseries.services.objects.Update;
 import de.m4lik.burningseries.ui.base.ActivityBase;
 import de.m4lik.burningseries.util.Updater;

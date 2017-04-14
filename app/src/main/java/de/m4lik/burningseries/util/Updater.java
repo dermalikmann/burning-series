@@ -22,7 +22,6 @@ import java.io.InputStream;
 import java.io.OutputStream;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.concurrent.Callable;
 
 import de.m4lik.burningseries.AppComponent;
 import de.m4lik.burningseries.BuildConfig;
@@ -38,9 +37,7 @@ import retrofit2.converter.gson.GsonConverterFactory;
 import retrofit2.http.GET;
 import rx.Observable;
 import rx.android.schedulers.AndroidSchedulers;
-import rx.functions.Action1;
 import rx.functions.Actions;
-import rx.functions.Func1;
 import rx.util.async.Async;
 
 import static de.m4lik.burningseries.ui.dialogs.ErrorDialog.defaultOnError;
@@ -103,22 +100,14 @@ public class Updater {
         // install on finish
         final Context appContext = activity.getApplicationContext();
         progress.filter(
-                new Func1<DownloadService.Status, Boolean>() {
-                    @Override
-                    public Boolean call(DownloadService.Status status) {
-                        return status.finished();
-                    }
-                })
-                .flatMap(new Func1<DownloadService.Status, Observable<?>>() {
-                    @Override
-                    public Observable<?> call(DownloadService.Status status) {
-                        try {
-                            install(appContext, status.file);
-                            return Observable.empty();
+                DownloadService.Status::finished)
+                .flatMap(status -> {
+                    try {
+                        install(appContext, status.file);
+                        return Observable.empty();
 
-                        } catch (IOException error) {
-                            return Observable.error(error);
-                        }
+                    } catch (IOException error) {
+                        return Observable.error(error);
                     }
                 })
                 .subscribe(Actions.empty(), defaultOnError());
@@ -135,20 +124,15 @@ public class Updater {
     private static void install(Context context, File apk) throws IOException {
         Log.d("BS-Updater", "Trying to install...");
         Uri uri = Uri.parse("");
-        Log.d("BS-Updater", "1");
         if (Build.VERSION.SDK_INT > Build.VERSION_CODES.M) {
-            Log.d("BS-Updater", "2");
             String provider = BuildConfig.APPLICATION_ID + ".FileProvider";
-            Log.d("BS-Updater", "3");
             try {
                 uri = FileProvider.getUriForFile(context, provider, apk);
             } catch (Exception e) {
                 e.printStackTrace();
             }
         } else {
-            Log.d("BS-Updater", "5");
             File file = new File(context.getExternalCacheDir(), "update.apk");
-            Log.d("BS-Updater", "6");
 
             //TODO: FA event
             try (InputStream input = new FileInputStream(apk)) {
@@ -175,61 +159,43 @@ public class Updater {
 
     private Observable<Update> check(final String endpoint) {
         Log.d("BS-Updater", "Checking for new version");
-        return Async.fromCallable(new Callable<Update>() {
-            @Override
-            public Update call() throws Exception {
-                UpdateApi api = newRestAdapter(endpoint).create(UpdateApi.class);
-                return api.get().execute().body();
-            }
+        return Async.fromCallable(() -> {
+            UpdateApi api = newRestAdapter(endpoint).create(UpdateApi.class);
+            return api.get().execute().body();
         }, BackgroundScheduler.instance()).filter(
-                new Func1<Update, Boolean>() {
-                    @Override
-                    public Boolean call(Update update) {
-                        //TODO: FA event
-                        // filter out if up to date
-                        Log.d("BSUD", "NV: " + update.buildNumber());
-                        return update.buildNumber() > currentVersion;
-                    }
+                update -> {
+                    //TODO: FA event
+                    // filter out if up to date
+                    Log.d("BSUD", "NV: " + update.buildNumber());
+                    return update.buildNumber() > currentVersion;
                 }
-        ).map(new Func1<Update, Update>() {
-            @Override
-            public Update call(Update update) {
-                // rewrite url to make it absolute
-                String apk = update.apk();
-                if (!apk.startsWith("http")) {
-                    apk = Uri.withAppendedPath(Uri.parse(endpoint), apk).toString();
-                }
-
-                //TODO: FA event
-                return ImmutableUpdate.builder()
-                        .buildNumber(update.buildNumber())
-                        .versionName(update.versionName())
-                        .changelog(update.changelog())
-                        .apk(apk)
-                        .build();
+        ).map(update -> {
+            // rewrite url to make it absolute
+            String apk = update.apk();
+            if (!apk.startsWith("http")) {
+                apk = Uri.withAppendedPath(Uri.parse(endpoint), apk).toString();
             }
+
+            //TODO: FA event
+            return ImmutableUpdate.builder()
+                    .buildNumber(update.buildNumber())
+                    .versionName(update.versionName())
+                    .changelog(update.changelog())
+                    .apk(apk)
+                    .build();
         });
     }
 
     public Observable<Update> check() {
         return Observable.from(endpoints)
-                .flatMap(
-                        new Func1<String, Observable<Update>>() {
-                            @Override
-                            public Observable<Update> call(String ep) {
-                                return check(ep)
-                                        .doOnError(new Action1<Throwable>() {
-                                            @Override
-                                            public void call(Throwable err) {
-                                                //logger.warn("Could not check for update at {}: {}", ep, err.toString());
-                                                FirebaseCrash.logcat(Log.ERROR, "BSUD", "Error while checking for new version.");
-                                                err.printStackTrace();
-                                                //FirebaseCrash.report(err);
-                                            }
-                                        })
-                                        .onErrorResumeNext(Observable.<Update>empty());
-                            }
-                        }
+                .flatMap(ep -> check(ep)
+                        .doOnError(err -> {
+                            //logger.warn("Could not check for update at {}: {}", ep, err.toString());
+                            FirebaseCrash.logcat(Log.ERROR, "BSUD", "Error while checking for new version.");
+                            err.printStackTrace();
+                            //FirebaseCrash.report(err);
+                        })
+                        .onErrorResumeNext(Observable.empty())
                 )
                 .take(1);
     }

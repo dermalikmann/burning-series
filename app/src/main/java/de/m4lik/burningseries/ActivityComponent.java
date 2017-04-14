@@ -2,6 +2,13 @@ package de.m4lik.burningseries;
 
 import dagger.Subcomponent;
 import de.m4lik.burningseries.modules.ActivityModule;
+import de.m4lik.burningseries.ui.FullscreenVideoActivity;
+import de.m4lik.burningseries.ui.LoginActivity;
+import de.m4lik.burningseries.ui.MainActivity;
+import de.m4lik.burningseries.ui.SettingsActivity;
+import de.m4lik.burningseries.ui.ShowActivity;
+import de.m4lik.burningseries.ui.StatisticsActivity;
+import de.m4lik.burningseries.ui.TabletShowActivity;
 import de.m4lik.burningseries.ui.dialogs.DownloadUpdateDialog;
 import de.m4lik.burningseries.ui.dialogs.ErrorDialog;
 import de.m4lik.burningseries.ui.dialogs.UpdateDialog;
@@ -29,7 +36,6 @@ public interface ActivityComponent {
     void inject(StatisticsActivity activity);
 
     void inject(TabletShowActivity activity);
-
 
 
     void inject(DownloadUpdateDialog dialog);

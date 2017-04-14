@@ -1,4 +1,4 @@
-package de.m4lik.burningseries;
+package de.m4lik.burningseries.ui;
 
 import android.content.Context;
 import android.content.SharedPreferences;
@@ -18,6 +18,8 @@ import org.jsoup.select.Elements;
 import java.util.ArrayList;
 import java.util.List;
 
+import de.m4lik.burningseries.ActivityComponent;
+import de.m4lik.burningseries.R;
 import de.m4lik.burningseries.ui.base.ActivityBase;
 import de.m4lik.burningseries.ui.listitems.StatsListItem;
 
@@ -26,6 +28,10 @@ import static de.m4lik.burningseries.services.ThemeHelperService.theme;
 public class StatisticsActivity extends ActivityBase {
 
     List<StatsListItem> statsList = new ArrayList<>();
+
+    static SharedPreferences getStatsPrefs(Context context) {
+        return context.getSharedPreferences("stats", Context.MODE_PRIVATE);
+    }
 
     @Override
     protected void injectComponent(ActivityComponent appComponent) {
@@ -41,7 +47,7 @@ public class StatisticsActivity extends ActivityBase {
         getSupportActionBar().setDisplayHomeAsUpEnabled(true);
         getSupportActionBar().setDisplayShowHomeEnabled(true);
 
-        if (getApplicationContext().getResources().getBoolean(R.bool.isTablet)){
+        if (getApplicationContext().getResources().getBoolean(R.bool.isTablet)) {
             this.setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_SENSOR_LANDSCAPE);
         } else {
             this.setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_SENSOR_PORTRAIT);
@@ -62,7 +68,7 @@ public class StatisticsActivity extends ActivityBase {
         statsList.add(new StatsListItem("Links pro Episode", getStatsPrefs(c).getString("lpe", "")));
         statsList.add(new StatsListItem("Links pro Serie", getStatsPrefs(c).getString("lps", "")));
 
-        ((ListView) findViewById(R.id.statsListView)).setAdapter(new statsListViewAdapter());
+        ((ListView) findViewById(R.id.statsListView)).setAdapter(new StatsListViewAdapter());
 
         new Stats().execute();
     }
@@ -131,13 +137,13 @@ public class StatisticsActivity extends ActivityBase {
             statsList.add(new StatsListItem("Links pro Episode", getStatsPrefs(c).getString("lpe", "")));
             statsList.add(new StatsListItem("Links pro Serie", getStatsPrefs(c).getString("lps", "")));
 
-            ((ListView) findViewById(R.id.statsListView)).setAdapter(new statsListViewAdapter());
+            ((ListView) findViewById(R.id.statsListView)).setAdapter(new StatsListViewAdapter());
         }
     }
 
-    private class statsListViewAdapter extends ArrayAdapter<StatsListItem> {
+    private class StatsListViewAdapter extends ArrayAdapter<StatsListItem> {
 
-        statsListViewAdapter() {
+        StatsListViewAdapter() {
             super(getApplicationContext(), R.layout.list_item_stats, statsList);
         }
 
@@ -154,9 +160,5 @@ public class StatisticsActivity extends ActivityBase {
 
             return view;
         }
-    }
-
-    static SharedPreferences getStatsPrefs(Context context) {
-        return context.getSharedPreferences("stats", Context.MODE_PRIVATE);
     }
 }

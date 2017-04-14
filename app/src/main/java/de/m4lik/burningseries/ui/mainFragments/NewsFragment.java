@@ -48,11 +48,11 @@ public class NewsFragment extends Fragment {
 
         new News().fetch();
 
-        return  rootView;
+        return rootView;
     }
 
 
-    class News extends AsyncTask<Void, Void, Void> {
+    private class News extends AsyncTask<Void, Void, Void> {
 
         void fetch() {
             this.execute();
@@ -77,7 +77,7 @@ public class NewsFragment extends Fragment {
                         newsItems.add(new NewsCardItem(id, title, date, content));
                 }
 
-            } catch (Exception e) {
+            } catch (Exception ignore) {
 
             }
 
@@ -91,21 +91,6 @@ public class NewsFragment extends Fragment {
     }
 
     class CardViewAdapter extends RecyclerView.Adapter<CardViewAdapter.NewsViewHolder> {
-
-        public class NewsViewHolder extends RecyclerView.ViewHolder {
-
-            CardView cardView;
-            TextView newsTitle;
-            TextView newsDate;
-            TextView newsContent;
-
-            NewsViewHolder(View itemView) {
-                super(itemView);
-                newsTitle = (TextView) itemView.findViewById(R.id.newsTitle);
-                newsDate = (TextView) itemView.findViewById(R.id.newsDate);
-                newsContent = (TextView) itemView.findViewById(R.id.newsContent);
-            }
-        }
 
         @Override
         public int getItemCount() {
@@ -128,6 +113,21 @@ public class NewsFragment extends Fragment {
         @Override
         public void onAttachedToRecyclerView(RecyclerView recyclerView) {
             super.onAttachedToRecyclerView(recyclerView);
+        }
+
+        public class NewsViewHolder extends RecyclerView.ViewHolder {
+
+            CardView cardView;
+            TextView newsTitle;
+            TextView newsDate;
+            TextView newsContent;
+
+            NewsViewHolder(View itemView) {
+                super(itemView);
+                newsTitle = (TextView) itemView.findViewById(R.id.newsTitle);
+                newsDate = (TextView) itemView.findViewById(R.id.newsDate);
+                newsContent = (TextView) itemView.findViewById(R.id.newsContent);
+            }
         }
     }
 }

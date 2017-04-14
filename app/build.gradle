@@ -1,10 +1,5 @@
 apply plugin: 'com.android.application'
-apply plugin: 'com.neenbedankt.android-apt'
-
-repositories {
-    mavenCentral();
-    jcenter();
-}
+apply plugin: 'me.tatarka.retrolambda'
 
 buildscript {
     repositories {
@@ -13,9 +8,7 @@ buildscript {
     }
 
     dependencies {
-        classpath 'com.google.gms:google-services:3.0.0'
-        classpath 'com.android.tools.build:gradle:2.3.0'
-        classpath 'com.neenbedankt.gradle.plugins:android-apt:1.6'
+        classpath 'me.tatarka:gradle-retrolambda:3.6.0'
     }
 }
 
@@ -52,7 +45,7 @@ android {
         minSdkVersion 19
         targetSdkVersion 25
         versionCode versionBuild
-        versionName "0.10.9"
+        versionName "0.10.10"
         vectorDrawables.useSupportLibrary = true
         //multiDexEnabled true
     }
@@ -108,8 +101,20 @@ android {
         exclude 'META-INF/maven/com.google.dagger/dagger/pom.xml'
         exclude 'META-INF/maven/com.google.dagger/dagger/pom.properties'
     }
+    
+    compileOptions {
+        sourceCompatibility JavaVersion.VERSION_1_8
+        targetCompatibility JavaVersion.VERSION_1_8
+    }
+
+    dataBinding {
+        enabled = true
+    }
+}
+
+retrolambda {
+    incremental true
 }
 
 apply from: "dependencies.gradle"
-
 apply plugin: 'com.google.gms.google-services'

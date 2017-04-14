@@ -14,25 +14,7 @@ import org.immutables.value.Value;
 
 @Value.Immutable
 @Gson.TypeAdapters
-public abstract class Update implements Parcelable{
-
-    public abstract Integer buildNumber();
-    public abstract String versionName();
-    public abstract String changelog();
-    public abstract String apk();
-
-    @Override
-    public int describeContents() {
-        return 0;
-    }
-
-    @Override
-    public void writeToParcel(Parcel dest, int flags) {
-        dest.writeInt(buildNumber());
-        dest.writeString(versionName());
-        dest.writeString(changelog());
-        dest.writeString(apk());
-    }
+public abstract class Update implements Parcelable {
 
     public static final Creator<Update> CREATOR = new Creator<Update>() {
         public Update createFromParcel(Parcel source) {
@@ -48,4 +30,25 @@ public abstract class Update implements Parcelable{
             return new Update[size];
         }
     };
+
+    public abstract Integer buildNumber();
+
+    public abstract String versionName();
+
+    public abstract String changelog();
+
+    public abstract String apk();
+
+    @Override
+    public int describeContents() {
+        return 0;
+    }
+
+    @Override
+    public void writeToParcel(Parcel dest, int flags) {
+        dest.writeInt(buildNumber());
+        dest.writeString(versionName());
+        dest.writeString(changelog());
+        dest.writeString(apk());
+    }
 }

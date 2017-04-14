@@ -19,6 +19,7 @@ import retrofit2.http.Query;
 
 /**
  * Interface for the API
+ *
  * @author Malik Mann
  */
 
@@ -26,6 +27,7 @@ public interface APIInterface {
 
     /**
      * API call for an alphabetically sorted list of ShowObjects
+     *
      * @param token
      * @param userAgent
      * @param session
@@ -38,6 +40,7 @@ public interface APIInterface {
 
     /**
      * API call which returns a map of genre objects.
+     *
      * @param token
      * @param userAgent
      * @param session
@@ -50,6 +53,7 @@ public interface APIInterface {
 
     /**
      * API call for a specific season of an specific show.
+     *
      * @param token
      * @param userAgent
      * @param id
@@ -66,6 +70,7 @@ public interface APIInterface {
 
     /**
      * API call for an specific episode of a specific season of a specific show.
+     *
      * @param token
      * @param userAgent
      * @param id
@@ -85,6 +90,7 @@ public interface APIInterface {
     /**
      * API call for an video object (mark an episode as watched an return the
      * link to the selected hoster).
+     *
      * @param token
      * @param userAgent
      * @param id
@@ -99,6 +105,7 @@ public interface APIInterface {
 
     /**
      * API call to mark a givin episode as not watched.
+     *
      * @param token
      * @param userAgent
      * @param id
@@ -113,6 +120,7 @@ public interface APIInterface {
 
     /**
      * API call for a list of shows that the user marked as favorites.
+     *
      * @param token
      * @param userAgent
      * @param session
@@ -125,6 +133,7 @@ public interface APIInterface {
 
     /**
      * API call to set the User's favorites.
+     *
      * @param token
      * @param userAgent
      * @param ids
@@ -139,6 +148,7 @@ public interface APIInterface {
 
     /**
      * API call to try to log in the user.
+     *
      * @param token
      * @param userAgent
      * @param userName
@@ -154,6 +164,7 @@ public interface APIInterface {
 
     /**
      * API call to try to log out the user.
+     *
      * @param token
      * @param userAgent
      * @param session

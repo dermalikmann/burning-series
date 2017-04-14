@@ -1,35 +1,33 @@
-package de.m4lik.burningseries;
+package de.m4lik.burningseries.ui;
 
 import android.content.ContentValues;
 import android.content.Intent;
-import android.content.SharedPreferences;
 import android.content.pm.ActivityInfo;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.net.Uri;
 import android.os.Bundle;
-import android.preference.PreferenceManager;
 import android.support.design.widget.FloatingActionButton;
-import android.support.design.widget.Snackbar;
 import android.support.v4.content.ContextCompat;
 import android.support.v7.widget.Toolbar;
 import android.util.Log;
 import android.view.MenuItem;
-import android.view.View;
 import android.widget.ImageView;
 
 import com.bumptech.glide.Glide;
 
 import butterknife.BindView;
+import de.m4lik.burningseries.ActivityComponent;
+import de.m4lik.burningseries.R;
 import de.m4lik.burningseries.api.API;
 import de.m4lik.burningseries.api.APIInterface;
-import de.m4lik.burningseries.api.objects.SeasonObj;
 import de.m4lik.burningseries.database.MainDBHelper;
 import de.m4lik.burningseries.database.SeriesContract;
 import de.m4lik.burningseries.ui.base.ActivityBase;
 import de.m4lik.burningseries.ui.showFragments.EpisodesFragment;
 import de.m4lik.burningseries.ui.showFragments.HosterFragment;
 import de.m4lik.burningseries.ui.showFragments.SeasonsFragment;
+import de.m4lik.burningseries.util.Settings;
 import okhttp3.ResponseBody;
 import retrofit2.Call;
 import retrofit2.Callback;
@@ -38,7 +36,7 @@ import retrofit2.Response;
 import static de.m4lik.burningseries.database.SeriesContract.seriesTable;
 import static de.m4lik.burningseries.services.ThemeHelperService.theme;
 
-public class ShowActivity extends ActivityBase implements Callback<SeasonObj> {
+public class ShowActivity extends ActivityBase {
 
     public Integer selectedShow;
     public Integer selectedSeason;
@@ -46,12 +44,10 @@ public class ShowActivity extends ActivityBase implements Callback<SeasonObj> {
     public Integer seasonCount;
     public Boolean withSpecials = false;
     public Boolean fav = false;
-    public View fragmentView;
     @BindView(R.id.fab)
     FloatingActionButton fab;
     String userSession;
     Intent i;
-    private String title;
     private String description;
     private String visibleFragment = "seasons";
 
@@ -78,7 +74,7 @@ public class ShowActivity extends ActivityBase implements Callback<SeasonObj> {
             this.setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_SENSOR_PORTRAIT);
         }
 
-        title = i.getStringExtra("ShowName");
+        String title = i.getStringExtra("ShowName");
         selectedShow = i.getIntExtra("ShowID", 60);
         Uri imageUri = Uri.parse("https://bs.to/public/img/cover/" + selectedShow + ".jpg");
         toolbar.setTitle(title);
@@ -92,8 +88,7 @@ public class ShowActivity extends ActivityBase implements Callback<SeasonObj> {
         getSupportActionBar().setDisplayHomeAsUpEnabled(true);
         getSupportActionBar().setDisplayShowHomeEnabled(true);
 
-        SharedPreferences sharedPreferences = PreferenceManager.getDefaultSharedPreferences(this);
-        userSession = sharedPreferences.getString("pref_session", "");
+        userSession = Settings.of(getApplicationContext()).getUserSession();
 
         final MainDBHelper dbHelper = new MainDBHelper(getApplicationContext());
         final SQLiteDatabase db = dbHelper.getWritableDatabase();
@@ -118,35 +113,25 @@ public class ShowActivity extends ActivityBase implements Callback<SeasonObj> {
 
         if (c.getCount() == 1)
             fav = true;
-
         c.close();
         db.close();
 
         if (fav)
             fab.setImageDrawable(ContextCompat.getDrawable(getApplicationContext(), R.drawable.ic_star_white));
 
-        fab.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                if (!fav) {
-                    addToFavorites();
-                    fab.setImageDrawable(ContextCompat.getDrawable(getApplicationContext(), R.drawable.ic_star_white));
-                    fav = !fav;
-                } else {
-                    removeFromFavorites();
-                    fab.setImageDrawable(ContextCompat.getDrawable(getApplicationContext(), R.drawable.ic_star_border_white));
-                    fav = !fav;
-                }
+        fab.setOnClickListener(view -> {
+            if (!fav) {
+                addToFavorites();
+                fab.setImageDrawable(ContextCompat.getDrawable(getApplicationContext(), R.drawable.ic_star_white));
+                fav = !fav;
+            } else {
+                removeFromFavorites();
+                fab.setImageDrawable(ContextCompat.getDrawable(getApplicationContext(), R.drawable.ic_star_border_white));
+                fav = !fav;
             }
         });
 
-        API api = new API();
-        api.setSession(userSession);
-        api.generateToken("series/" + selectedShow + "/1");
-        APIInterface apii = api.getInterface();
-        Call<SeasonObj> call = apii.getSeason(api.getToken(), api.getUserAgent(), selectedShow, 1, api.getSession());
-        call.enqueue(this);
-
+        setDefaultFragment();
     }
 
     public void setDefaultFragment() {
@@ -156,23 +141,6 @@ public class ShowActivity extends ActivityBase implements Callback<SeasonObj> {
                 .commit();
 
         visibleFragment = "seasons";
-    }
-
-    @Override
-    public void onResponse(Call<SeasonObj> call, Response<SeasonObj> response) {
-        SeasonObj show = response.body();
-
-        description = show.getSeries().getDescription();
-        seasonCount = show.getSeries().getSeasonCount();
-        withSpecials = show.getSeries().getMovieCount() != 0;
-
-        setDefaultFragment();
-    }
-
-    @Override
-    public void onFailure(Call<SeasonObj> call, Throwable t) {
-
-        Snackbar.make(findViewById(android.R.id.content), "Fehler beim Laden der Seriendetails", Snackbar.LENGTH_SHORT);
     }
 
     @Override

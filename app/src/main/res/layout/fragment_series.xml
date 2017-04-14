@@ -1,30 +1,28 @@
 <LinearLayout
     xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
-    android:orientation="vertical"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
+    android:orientation="vertical"
     tools:context=".ui.mainFragments.SeriesFragment">
 
     <TextView
-        android:text="@string/no_series_found"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
         android:id="@+id/nothing_found"
-        android:visibility="gone"
-        android:gravity="center_horizontal"
-        android:layout_marginTop="30dp"
-        android:textAppearance="@android:style/TextAppearance.Medium"
-        android:textSize="25sp"
-        android:textColor="@color/lightgray" />
-
-    <ListView
-        android:id="@+id/seriesListView"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_gravity="center_horizontal"
-        android:divider="@null"
-        android:dividerHeight="0dp"
-        tools:listitem="@layout/list_item_series"/>
+        android:layout_marginTop="30dp"
+        android:gravity="center_horizontal"
+        android:text="@string/no_series_found"
+        android:textAppearance="@android:style/TextAppearance.Medium"
+        android:textColor="@color/lightgray"
+        android:textSize="25sp"
+        android:visibility="gone"/>
+
+    <com.simplecityapps.recyclerview_fastscroll.views.FastScrollRecyclerView
+        android:id="@+id/seriesRecyclerView"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        app:fastScrollPopupBackgroundSize="50dp"/>
 
 </LinearLayout>

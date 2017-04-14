@@ -29,11 +29,11 @@ public abstract class ActivityBase extends RxAppCompatActivity {
     private Unbinder unbinder;
 
     public <T> Observable.Transformer<T, T> bindUntilEventAsync(ActivityEvent event) {
-        return (Observable.Transformer<T, T>) new AsyncLifecycleTransformer<>(bindUntilEvent(event));
+        return new AsyncLifecycleTransformer<>(bindUntilEvent(event));
     }
 
     public final <T> LifecycleTransformer<T> bindToLifecycleAsync() {
-        return (LifecycleTransformer<T>) new AsyncLifecycleTransformer<>(bindToLifecycle());
+        return new AsyncLifecycleTransformer<>(bindToLifecycle());
     }
 
     @Override

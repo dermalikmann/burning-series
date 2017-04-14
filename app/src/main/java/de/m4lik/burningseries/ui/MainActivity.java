@@ -1,10 +1,9 @@
-package de.m4lik.burningseries;
+package de.m4lik.burningseries.ui;
 
 import android.app.ActivityManager;
 import android.app.ProgressDialog;
 import android.content.ContentValues;
 import android.content.Intent;
-import android.content.SharedPreferences;
 import android.content.pm.ActivityInfo;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
@@ -13,7 +12,6 @@ import android.graphics.BitmapFactory;
 import android.os.AsyncTask;
 import android.os.Build;
 import android.os.Bundle;
-import android.preference.PreferenceManager;
 import android.support.annotation.NonNull;
 import android.support.design.widget.NavigationView;
 import android.support.design.widget.Snackbar;
@@ -26,6 +24,7 @@ import android.support.v4.widget.DrawerLayout;
 import android.support.v7.app.ActionBarDrawerToggle;
 import android.support.v7.widget.SearchView;
 import android.support.v7.widget.Toolbar;
+import android.util.Log;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
@@ -38,17 +37,18 @@ import java.util.Arrays;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
-import java.util.concurrent.TimeUnit;
 
 import butterknife.BindView;
+import de.m4lik.burningseries.ActivityComponent;
+import de.m4lik.burningseries.R;
 import de.m4lik.burningseries.api.API;
 import de.m4lik.burningseries.api.APIInterface;
 import de.m4lik.burningseries.api.objects.GenreMap;
 import de.m4lik.burningseries.api.objects.GenreObj;
 import de.m4lik.burningseries.api.objects.ShowObj;
 import de.m4lik.burningseries.database.MainDBHelper;
-import de.m4lik.burningseries.services.SyncBroadcastReceiver;
 import de.m4lik.burningseries.ui.base.ActivityBase;
+import de.m4lik.burningseries.ui.dialogs.UpdateDialog;
 import de.m4lik.burningseries.ui.mainFragments.FavsFragment;
 import de.m4lik.burningseries.ui.mainFragments.GenresFragment;
 import de.m4lik.burningseries.ui.mainFragments.NewsFragment;
@@ -60,8 +60,6 @@ import retrofit2.Call;
 import retrofit2.Callback;
 import retrofit2.Response;
 import rx.Observable;
-import rx.android.schedulers.AndroidSchedulers;
-import rx.functions.Action1;
 
 import static de.m4lik.burningseries.database.SeriesContract.SQL_TRUNCATE_GENRES_TABLE;
 import static de.m4lik.burningseries.database.SeriesContract.SQL_TRUNCATE_SERIES_TABLE;
@@ -125,16 +123,16 @@ public class MainActivity extends ActivityBase
         }
         setSupportActionBar(toolbar);
 
-        if (getApplicationContext().getResources().getBoolean(R.bool.isTablet)){
+        if (getApplicationContext().getResources().getBoolean(R.bool.isTablet)) {
             this.setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_SENSOR_LANDSCAPE);
             isTablet = true;
         } else {
             this.setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_SENSOR_PORTRAIT);
         }
 
-        SharedPreferences sharedPreferences = PreferenceManager.getDefaultSharedPreferences(this);
-        userName = sharedPreferences.getString("pref_user", "Bitte Einloggen");
-        userSession = sharedPreferences.getString("pref_session", "");
+        Settings settings = Settings.of(this);
+        userName = settings.getUserName();
+        userSession = settings.getUserSession();
 
         navigationView.setNavigationItemSelectedListener(this);
 
@@ -145,6 +143,10 @@ public class MainActivity extends ActivityBase
             toggle.syncState();
         }
 
+        //Update check
+        Observable.just(null)
+                .compose(RxLifecycleAndroid.bindActivity(lifecycle()))
+                .subscribe(o -> UpdateDialog.checkForUpdates(MainActivity.this, false));
 
         TextView userTextView = (TextView) navigationView.getHeaderView(0).findViewById(R.id.nav_username_text);
         userTextView.setText(userName);
@@ -177,21 +179,6 @@ public class MainActivity extends ActivityBase
 
         super.onBackPressed();
 
-    }
-
-    @Override
-    protected void onStart() {
-        super.onStart();
-
-        // schedule a sync operation every minute
-        Observable.interval(0, 1, TimeUnit.MINUTES, AndroidSchedulers.mainThread())
-                .compose(RxLifecycleAndroid.bindActivity(lifecycle()))
-                .subscribe(new Action1<Object>() {
-                    @Override
-                    public void call(Object o) {
-                        SyncBroadcastReceiver.syncNow(MainActivity.this);
-                    }
-                });
     }
 
 
@@ -288,11 +275,11 @@ public class MainActivity extends ActivityBase
 
             case R.id.nav_share:
                 String text = "Versuch mal die neue Burning-Series App. https://github.com/M4lik/burning-series/releases";
-                Intent shareintent = new Intent(Intent.ACTION_SEND);
-                shareintent.setType("text/plain");
-                shareintent.putExtra(Intent.EXTRA_SUBJECT, "Burning-Series app");
-                shareintent.putExtra(Intent.EXTRA_TEXT, text);
-                startActivity(Intent.createChooser(shareintent, getString(R.string.share_using)));
+                Intent shareIntent = new Intent(Intent.ACTION_SEND);
+                shareIntent.setType("text/plain");
+                shareIntent.putExtra(Intent.EXTRA_SUBJECT, "Burning-Series app");
+                shareIntent.putExtra(Intent.EXTRA_TEXT, text);
+                startActivity(Intent.createChooser(shareIntent, getString(R.string.share_using)));
                 break;
 
             case R.id.nav_settings:
@@ -309,9 +296,11 @@ public class MainActivity extends ActivityBase
     }
 
     public void logout() {
-        final SharedPreferences sharedPreferences = PreferenceManager.getDefaultSharedPreferences(this);
+
+        Log.d("Logout", "Logging out...");
+
         final API api = new API();
-        api.setSession(sharedPreferences.getString("pref_session", ""));
+        api.setSession(Settings.of(this).getUserSession());
         api.generateToken("logout");
 
         Logger.logout(getApplicationContext());
@@ -321,7 +310,10 @@ public class MainActivity extends ActivityBase
         call.enqueue(new Callback<ResponseBody>() {
             @Override
             public void onResponse(Call<ResponseBody> call, Response<ResponseBody> response) {
-                sharedPreferences.edit().clear().apply();
+                Settings.of(getApplicationContext()).raw().edit()
+                        .remove("pref_session")
+                        .remove("pref_user")
+                        .commit();
 
                 navigationView.getMenu().findItem(R.id.logout_menu_item).setVisible(false);
                 navigationView.getMenu().findItem(R.id.login_menu_item).setVisible(true);
@@ -332,6 +324,7 @@ public class MainActivity extends ActivityBase
                 snackbar.show();
 
                 Intent intent = new Intent(getApplicationContext(), MainActivity.class);
+                Log.d("Logout", "Restarting...");
                 intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP | Intent.FLAG_ACTIVITY_NEW_TASK);
                 startActivity(intent);
                 finish();
@@ -406,7 +399,7 @@ public class MainActivity extends ActivityBase
                 db.execSQL(SQL_TRUNCATE_GENRES_TABLE);
                 db.close();
 
-                new seriesDatabaseUpdate(response.body()).execute();
+                new SeriesDatabaseUpdate(response.body()).execute();
             }
 
             @Override
@@ -460,11 +453,11 @@ public class MainActivity extends ActivityBase
         });
     }
 
-    class seriesDatabaseUpdate extends AsyncTask<Void, Void, Void> {
+    private class SeriesDatabaseUpdate extends AsyncTask<Void, Void, Void> {
 
         GenreMap genreMap;
 
-        seriesDatabaseUpdate(GenreMap genreMap) {
+        SeriesDatabaseUpdate(GenreMap genreMap) {
             this.genreMap = genreMap;
         }
 
@@ -526,7 +519,7 @@ public class MainActivity extends ActivityBase
         }
     }
 
-    class favoritesDatabaseUpdate extends AsyncTask<Void, Void, Void> {
+    private class favoritesDatabaseUpdate extends AsyncTask<Void, Void, Void> {
 
         List<ShowObj> list;
 

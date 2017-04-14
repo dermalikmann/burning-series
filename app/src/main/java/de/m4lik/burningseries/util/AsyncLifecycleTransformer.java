@@ -22,31 +22,21 @@ public class AsyncLifecycleTransformer<T> implements LifecycleTransformer<T> {
     @NonNull
     @Override
     public <U> Single.Transformer<U, U> forSingle() {
-        return new Single.Transformer<U, U>() {
-            @Override
-            public Single<U> call(Single<U> uSingle) {
-                return (Single<U>) uSingle
-                        .subscribeOn(BackgroundScheduler.instance())
-                        .observeOn(AndroidSchedulers.mainThread())
-                        .compose(transformer.forSingle());
-            }
-        };
+        return uSingle -> (Single<U>) uSingle
+                .subscribeOn(BackgroundScheduler.instance())
+                .observeOn(AndroidSchedulers.mainThread())
+                .compose(transformer.forSingle());
 
     }
 
     @NonNull
     @Override
     public Completable.Transformer forCompletable() {
-        return new Completable.Transformer() {
-            @Override
-            public Completable call(Completable completable) {
-                return completable
-                        .subscribeOn(BackgroundScheduler.instance())
-                        .unsubscribeOn(BackgroundScheduler.instance())
-                        .observeOn(AndroidSchedulers.mainThread())
-                        .compose(transformer.forCompletable());
-            }
-        };
+        return completable -> completable
+                .subscribeOn(BackgroundScheduler.instance())
+                .unsubscribeOn(BackgroundScheduler.instance())
+                .observeOn(AndroidSchedulers.mainThread())
+                .compose(transformer.forCompletable());
 
     }
 

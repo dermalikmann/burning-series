@@ -17,10 +17,6 @@ public class Settings {
 
     private final SharedPreferences preferences;
 
-    public static void initialize(Context context) {
-        PreferenceManager.setDefaultValues(context, R.xml.preferences, false);
-    }
-
     public Settings(Context context) {
         this(PreferenceManager.getDefaultSharedPreferences(context));
     }
@@ -29,12 +25,8 @@ public class Settings {
         this.preferences = preferences;
     }
 
-    public SharedPreferences raw() {
-        return preferences;
-    }
-
-    public SharedPreferences.Editor edit() {
-        return preferences.edit();
+    public static void initialize(Context context) {
+        PreferenceManager.setDefaultValues(context, R.xml.preferences, false);
     }
 
     public static Settings of(Context context) {
@@ -45,11 +37,23 @@ public class Settings {
         return new Settings(preferences);
     }
 
+    public SharedPreferences raw() {
+        return preferences;
+    }
+
+    public SharedPreferences.Editor edit() {
+        return preferences.edit();
+    }
+
 
     /* Getter for settings */
 
     public String themeName() {
         return preferences.getString("pref_theme", Themes.BLUE.name());
+    }
+
+    public boolean isDarkTheme() {
+        return themeName().contains("_DARK");
     }
 
     public boolean alarmOnMobile() {
@@ -60,11 +64,11 @@ public class Settings {
         return preferences.getString("pref_startup_view", "serieslist");
     }
 
-    public String getUser() {
+    public String getUserName() {
         return preferences.getString("pref_user", "");
     }
 
-    public String getSession() {
+    public String getUserSession() {
         return preferences.getString("pref_session", "");
     }
 
@@ -73,7 +77,11 @@ public class Settings {
     }
 
     public boolean isBetaChannel() {
-        return  preferences.getString("pref_update_channel", "stable").equals("beta");
+        return preferences.getString("pref_update_channel", "stable").equals("beta");
+    }
+
+    public boolean showCovers() {
+        return preferences.getBoolean("pref_show_cover_images", true);
     }
 
 }

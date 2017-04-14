@@ -15,8 +15,6 @@ import de.m4lik.burningseries.R;
 import de.m4lik.burningseries.services.DownloadService;
 import de.m4lik.burningseries.ui.base.DialogBase;
 import rx.Observable;
-import rx.functions.Action0;
-import rx.functions.Action1;
 
 import static de.m4lik.burningseries.util.AndroidUtility.checkMainThread;
 
@@ -34,7 +32,7 @@ public class DownloadUpdateDialog extends DialogBase {
     ProgressBar progressBar;
 
     public DownloadUpdateDialog() {
-        this(Observable.<DownloadService.Status>empty());
+        this(Observable.empty());
     }
 
     @SuppressLint("ValidFragment")
@@ -66,18 +64,8 @@ public class DownloadUpdateDialog extends DialogBase {
         progressBar.setMax(1000);
         progress.compose(bindUntilEvent(FragmentEvent.DESTROY_VIEW))
                 .onErrorResumeNext(Observable.empty())
-                .doAfterTerminate(new Action0() {
-                    @Override
-                    public void call() {
-                        dismiss();
-                    }
-                })
-                .subscribe(new Action1<Object>() {
-                    @Override
-                    public void call(Object o) {
-                        updateStatus((DownloadService.Status) o);
-                    }
-                });
+                .doAfterTerminate(this::dismiss)
+                .subscribe(this::updateStatus);
     }
 
     private void updateStatus(DownloadService.Status status) {

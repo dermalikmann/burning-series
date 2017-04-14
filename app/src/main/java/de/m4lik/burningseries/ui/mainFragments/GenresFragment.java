@@ -54,7 +54,7 @@ public class GenresFragment extends Fragment {
             if (getContext().getResources().getBoolean(R.bool.isTablet))
                 i = new Intent(getActivity(), TabletShowActivity.class);
             i.putExtra("ShowName", ((TextView) view.findViewById(R.id.seriesTitle)).getText().toString());
-            i.putExtra("ShowID", ((TextView) view.findViewById(R.id.seriesId)).getText().toString());
+            i.putExtra("ShowID", Integer.parseInt(((TextView) view.findViewById(R.id.seriesId)).getText().toString()));
             i.putExtra("ShowGenre", ((TextView) view.findViewById(R.id.seriesGenre)).getText().toString());
             startActivity(i);
         }

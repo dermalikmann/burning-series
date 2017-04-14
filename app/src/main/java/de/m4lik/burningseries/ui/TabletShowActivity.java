@@ -14,7 +14,6 @@ import android.support.annotation.NonNull;
 import android.support.customtabs.CustomTabsIntent;
 import android.support.design.widget.Snackbar;
 import android.support.v4.content.ContextCompat;
-import android.support.v7.util.SortedList;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.util.Log;
@@ -108,9 +107,7 @@ public class TabletShowActivity extends ActivityBase {
     String userSession;
 
     List<SeasonListItem> seasons = new ArrayList<>();
-    EpisodesRecyclerAdapter episodesAdapter;
     List<EpisodeListItem> episodes = new ArrayList<>();
-    HosterRecyclerAdapter hosterAdapter;
     List<HosterListItem> hosters = new ArrayList<>();
 
     Intent i;
@@ -258,8 +255,6 @@ public class TabletShowActivity extends ActivityBase {
     private void setupEpisodeList() {
         LinearLayoutManager llm = new LinearLayoutManager(getApplicationContext(), LinearLayoutManager.VERTICAL, false);
         episodesRecyclerView.setLayoutManager(llm);
-        episodesAdapter = new EpisodesRecyclerAdapter();
-        episodesRecyclerView.setAdapter(episodesAdapter);
         episodesRecyclerView.addOnItemTouchListener(
                 new RecyclerItemClickListener(getApplicationContext(), episodesRecyclerView, new RecyclerItemClickListener.OnItemClickListener() {
                     @Override
@@ -324,8 +319,6 @@ public class TabletShowActivity extends ActivityBase {
     private void setupHosterList() {
         LinearLayoutManager llm = new LinearLayoutManager(getApplicationContext(), LinearLayoutManager.VERTICAL, false);
         hosterRecyclerView.setLayoutManager(llm);
-        hosterAdapter = new HosterRecyclerAdapter();
-        hosterRecyclerView.setAdapter(hosterAdapter);
         hosterRecyclerView.addOnItemTouchListener(
                 new RecyclerItemClickListener(getApplicationContext(), hosterRecyclerView, new RecyclerItemClickListener.OnItemClickListener() {
                     @Override
@@ -422,11 +415,11 @@ public class TabletShowActivity extends ActivityBase {
     }
 
     private void refreshEpisodesList() {
-        episodesAdapter.replaceAll(episodes);
+        episodesRecyclerView.setAdapter(new EpisodesRecyclerAdapter(episodes));
     }
 
     private void refreshHosterList() {
-        hosterAdapter.replaceAll(hosters);
+        hosterRecyclerView.setAdapter(new HosterRecyclerAdapter(hosters));
     }
 
 
@@ -727,44 +720,13 @@ public class TabletShowActivity extends ActivityBase {
 
     private class EpisodesRecyclerAdapter extends RecyclerView.Adapter<EpisodesRecyclerAdapter.EpisodesViewHolder> {
 
-        private final SortedList<EpisodeListItem> list = new SortedList<EpisodeListItem>(EpisodeListItem.class, new SortedList.Callback<EpisodeListItem>() {
-
-            @Override
-            public void onInserted(int position, int count) {
-                notifyItemRangeInserted(position, count);
-            }
-
-            @Override
-            public void onRemoved(int position, int count) {
-                notifyItemRangeRemoved(position, count);
-            }
-
-            @Override
-            public void onMoved(int fromPosition, int toPosition) {
-                notifyItemMoved(fromPosition, toPosition);
-            }
-
-            @Override
-            public void onChanged(int position, int count) {
-                notifyItemRangeChanged(position, count);
-            }
-
-            @Override
-            public int compare(EpisodeListItem o1, EpisodeListItem o2) {
-                return o1.compareTo(o2);
-            }
-
-            @Override
-            public boolean areContentsTheSame(EpisodeListItem oldItem, EpisodeListItem newItem) {
-                return oldItem.getTitle().equals(newItem.getTitle());
-            }
-
-            @Override
-            public boolean areItemsTheSame(EpisodeListItem item1, EpisodeListItem item2) {
-                return item1.hashCode() == item2.hashCode();
-            }
-        });
         Context context = getApplicationContext();
+
+        List<EpisodeListItem> list = new ArrayList<>();
+
+        EpisodesRecyclerAdapter(List<EpisodeListItem> list) {
+            this.list = list;
+        }
 
         @Override
         public EpisodesViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
@@ -782,35 +744,6 @@ public class TabletShowActivity extends ActivityBase {
         @Override
         public int getItemCount() {
             return list.size();
-        }
-
-        void add(EpisodeListItem model) {
-            list.add(model);
-        }
-
-        void remove(EpisodeListItem model) {
-            list.remove(model);
-        }
-
-        void add(List<EpisodeListItem> models) {
-            list.addAll(models);
-        }
-
-        void remove(List<EpisodeListItem> models) {
-            list.beginBatchedUpdates();
-            models.forEach(list::remove);
-            list.endBatchedUpdates();
-        }
-
-        void replaceAll(List<EpisodeListItem> models) {
-            list.beginBatchedUpdates();
-            for (int i = list.size() - 1; i >= 0; i--) {
-                final EpisodeListItem model = list.get(i);
-                list.remove(model);
-            }
-            list.addAll(models);
-            list.endBatchedUpdates();
-            Log.d("BSTV", String.valueOf(list.size()));
         }
 
         class EpisodesViewHolder extends RecyclerView.ViewHolder {
@@ -859,44 +792,13 @@ public class TabletShowActivity extends ActivityBase {
 
     private class HosterRecyclerAdapter extends RecyclerView.Adapter<HosterRecyclerAdapter.HosterViewHolder> {
 
-        private final SortedList<HosterListItem> list = new SortedList<HosterListItem>(HosterListItem.class, new SortedList.Callback<HosterListItem>() {
-
-            @Override
-            public void onInserted(int position, int count) {
-                notifyItemRangeInserted(position, count);
-            }
-
-            @Override
-            public void onRemoved(int position, int count) {
-                notifyItemRangeRemoved(position, count);
-            }
-
-            @Override
-            public void onMoved(int fromPosition, int toPosition) {
-                notifyItemMoved(fromPosition, toPosition);
-            }
-
-            @Override
-            public void onChanged(int position, int count) {
-                notifyItemRangeChanged(position, count);
-            }
-
-            @Override
-            public int compare(HosterListItem o1, HosterListItem o2) {
-                return o1.compareTo(o2);
-            }
-
-            @Override
-            public boolean areContentsTheSame(HosterListItem oldItem, HosterListItem newItem) {
-                return oldItem.getHoster().equals(newItem.getHoster());
-            }
-
-            @Override
-            public boolean areItemsTheSame(HosterListItem item1, HosterListItem item2) {
-                return item1.hashCode() == item2.hashCode();
-            }
-        });
         Context context = getApplicationContext();
+
+        List<HosterListItem> list = new ArrayList<>();
+
+        HosterRecyclerAdapter(List<HosterListItem> list) {
+            this.list = list;
+        }
 
         @Override
         public HosterRecyclerAdapter.HosterViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
@@ -914,35 +816,6 @@ public class TabletShowActivity extends ActivityBase {
         @Override
         public int getItemCount() {
             return list.size();
-        }
-
-        void add(HosterListItem model) {
-            list.add(model);
-        }
-
-        void remove(HosterListItem model) {
-            list.remove(model);
-        }
-
-        void add(List<HosterListItem> models) {
-            list.addAll(models);
-        }
-
-        void remove(List<HosterListItem> models) {
-            list.beginBatchedUpdates();
-            models.forEach(list::remove);
-            list.endBatchedUpdates();
-        }
-
-        void replaceAll(List<HosterListItem> models) {
-            list.beginBatchedUpdates();
-            for (int i = list.size() - 1; i >= 0; i--) {
-                final HosterListItem model = list.get(i);
-                list.remove(model);
-            }
-            list.addAll(models);
-            list.endBatchedUpdates();
-            Log.d("BSTV", String.valueOf(list.size()));
         }
 
         class HosterViewHolder extends RecyclerView.ViewHolder {

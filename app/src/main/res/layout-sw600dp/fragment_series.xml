@@ -1,9 +1,9 @@
 <LinearLayout
     xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    xmlns:app="http://schemas.android.com/apk/res-auto"
     android:orientation="vertical"
     tools:context=".ui.mainFragments.SeriesFragment">
 
@@ -23,8 +23,8 @@
         android:id="@+id/seriesRecyclerView"
         android:layout_width="600dp"
         android:layout_height="match_parent"
-        app:fastScrollPopupBackgroundSize="50dp"
         android:layout_gravity="center_horizontal"
-        android:layout_margin="25dp"/>
+        android:layout_margin="25dp"
+        app:fastScrollPopupBackgroundSize="50dp"/>
 
 </LinearLayout>

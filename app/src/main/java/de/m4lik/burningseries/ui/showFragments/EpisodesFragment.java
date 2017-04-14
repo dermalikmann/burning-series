@@ -14,6 +14,7 @@ import android.widget.ImageView;
 import android.widget.TextView;
 
 import java.util.ArrayList;
+import java.util.List;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
@@ -23,6 +24,7 @@ import de.m4lik.burningseries.api.APIInterface;
 import de.m4lik.burningseries.api.objects.EpisodeObj;
 import de.m4lik.burningseries.api.objects.SeasonObj;
 import de.m4lik.burningseries.api.objects.VideoObj;
+import de.m4lik.burningseries.databinding.ListItemEpisodesBinding;
 import de.m4lik.burningseries.ui.ShowActivity;
 import de.m4lik.burningseries.ui.listitems.EpisodeListItem;
 import de.m4lik.burningseries.util.Settings;
@@ -30,6 +32,8 @@ import de.m4lik.burningseries.util.listeners.RecyclerItemClickListener;
 import retrofit2.Call;
 import retrofit2.Callback;
 import retrofit2.Response;
+
+import static de.m4lik.burningseries.services.ThemeHelperService.theme;
 
 /**
  * A simple {@link Fragment} subclass.
@@ -46,7 +50,7 @@ public class EpisodesFragment extends Fragment implements Callback<SeasonObj> {
     @BindView(R.id.episodesRecyclerView)
     RecyclerView episodesRecyclerView;
 
-    ArrayList<EpisodeListItem> episodesList = new ArrayList<>();
+    List<EpisodeListItem> episodesList = new ArrayList<>();
 
     boolean loaded = false;
 
@@ -82,8 +86,10 @@ public class EpisodesFragment extends Fragment implements Callback<SeasonObj> {
 
         SeasonObj season = response.body();
 
+        Integer i = 1;
         for (SeasonObj.Episode episode : season.getEpisodes()) {
-            episodesList.add(new EpisodeListItem(episode.getGermanTitle(), episode.getEnglishTitle(), episode.getEpisodeID(), episode.isWatched() == 1));
+            episodesList.add(new EpisodeListItem(episode.getGermanTitle() + " " + i, episode.getEnglishTitle(), episode.getEpisodeID(), episode.isWatched() == 1));
+            i++;
         }
 
         loaded = true;
@@ -169,38 +175,23 @@ public class EpisodesFragment extends Fragment implements Callback<SeasonObj> {
 
     private class EpisodesRecyclerAdapter extends RecyclerView.Adapter<EpisodesRecyclerAdapter.EpisodesViewHolder> {
 
-        ArrayList<EpisodeListItem> list;
+        List<EpisodeListItem> list;
 
-        EpisodesRecyclerAdapter(ArrayList<EpisodeListItem> list) {
+        EpisodesRecyclerAdapter(List<EpisodeListItem> list) {
             this.list = list;
         }
 
         @Override
         public EpisodesViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
-            View v = LayoutInflater.from(parent.getContext())
-                    .inflate(R.layout.list_item_episodes, parent, false);
-            return new EpisodesViewHolder(v);
+            LayoutInflater layoutInflater = LayoutInflater.from(getActivity());
+            ListItemEpisodesBinding binding = ListItemEpisodesBinding.inflate(layoutInflater, parent, false);
+            return new EpisodesViewHolder(binding);
         }
 
         @Override
         public void onBindViewHolder(EpisodesViewHolder holder, int position) {
-            EpisodeListItem c = list.get(position);
-
-            holder.id.setText(c.getId().toString());
-
-            holder.titleGer.setText((position + 1) + " " + c.getTitleGer());
-            if (!Settings.of(getActivity().getApplicationContext()).themeName().contains("_DARK"))
-                holder.titleGer.setTextColor(ContextCompat.getColor(getActivity().getApplicationContext(), c.isWatched() ? android.R.color.darker_gray : android.R.color.black));
-
-            holder.title.setText(c.getTitle());
-
-            if (c.isWatched())
-                if (!Settings.of(getActivity().getApplicationContext()).themeName().contains("_DARK"))
-                    holder.watchedImg.setImageDrawable(ContextCompat.getDrawable(getActivity().getApplicationContext(), R.drawable.ic_watched));
-                else
-                    holder.watchedImg.setImageDrawable(ContextCompat.getDrawable(getActivity().getApplicationContext(), R.drawable.ic_watched_white));
-            else
-                holder.watchedImg.setImageDrawable(null);
+            EpisodeListItem current = list.get(position);
+            holder.bind(current);
         }
 
         @Override
@@ -210,20 +201,33 @@ public class EpisodesFragment extends Fragment implements Callback<SeasonObj> {
 
         class EpisodesViewHolder extends RecyclerView.ViewHolder {
 
-            TextView id;
-            TextView title;
-            TextView titleGer;
-            ImageView watchedImg;
+            ListItemEpisodesBinding binding;
 
-            EpisodesViewHolder(View itemView) {
-                super(itemView);
+            EpisodesViewHolder(ListItemEpisodesBinding binding) {
+                super(binding.getRoot());
+                this.binding = binding;
+            }
 
-                id = (TextView) itemView.findViewById(R.id.episodeId);
-                title = (TextView) itemView.findViewById(R.id.episodeTitle);
-                titleGer = (TextView) itemView.findViewById(R.id.episodeTitleGer);
-                watchedImg = (ImageView) itemView.findViewById(R.id.watchedImageView);
+            public void bind(EpisodeListItem item) {
+                binding.setEpisode(item);
+
+                View root = binding.getRoot();
+
+                root.findViewById(R.id.listItemContainer).setBackground(ContextCompat.getDrawable(getActivity(), theme().listItemBackground));
+
+                if (!Settings.of(getActivity()).isDarkTheme())
+                    ((TextView) root.findViewById(R.id.episodeTitleGer)).setTextColor(ContextCompat.getColor(getActivity(), item.isWatched() ? android.R.color.darker_gray : android.R.color.black));
+
+                if (item.isWatched())
+                    if (!Settings.of(getActivity()).isDarkTheme())
+                        ((ImageView) root.findViewById(R.id.watchedImageView)).setImageDrawable(ContextCompat.getDrawable(getActivity(), R.drawable.ic_watched));
+                    else
+                        ((ImageView) root.findViewById(R.id.watchedImageView)).setImageDrawable(ContextCompat.getDrawable(getActivity(), R.drawable.ic_watched_white));
+                else
+                    ((ImageView) root.findViewById(R.id.watchedImageView)).setImageDrawable(null);
+
+                binding.executePendingBindings();
             }
         }
     }
-
 }

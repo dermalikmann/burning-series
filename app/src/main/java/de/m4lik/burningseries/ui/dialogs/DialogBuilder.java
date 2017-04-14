@@ -18,15 +18,26 @@ import de.m4lik.burningseries.util.AndroidUtility;
  */
 
 public class DialogBuilder {
+    private static final int[] BUTTONS = {
+            Dialog.BUTTON_NEGATIVE,
+            Dialog.BUTTON_POSITIVE,
+            Dialog.BUTTON_NEUTRAL};
+    private static final OnClickListener DO_NOTHING = new OnClickListener() {
+        @Override
+        public void onClick(Dialog dialog) {
+
+        }
+    };
     private final Context context;
     private final AlertDialog.Builder builder;
-
     private boolean autoDismiss = true;
     private OnClickListener positiveOnClick = DO_NOTHING;
     private OnClickListener negativeOnClick = DO_NOTHING;
     private OnClickListener neutralOnClick = DO_NOTHING;
     private DialogInterface.OnShowListener onShowListener;
     private DialogInterface.OnCancelListener onCancelListener;
+
+    /* Dialog mutations */
 
     private DialogBuilder(Context context) {
         this.context = context;
@@ -40,8 +51,6 @@ public class DialogBuilder {
         AndroidUtility.checkMainThread();
         return new DialogBuilder(context);
     }
-
-    /* Dialog mutations */
 
     public DialogBuilder content(CharSequence content) {
         builder.setMessage(content);
@@ -102,6 +111,8 @@ public class DialogBuilder {
         return this;
     }
 
+    /* Build & show */
+
     public DialogBuilder onShow(Dialog.OnShowListener onShowListener) {
         this.onShowListener = onShowListener;
         return this;
@@ -112,7 +123,7 @@ public class DialogBuilder {
         return this;
     }
 
-    /* Build & show */
+    /* Stuff */
 
     public Dialog show() {
         return build();
@@ -149,8 +160,6 @@ public class DialogBuilder {
         return dialog;
     }
 
-    /* Stuff */
-
     private void onButtonClicked(int button, AlertDialog dialog) {
         if (button == Dialog.BUTTON_POSITIVE)
             positiveOnClick.onClick(dialog);
@@ -168,16 +177,4 @@ public class DialogBuilder {
     public interface OnClickListener {
         void onClick(Dialog dialog);
     }
-
-    private static final int[] BUTTONS = {
-            Dialog.BUTTON_NEGATIVE,
-            Dialog.BUTTON_POSITIVE,
-            Dialog.BUTTON_NEUTRAL};
-
-    private static final OnClickListener DO_NOTHING = new OnClickListener() {
-        @Override
-        public void onClick(Dialog dialog) {
-
-        }
-    };
 }

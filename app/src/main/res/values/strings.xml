@@ -89,7 +89,10 @@
 
     <string name="pref_alarm_on_mobile_data">Warnen bei mobilen Daten</string>
     <string name="pref_alarm_on_mobile_data_summary_on">Warne mich vor jedem Video falls ich mobile Daten benutze.</string>
-    <string name="pref_alarm_on_mobile_data_summary_off">Warne mich nicht falls ich mobile Daten benutze.\n </string>
+    <string name="pref_alarm_on_mobile_data_summary_off">Warne mich nicht falls ich mobile Daten benutze.</string>
+    <string name="pref_show_cover_images_title">Serienbilder</string>
+    <string name="pref_show_cover_images_summary_on">Zeige mir die Serienbilder in der Hauptansicht</string>
+    <string name="pref_show_cover_images_summary_off">Zeige mir keine Serienbilder in der Hauptansicht</string>
 
     <string name="pref_startup_view">Standardansicht</string>
     <string name="pref_startup_view_summary">Hier kannst du feslegen, was du beim Starten der App als erstes sehen willst.</string>

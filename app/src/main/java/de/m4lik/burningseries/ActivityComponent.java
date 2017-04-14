@@ -38,7 +38,6 @@ public interface ActivityComponent {
     void inject(TabletShowActivity activity);
 
 
-
     void inject(DownloadUpdateDialog dialog);
 
     void inject(ErrorDialog dialog);

@@ -28,36 +28,12 @@ import static org.joda.time.Duration.standardHours;
 import static org.joda.time.Instant.now;
 
 public class UpdateDialog extends DialogBase {
+    private static final String KEY_LAST_UPDATE_CHECK = "pref_last_update";
+    private static final Observable.Operator<Update, Update> NOOP = subscriber -> subscriber;
     @Inject
     DownloadManager downloadManager;
-
     @Inject
     SharedPreferences sharedPreferences;
-
-    @NonNull
-    @Override
-    public Dialog onCreateDialog(Bundle savedInstanceState) {
-        Update update = getArguments().getParcelable("update");
-        return update != null ?
-                updateAvailableDialog(update) :
-                noUpdateAvailableDialog();
-    }
-
-    private Dialog updateAvailableDialog(final Update update) {
-        return DialogBuilder.start(getActivity())
-                .title("Es ist ein neues Update verfügbar!")
-                .content("Unteranderem enthalten: " + update.changelog())
-                .positive("Download", dialog -> Updater.download(getActivity(), update))
-                .negative("Ignorieren")
-                .build();
-    }
-
-    private Dialog noUpdateAvailableDialog() {
-        return DialogBuilder.start(getActivity())
-                .content("Du hast bereits die aktuelle Version!")
-                .positive()
-                .build();
-    }
 
     public static UpdateDialog newInstance(Update update) {
         Bundle bundle = new Bundle();
@@ -67,8 +43,6 @@ public class UpdateDialog extends DialogBase {
         dialog.setArguments(bundle);
         return dialog;
     }
-
-    /* The whole magic */
 
     public static void checkForUpdates(final ActivityBase activity, final boolean interactive) {
         final SharedPreferences shared = PreferenceManager.getDefaultSharedPreferences(activity.getApplicationContext());
@@ -98,15 +72,36 @@ public class UpdateDialog extends DialogBase {
                 .lift(busyOperator)
                 .doAfterTerminate(storeCheckTime)
                 .subscribe(update -> {
-                            if (interactive || update != null) {
-                                UpdateDialog dialog = newInstance((Update) update);
-                                dialog.show(activity.getSupportFragmentManager(), null);
-                            }
+                    if (interactive || update != null) {
+                        UpdateDialog dialog = newInstance((Update) update);
+                        dialog.show(activity.getSupportFragmentManager(), null);
+                    }
                 }, Actions.empty());
     }
 
-    private static final String KEY_LAST_UPDATE_CHECK = "pref_last_update";
-    private static final Observable.Operator<Update, Update> NOOP = subscriber -> subscriber;
+    @NonNull
+    @Override
+    public Dialog onCreateDialog(Bundle savedInstanceState) {
+        Update update = getArguments().getParcelable("update");
+        return update != null ?
+                updateAvailableDialog(update) :
+                noUpdateAvailableDialog();
+    }
+
+    private Dialog updateAvailableDialog(final Update update) {
+        return DialogBuilder.start(getActivity())
+                .content("Es ist ein neues Update verfügbar!")
+                .positive("Download", dialog -> Updater.download(getActivity(), update))
+                .negative("Ignorieren")
+                .build();
+    }
+
+    private Dialog noUpdateAvailableDialog() {
+        return DialogBuilder.start(getActivity())
+                .content("Du hast bereits die aktuelle Version!")
+                .positive()
+                .build();
+    }
 
     @Override
     protected void injectComponent(ActivityComponent activityComponent) {

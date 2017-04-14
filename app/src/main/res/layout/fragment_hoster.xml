@@ -23,15 +23,11 @@
             android:textColor="?android:attr/textColorPrimary"
             />
 
-        <ListView
-            android:id="@+id/hosterListView"
+        <android.support.v7.widget.RecyclerView
+            android:id="@+id/hosterRecyclerView"
             android:layout_width="fill_parent"
-            android:layout_height="fill_parent"
-            android:layout_gravity="center_horizontal"
-            android:layout_weight="40.14"
-            android:divider="@null"
-            android:dividerHeight="0dp"
-            android:visibility="visible"/>
+            android:layout_height="wrap_content"
+            android:layout_gravity="center_horizontal"/>
 
     </LinearLayout>
 

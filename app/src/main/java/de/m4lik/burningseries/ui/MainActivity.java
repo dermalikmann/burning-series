@@ -24,6 +24,7 @@ import android.support.v4.widget.DrawerLayout;
 import android.support.v7.app.ActionBarDrawerToggle;
 import android.support.v7.widget.SearchView;
 import android.support.v7.widget.Toolbar;
+import android.util.Log;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
@@ -122,7 +123,7 @@ public class MainActivity extends ActivityBase
         }
         setSupportActionBar(toolbar);
 
-        if (getApplicationContext().getResources().getBoolean(R.bool.isTablet)){
+        if (getApplicationContext().getResources().getBoolean(R.bool.isTablet)) {
             this.setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_SENSOR_LANDSCAPE);
             isTablet = true;
         } else {
@@ -295,8 +296,11 @@ public class MainActivity extends ActivityBase
     }
 
     public void logout() {
+
+        Log.d("Logout", "Logging out...");
+
         final API api = new API();
-        api.setSession(Settings.of(getApplicationContext()).getUserName());
+        api.setSession(Settings.of(this).getUserSession());
         api.generateToken("logout");
 
         Logger.logout(getApplicationContext());
@@ -320,6 +324,7 @@ public class MainActivity extends ActivityBase
                 snackbar.show();
 
                 Intent intent = new Intent(getApplicationContext(), MainActivity.class);
+                Log.d("Logout", "Restarting...");
                 intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP | Intent.FLAG_ACTIVITY_NEW_TASK);
                 startActivity(intent);
                 finish();
@@ -394,7 +399,7 @@ public class MainActivity extends ActivityBase
                 db.execSQL(SQL_TRUNCATE_GENRES_TABLE);
                 db.close();
 
-                new seriesDatabaseUpdate(response.body()).execute();
+                new SeriesDatabaseUpdate(response.body()).execute();
             }
 
             @Override
@@ -448,11 +453,11 @@ public class MainActivity extends ActivityBase
         });
     }
 
-    private class seriesDatabaseUpdate extends AsyncTask<Void, Void, Void> {
+    private class SeriesDatabaseUpdate extends AsyncTask<Void, Void, Void> {
 
         GenreMap genreMap;
 
-        seriesDatabaseUpdate(GenreMap genreMap) {
+        SeriesDatabaseUpdate(GenreMap genreMap) {
             this.genreMap = genreMap;
         }
 

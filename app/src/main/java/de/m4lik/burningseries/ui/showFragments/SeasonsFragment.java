@@ -29,7 +29,7 @@ import retrofit2.Response;
 
 import static de.m4lik.burningseries.services.ThemeHelperService.theme;
 
-public class SeasonsFragment extends Fragment implements Callback<SeasonObj>{
+public class SeasonsFragment extends Fragment implements Callback<SeasonObj> {
 
     View rootView;
 
@@ -79,7 +79,7 @@ public class SeasonsFragment extends Fragment implements Callback<SeasonObj>{
         Integer seasonCount = show.getSeries().getSeasonCount();
         Boolean withSpecials = show.getSeries().getMovieCount() != 0;
 
-        for (int i = withSpecials ? 0 : 1 ; i <= seasonCount; i++) {
+        for (int i = withSpecials ? 0 : 1; i <= seasonCount; i++) {
             seasonsList.add(new SeasonListItem(i));
         }
 
@@ -97,7 +97,7 @@ public class SeasonsFragment extends Fragment implements Callback<SeasonObj>{
 
 
     private void refreshList() {
-        ArrayAdapter<SeasonListItem> adapter = new seasonsListAdapter();
+        ArrayAdapter<SeasonListItem> adapter = new SeasonsListAdapter();
         seasonsListView.setAdapter(adapter);
 
         Integer numOfItems = adapter.getCount();
@@ -121,9 +121,14 @@ public class SeasonsFragment extends Fragment implements Callback<SeasonObj>{
         });
     }
 
-    private class seasonsListAdapter extends ArrayAdapter<SeasonListItem> {
+    private void showSeason(Integer id) {
+        ((ShowActivity) getActivity()).setSelectedSeason(id);
+        ((ShowActivity) getActivity()).switchSeasonsToEpisodes();
+    }
 
-        seasonsListAdapter() {
+    private class SeasonsListAdapter extends ArrayAdapter<SeasonListItem> {
+
+        SeasonsListAdapter() {
             super(getActivity().getApplicationContext(), R.layout.list_item_seasons, seasonsList);
         }
 
@@ -149,10 +154,5 @@ public class SeasonsFragment extends Fragment implements Callback<SeasonObj>{
 
             return view;
         }
-    }
-
-    private void showSeason(Integer id) {
-        ((ShowActivity) getActivity()).setSelectedSeason(id);
-        ((ShowActivity) getActivity()).switchSeasonsToEpisodes();
     }
 }

@@ -44,7 +44,7 @@ public class SettingsActivity extends ActivityBase {
         getSupportActionBar().setDisplayHomeAsUpEnabled(true);
         getSupportActionBar().setDisplayShowHomeEnabled(true);
 
-        if (getApplicationContext().getResources().getBoolean(R.bool.isTablet)){
+        if (getApplicationContext().getResources().getBoolean(R.bool.isTablet)) {
             this.setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_SENSOR_LANDSCAPE);
         } else {
             this.setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_SENSOR_PORTRAIT);
@@ -83,6 +83,10 @@ public class SettingsActivity extends ActivityBase {
 
     public static class SettingsFragment extends PreferenceFragment
             implements SharedPreferences.OnSharedPreferenceChangeListener {
+
+        private static android.support.v4.app.NotificationCompat.Builder newNotificationBuilder(Context context) {
+            return new android.support.v7.app.NotificationCompat.Builder(context);
+        }
 
         @Override
         public void onCreate(Bundle savedInstanceState) {
@@ -210,10 +214,6 @@ public class SettingsActivity extends ActivityBase {
                     .unregisterOnSharedPreferenceChangeListener(this);
 
             super.onPause();
-        }
-
-        private static android.support.v4.app.NotificationCompat.Builder newNotificationBuilder(Context context) {
-            return new android.support.v7.app.NotificationCompat.Builder(context);
         }
     }
 }

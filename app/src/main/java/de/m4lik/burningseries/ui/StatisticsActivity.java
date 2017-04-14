@@ -29,6 +29,10 @@ public class StatisticsActivity extends ActivityBase {
 
     List<StatsListItem> statsList = new ArrayList<>();
 
+    static SharedPreferences getStatsPrefs(Context context) {
+        return context.getSharedPreferences("stats", Context.MODE_PRIVATE);
+    }
+
     @Override
     protected void injectComponent(ActivityComponent appComponent) {
         appComponent.inject(this);
@@ -43,7 +47,7 @@ public class StatisticsActivity extends ActivityBase {
         getSupportActionBar().setDisplayHomeAsUpEnabled(true);
         getSupportActionBar().setDisplayShowHomeEnabled(true);
 
-        if (getApplicationContext().getResources().getBoolean(R.bool.isTablet)){
+        if (getApplicationContext().getResources().getBoolean(R.bool.isTablet)) {
             this.setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_SENSOR_LANDSCAPE);
         } else {
             this.setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_SENSOR_PORTRAIT);
@@ -64,7 +68,7 @@ public class StatisticsActivity extends ActivityBase {
         statsList.add(new StatsListItem("Links pro Episode", getStatsPrefs(c).getString("lpe", "")));
         statsList.add(new StatsListItem("Links pro Serie", getStatsPrefs(c).getString("lps", "")));
 
-        ((ListView) findViewById(R.id.statsListView)).setAdapter(new statsListViewAdapter());
+        ((ListView) findViewById(R.id.statsListView)).setAdapter(new StatsListViewAdapter());
 
         new Stats().execute();
     }
@@ -133,13 +137,13 @@ public class StatisticsActivity extends ActivityBase {
             statsList.add(new StatsListItem("Links pro Episode", getStatsPrefs(c).getString("lpe", "")));
             statsList.add(new StatsListItem("Links pro Serie", getStatsPrefs(c).getString("lps", "")));
 
-            ((ListView) findViewById(R.id.statsListView)).setAdapter(new statsListViewAdapter());
+            ((ListView) findViewById(R.id.statsListView)).setAdapter(new StatsListViewAdapter());
         }
     }
 
-    private class statsListViewAdapter extends ArrayAdapter<StatsListItem> {
+    private class StatsListViewAdapter extends ArrayAdapter<StatsListItem> {
 
-        statsListViewAdapter() {
+        StatsListViewAdapter() {
             super(getApplicationContext(), R.layout.list_item_stats, statsList);
         }
 
@@ -156,9 +160,5 @@ public class StatisticsActivity extends ActivityBase {
 
             return view;
         }
-    }
-
-    static SharedPreferences getStatsPrefs(Context context) {
-        return context.getSharedPreferences("stats", Context.MODE_PRIVATE);
     }
 }

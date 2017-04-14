@@ -6,12 +6,11 @@
     android:orientation="vertical"
     tools:context=".ui.mainFragments.SeriesFragment">
 
-    <ListView
-        android:id="@+id/genresListView"
+    <com.simplecityapps.recyclerview_fastscroll.views.FastScrollRecyclerView
+        android:id="@+id/genresRecyclerView"
         android:layout_width="600dp"
         android:layout_height="match_parent"
         android:layout_gravity="center_horizontal"
-        android:layout_margin="25dp"
-        android:divider="@null"
-        android:dividerHeight="0dp"/>
+        android:layout_margin="25dp"/>
+
 </LinearLayout>

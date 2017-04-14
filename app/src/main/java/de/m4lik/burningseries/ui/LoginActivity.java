@@ -134,9 +134,9 @@ public class LoginActivity extends AppCompatActivity implements Callback<Respons
                 String session = data[1].split(":")[1].replace("\"", "").replace("}", "").trim();
                 String user = data[0].split(":")[1].replace("\"", "").replace("}", "").trim();
                 Settings.of(this).raw().edit()
-                    .putString("pref_session", session)
-                    .putString("pref_user", user)
-                    .commit();
+                        .putString("pref_session", session)
+                        .putString("pref_user", user)
+                        .commit();
 
                 Context context = getApplicationContext();
 

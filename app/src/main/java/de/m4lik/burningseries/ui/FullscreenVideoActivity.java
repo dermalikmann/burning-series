@@ -24,6 +24,13 @@ public class FullscreenVideoActivity extends ActivityBase {
 
     private static final int UI_ANIMATION_DELAY = 300;
     private final Handler mHideHandler = new Handler();
+    private final Runnable mShowPart2Runnable = () -> {
+
+        ActionBar actionBar = getActionBar();
+        if (actionBar != null) {
+            actionBar.show();
+        }
+    };
     private EMVideoView videoView;
     private int position = 0;
     private View mContentView;
@@ -38,13 +45,6 @@ public class FullscreenVideoActivity extends ActivityBase {
                     | View.SYSTEM_UI_FLAG_IMMERSIVE_STICKY
                     | View.SYSTEM_UI_FLAG_LAYOUT_HIDE_NAVIGATION
                     | View.SYSTEM_UI_FLAG_HIDE_NAVIGATION);
-        }
-    };
-    private final Runnable mShowPart2Runnable = () -> {
-
-        ActionBar actionBar = getActionBar();
-        if (actionBar != null) {
-            actionBar.show();
         }
     };
     private boolean visible;

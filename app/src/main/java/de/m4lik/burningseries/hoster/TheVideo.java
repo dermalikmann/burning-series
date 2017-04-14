@@ -22,7 +22,7 @@ class TheVideo extends Hoster {
     static {
         filenamePattern = Pattern.compile("<input type=\"hidden\" name=\"fname\" value=\"[a-zA-Z0-9-]+\">");
         hashPattern = Pattern.compile("<input type=\"hidden\" name=\"hash\" value=\"([a-zA-Z0-9-]+)\">");
-        mpriPattern = Pattern.compile("var try_again='([a-zA-Z0-9]+)'");
+        mpriPattern = Pattern.compile("='([a-zA-Z0-9]{22,26})'");
         vtPattern = Pattern.compile("([a-zA-Z0-9]{15,})");
         hdPattern = Pattern.compile("file\":\"(https://([a-zA-Z0-9/.:]+))\",\"label\":\"720p\"");
         sdPattern = Pattern.compile("file\":\"(https://([a-zA-Z0-9/.:]+))\",\"label\":\"480p\"");
@@ -76,7 +76,7 @@ class TheVideo extends Hoster {
             String mpriKey = mpriMatcher.group(1);
 
 
-            String videoTokenRequest = GetRequestString("https://thevideo.me/jwv/" + mpriKey);
+            String videoTokenRequest = GetRequestString("https://thevideo.me/vsign/player/" + mpriKey);
 
             Matcher vtMatcher = vtPattern.matcher(videoTokenRequest);
             vtMatcher.find();

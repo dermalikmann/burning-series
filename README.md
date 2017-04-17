@@ -9,7 +9,7 @@ Hier geht's zum [Download](https://github.com/M4lik/burning-series/releases/tag/
 
 Hi und willkommen bei der neuen Android App für Burning Series. Dies ist momentan nur ein kleines Community-Projekt. Ich hoffe, dass ich es, zusammen mit eurer Hilfe, schaffen kann das Projekt in die neue Offizielle App von Burning Series zu verwandeln.
 
-Wie man sehen kann ist die App noch in der Pre-Release Phase, doch denke ich, dass sich das sehr bald ändern wird :wink:
+Wie man sehen kann ist die App noch in der Pre-Release Phase, doch ich denke, dass sich das sehr bald ändern wird :wink:
 
 ## Features
 

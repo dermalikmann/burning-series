@@ -22,10 +22,10 @@
                 android:id="@+id/coverImageView"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
+                android:adjustViewBounds="true"
                 android:background="@color/blue_primary_dark"
                 android:fitsSystemWindows="true"
-                android:scaleType="fitXY"
-                android:adjustViewBounds="true"/>
+                android:scaleType="fitXY"/>
 
             <Button
                 android:id="@+id/favButton"
@@ -35,10 +35,10 @@
                 android:text="Zu Favorieten hinzufügen"/>
 
             <LinearLayout
+                android:id="@+id/showDetails"
                 android:layout_width="match_parent"
                 android:layout_height="match_parent"
-                android:orientation="vertical"
-                android:id="@+id/showDetails">
+                android:orientation="vertical">
 
                 <TextView
                     android:layout_width="match_parent"

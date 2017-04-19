@@ -1,39 +1,39 @@
 <?xml version="1.0" encoding="utf-8"?>
 <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    android:layout_width="match_parent"
-    android:layout_height="190dp"
-    android:background="@drawable/navbarheader"
-    android:orientation="vertical"
+                android:layout_width="match_parent"
+                android:layout_height="190dp"
+                android:background="@drawable/navbarheader"
+                android:orientation="vertical"
     >
 
     <TextView
         android:id="@+id/profile_image"
         android:layout_width="70dp"
         android:layout_height="70dp"
-        android:background="@drawable/roundbackground"
-        android:layout_marginLeft="24dp"
-        android:layout_centerVertical="true"
         android:layout_alignParentLeft="true"
         android:layout_alignParentStart="true"
-        android:layout_marginStart="24dp"
-        android:gravity="center"
+        android:layout_centerVertical="true"
         android:layout_gravity="center"
-        android:textSize="35dp"
+        android:layout_marginLeft="24dp"
+        android:layout_marginStart="24dp"
+        android:background="@drawable/roundbackground"
+        android:gravity="center"
         android:text="BS"
         android:textColor="#ffffff"
-        android:textIsSelectable="true" />
+        android:textIsSelectable="true"
+        android:textSize="35dp"/>
 
     <TextView
+        android:id="@+id/nav_username_text"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:id="@+id/nav_username_text"
-        android:gravity="left"
-        android:textSize="14sp"
-        android:textColor="#fff"
-        android:layout_below="@+id/profile_image"
         android:layout_alignLeft="@+id/profile_image"
         android:layout_alignStart="@+id/profile_image"
+        android:layout_below="@+id/profile_image"
         android:layout_marginTop="19dp"
-        android:text="@string/placeholder_login" />
+        android:gravity="left"
+        android:text="@string/placeholder_login"
+        android:textColor="#fff"
+        android:textSize="14sp"/>
 
 </RelativeLayout>

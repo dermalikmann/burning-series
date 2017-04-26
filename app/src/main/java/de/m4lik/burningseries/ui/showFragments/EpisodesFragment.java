@@ -54,10 +54,7 @@ public class EpisodesFragment extends Fragment implements Callback<SeasonObj> {
 
     boolean loaded = false;
 
-    public EpisodesFragment() {
-
-    }
-
+    public EpisodesFragment() {}
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
@@ -88,7 +85,7 @@ public class EpisodesFragment extends Fragment implements Callback<SeasonObj> {
 
         Integer i = 1;
         for (SeasonObj.Episode episode : season.getEpisodes()) {
-            episodesList.add(new EpisodeListItem(episode.getGermanTitle() + " " + i, episode.getEnglishTitle(), episode.getEpisodeID(), episode.isWatched() == 1));
+            episodesList.add(new EpisodeListItem(episode.getGermanTitle(), episode.getEnglishTitle(), episode.getEpisodeID(), episode.isWatched() == 1));
             i++;
         }
 
@@ -115,8 +112,9 @@ public class EpisodesFragment extends Fragment implements Callback<SeasonObj> {
 
                     @Override
                     public void onItemClick(View view, int position) {
-                        TextView idView = (TextView) view.findViewById(R.id.episodeId);
-                        showEpisode(Integer.parseInt(idView.getText().toString()));
+                        Integer id = episodesList.get(position).getId();
+                        String name = episodesList.get(position).getTitleGer().equals("") ? episodesList.get(position).getTitle() : episodesList.get(position).getTitleGer();
+                        showEpisode(id, name);
                     }
 
                     @Override
@@ -168,8 +166,9 @@ public class EpisodesFragment extends Fragment implements Callback<SeasonObj> {
 
     }
 
-    private void showEpisode(Integer id) {
+    private void showEpisode(Integer id, String name) {
         ((ShowActivity) getActivity()).setSelectedEpisode(id);
+        ((ShowActivity) getActivity()).setEpisodeName(name);
         ((ShowActivity) getActivity()).switchEpisodesToHosters();
     }
 

@@ -12,7 +12,7 @@ import android.database.sqlite.SQLiteOpenHelper;
  */
 public class MainDBHelper extends SQLiteOpenHelper {
 
-    public static final int DATABASE_VERSION = 5;
+    public static final int DATABASE_VERSION = 6;
     public static final String DATABASE_NAME = "main.db";
 
 
@@ -22,13 +22,15 @@ public class MainDBHelper extends SQLiteOpenHelper {
 
     public void onCreate(SQLiteDatabase db) {
         db.execSQL(SeriesContract.SQL_CREATE_SERIES_TABLE);
+        db.execSQL(SeriesContract.SQL_CREATE_HISTORY_TABLE);
         db.execSQL(SeriesContract.SQL_CREATE_GENRES_TABLE);
-
     }
 
     public void onUpgrade(SQLiteDatabase db, int oldVersion, int newVersion) {
+        db.execSQL(SeriesContract.SQL_DELETE_SERIES_TABLE);
+        db.execSQL(SeriesContract.SQL_DELETE_GENRES_TABLE);
+        db.execSQL(SeriesContract.SQL_DELETE_HISTORY_TABLE);
         onCreate(db);
-
     }
 
     public void onDowngrade(SQLiteDatabase db, int oldVersion, int newVersion) {

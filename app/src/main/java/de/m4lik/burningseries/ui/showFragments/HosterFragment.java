@@ -3,8 +3,10 @@ package de.m4lik.burningseries.ui.showFragments;
 
 import android.app.Fragment;
 import android.app.ProgressDialog;
+import android.content.ContentValues;
 import android.content.Context;
 import android.content.Intent;
+import android.database.sqlite.SQLiteDatabase;
 import android.net.Uri;
 import android.os.AsyncTask;
 import android.os.Bundle;
@@ -21,6 +23,7 @@ import android.widget.ImageView;
 import android.widget.TextView;
 
 import java.util.ArrayList;
+import java.util.Calendar;
 import java.util.List;
 
 import butterknife.BindView;
@@ -30,6 +33,7 @@ import de.m4lik.burningseries.api.API;
 import de.m4lik.burningseries.api.APIInterface;
 import de.m4lik.burningseries.api.objects.EpisodeObj;
 import de.m4lik.burningseries.api.objects.VideoObj;
+import de.m4lik.burningseries.database.MainDBHelper;
 import de.m4lik.burningseries.databinding.ListItemHosterBinding;
 import de.m4lik.burningseries.hoster.Hoster;
 import de.m4lik.burningseries.ui.FullscreenVideoActivity;
@@ -43,6 +47,7 @@ import retrofit2.Call;
 import retrofit2.Callback;
 import retrofit2.Response;
 
+import static de.m4lik.burningseries.database.SeriesContract.historyTable;
 import static de.m4lik.burningseries.services.ThemeHelperService.theme;
 
 /**
@@ -55,6 +60,8 @@ public class HosterFragment extends Fragment implements Callback<EpisodeObj> {
     Integer selectedShow;
     Integer selectedSeason;
     Integer selectedEpisode;
+    String showName;
+    String episodeName;
 
     String userSession;
 
@@ -82,6 +89,8 @@ public class HosterFragment extends Fragment implements Callback<EpisodeObj> {
         selectedShow = ((ShowActivity) getActivity()).getSelectedShow();
         selectedSeason = ((ShowActivity) getActivity()).getSelectedSeason();
         selectedEpisode = ((ShowActivity) getActivity()).getSelectedEpisode();
+        showName = ((ShowActivity) getActivity()).getShowName();
+        episodeName = ((ShowActivity) getActivity()).getEpisodeName();
 
         userSession = Settings.of(getActivity()).getUserSession();
 
@@ -252,6 +261,23 @@ public class HosterFragment extends Fragment implements Callback<EpisodeObj> {
                 intent.putExtra("burning-series.videoURL", hosterReturn);
                 startActivity(intent);
             }
+
+            MainDBHelper dbHelper = new MainDBHelper(getActivity());
+            SQLiteDatabase db = dbHelper.getWritableDatabase();
+
+            ContentValues cv = new ContentValues();
+            Calendar calendar = Calendar.getInstance();
+
+            cv.put(historyTable.COLUMN_NAME_SHOW_ID, selectedShow);
+            cv.put(historyTable.COLUMN_NAME_SEASON_ID, selectedSeason);
+            cv.put(historyTable.COLUMN_NAME_EPISODE_ID, selectedEpisode);
+            cv.put(historyTable.COLUMN_NAME_SHOW_NAME, showName);
+            cv.put(historyTable.COLUMN_NAME_EPISODE_NAME, episodeName);
+            cv.put(historyTable.COLUMN_NAME_DATE, calendar.get(Calendar.DAY_OF_MONTH) + "." + calendar.get(Calendar.MONTH));
+            cv.put(historyTable.COLUMN_NAME_TIME, calendar.get(Calendar.HOUR_OF_DAY) + ":" + calendar.get(Calendar.MINUTE));
+
+            db.insert(historyTable.TABLE_NAME, null, cv);
+
             super.onPostExecute(aVoid);
         }
     }

@@ -28,6 +28,7 @@
     <string name="share_using">Teilen mit</string>
 
     <string name="no_series_found">Keine Serien gefunden</string>
+    <string name="nothing_watched">Bisher hast du noch nichts geschaut.</string>
     <string name="not_logged_in">Nicht angemeldet</string>
 
     <!-- Strings related to login -->

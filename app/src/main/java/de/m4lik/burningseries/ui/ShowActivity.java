@@ -48,8 +48,11 @@ public class ShowActivity extends ActivityBase {
 
     @BindView(R.id.fab)
     FloatingActionButton fab;
-    String userSession;
+
     Intent i;
+    String userSession;
+    Boolean fromWatchHistory;
+
     private String visibleFragment = "seasons";
 
     @Override
@@ -77,6 +80,12 @@ public class ShowActivity extends ActivityBase {
 
         showName = i.getStringExtra("ShowName");
         selectedShow = i.getIntExtra("ShowID", 60);
+        fromWatchHistory = i.getBooleanExtra("ShowEpisode", false);
+        if (fromWatchHistory) {
+            selectedSeason = i.getIntExtra("SeasonID", 1);
+            selectedEpisode = i.getIntExtra("EpisodeID", 1);
+        }
+
         Uri imageUri = Uri.parse("https://bs.to/public/img/cover/" + selectedShow + ".jpg");
         toolbar.setTitle(showName);
 
@@ -136,12 +145,17 @@ public class ShowActivity extends ActivityBase {
     }
 
     public void setDefaultFragment() {
-
-        getFragmentManager().beginTransaction()
-                .replace(R.id.fragmentContainerShow, new SeasonsFragment())
-                .commit();
-
-        visibleFragment = "seasons";
+        if (fromWatchHistory) {
+            getFragmentManager().beginTransaction()
+                    .replace(R.id.fragmentContainerShow, new HosterFragment())
+                    .commit();
+            visibleFragment = "hoster";
+        } else {
+            getFragmentManager().beginTransaction()
+                    .replace(R.id.fragmentContainerShow, new SeasonsFragment())
+                    .commit();
+            visibleFragment = "seasons";
+        }
     }
 
     @Override

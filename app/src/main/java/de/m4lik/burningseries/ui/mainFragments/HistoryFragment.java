@@ -116,7 +116,8 @@ public class HistoryFragment extends Fragment {
                             Integer seasonId = Integer.parseInt(((TextView) view.findViewById(R.id.seasonId)).getText().toString());
                             Integer episodeId = Integer.parseInt(((TextView) view.findViewById(R.id.episodeId)).getText().toString());
                             String name = ((TextView) view.findViewById(R.id.seriesTitle)).getText().toString();
-                            showSeries(showId, seasonId, episodeId, name);
+                            String epiName = ((TextView) view.findViewById(R.id.episodeTitle)).getText().toString();
+                            showSeries(showId, seasonId, episodeId, name, epiName);
                         }
 
                         @Override
@@ -133,7 +134,7 @@ public class HistoryFragment extends Fragment {
         return rootView;
     }
 
-    private void showSeries(Integer showID, Integer seasonID, Integer episodeID, String name) {
+    private void showSeries(Integer showID, Integer seasonID, Integer episodeID, String name, String epiName) {
         Intent i = new Intent(getActivity(), ShowActivity.class);
         if (getContext().getResources().getBoolean(R.bool.isTablet))
             i = new Intent(getActivity(), TabletShowActivity.class);
@@ -141,6 +142,7 @@ public class HistoryFragment extends Fragment {
         i.putExtra("SeasonID", seasonID);
         i.putExtra("EpisodeID", episodeID);
         i.putExtra("ShowName", name);
+        i.putExtra("EpisodeName", epiName);
         i.putExtra("ShowEpisode", true);
         startActivity(i);
     }

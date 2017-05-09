@@ -29,6 +29,7 @@ import android.widget.TextView;
 import com.bumptech.glide.Glide;
 
 import java.util.ArrayList;
+import java.util.Calendar;
 import java.util.List;
 
 import butterknife.BindView;
@@ -41,6 +42,7 @@ import de.m4lik.burningseries.api.objects.FullShowObj;
 import de.m4lik.burningseries.api.objects.SeasonObj;
 import de.m4lik.burningseries.api.objects.VideoObj;
 import de.m4lik.burningseries.database.MainDBHelper;
+import de.m4lik.burningseries.database.SeriesContract;
 import de.m4lik.burningseries.databinding.ListItemEpisodesBinding;
 import de.m4lik.burningseries.databinding.ListItemHosterBinding;
 import de.m4lik.burningseries.hoster.Hoster;
@@ -64,9 +66,13 @@ public class TabletShowActivity extends ActivityBase {
 
     Integer currentShow;
     Integer currentSeason;
+    Integer currentEpisode;
+    String showName;
+    String episodeName;
 
     Boolean fav = false;
     Boolean loaded = false;
+    Boolean fromWatchHistory = false;
 
     @BindView(R.id.favButton)
     Button favButton;
@@ -104,6 +110,12 @@ public class TabletShowActivity extends ActivityBase {
     @BindView(R.id.coverImageView)
     ImageView coverImageView;
 
+    @BindView(R.id.episodeName)
+    TextView episodeNameTV;
+
+    @BindView(R.id.seasonTV)
+    TextView seasonTV;
+
     String userSession;
 
     List<SeasonListItem> seasons = new ArrayList<>();
@@ -129,6 +141,15 @@ public class TabletShowActivity extends ActivityBase {
 
         String title = i.getStringExtra("ShowName");
         currentShow = i.getIntExtra("ShowID", 60);
+
+        fromWatchHistory = i.getBooleanExtra("ShowEpisode", false);
+        if (fromWatchHistory) {
+            currentSeason = i.getIntExtra("SeasonID", 1);
+            currentEpisode = i.getIntExtra("EpisodeID", 1);
+            episodeName = i.getStringExtra("EpisodeName");
+        }
+
+        showName = title;
         Uri imageUri = Uri.parse("https://bs.to/public/img/cover/" + currentShow + ".jpg");
         getSupportActionBar().setTitle(title);
 
@@ -187,12 +208,15 @@ public class TabletShowActivity extends ActivityBase {
                 if (!loaded)
                     refreshSeries(season);
 
+                seasonTV.setText("Staffel " + currentSeason + ":");
+
                 episodes = new ArrayList<>();
 
-                int i = 1;
                 for (SeasonObj.Episode episode : season.getEpisodes()) {
-                    episodes.add(new EpisodeListItem(i + " " + episode.getGermanTitle(), episode.getEnglishTitle(), episode.getEpisodeID(), episode.isWatched() == 1));
-                    i++;
+                    episodes.add(new EpisodeListItem(episode.getGermanTitle(),
+                            episode.getEnglishTitle(),
+                            episode.getEpisodeID(),
+                            episode.isWatched() == 1));
                 }
 
                 refreshEpisodesList();
@@ -221,6 +245,7 @@ public class TabletShowActivity extends ActivityBase {
         episodeCall.enqueue(new Callback<EpisodeObj>() {
             @Override
             public void onResponse(Call<EpisodeObj> call, Response<EpisodeObj> response) {
+                currentEpisode = episode;
                 EpisodeObj episode = response.body();
 
                 hosters = new ArrayList<>();
@@ -260,7 +285,8 @@ public class TabletShowActivity extends ActivityBase {
                     @Override
                     public void onItemClick(View view, int position) {
                         EpisodeListItem clickedEpisode = episodes.get(position);
-                        ((TextView) findViewById(R.id.episodeName)).setText(clickedEpisode.getTitleGer().equals("") ? clickedEpisode.getTitle() : clickedEpisode.getTitleGer());
+                        episodeName = clickedEpisode.getTitleGer().equals("") ? clickedEpisode.getTitle() : clickedEpisode.getTitleGer();
+                        episodeNameTV.setText(episodeName);
                         TextView idView = (TextView) view.findViewById(R.id.episodeId);
                         showEpisode(currentSeason, Integer.parseInt(idView.getText().toString()));
                     }
@@ -313,7 +339,7 @@ public class TabletShowActivity extends ActivityBase {
                 })
         );
 
-        showSeason(1);
+        showSeason(fromWatchHistory ? currentSeason : 1);
     }
 
     private void setupHosterList() {
@@ -351,10 +377,15 @@ public class TabletShowActivity extends ActivityBase {
                 })
         );
 
-        showEpisode(1, 1);
+        if (fromWatchHistory) {
+            episodeNameTV.setText(episodeName);
+            showEpisode(currentSeason, currentEpisode);
+        } else
+            showEpisode(1, 1);
     }
 
     private void refreshSeries(SeasonObj seasonObj) {
+        loaded = true;
         FullShowObj show = seasonObj.getSeries();
 
         descriptionTV.setText(show.getDescription());
@@ -673,12 +704,28 @@ public class TabletShowActivity extends ActivityBase {
                     return;
             }
 
+
+            MainDBHelper dbHelper = new MainDBHelper(getApplicationContext());
+            SQLiteDatabase db = dbHelper.getWritableDatabase();
+
+            ContentValues cv = new ContentValues();
+            Calendar calendar = Calendar.getInstance();
+
+            cv.put(SeriesContract.historyTable.COLUMN_NAME_SHOW_ID, currentShow);
+            cv.put(SeriesContract.historyTable.COLUMN_NAME_SEASON_ID, currentSeason);
+            cv.put(SeriesContract.historyTable.COLUMN_NAME_EPISODE_ID, currentEpisode);
+            cv.put(SeriesContract.historyTable.COLUMN_NAME_SHOW_NAME, showName);
+            cv.put(SeriesContract.historyTable.COLUMN_NAME_EPISODE_NAME, episodeName);
+            cv.put(SeriesContract.historyTable.COLUMN_NAME_DATE, calendar.get(Calendar.DAY_OF_MONTH) + "." + calendar.get(Calendar.MONTH));
+            cv.put(SeriesContract.historyTable.COLUMN_NAME_TIME, calendar.get(Calendar.HOUR_OF_DAY) + ":" + calendar.get(Calendar.MINUTE));
+
+            db.insert(SeriesContract.historyTable.TABLE_NAME, null, cv);
+
             if (hosterReturn.equals("unkown_hoster")) {
                 CustomTabsIntent.Builder builder = new CustomTabsIntent.Builder();
                 CustomTabsIntent customTabsIntent = builder.build();
                 customTabsIntent.launchUrl(context, Uri.parse(videoObj.getFullUrl()));
             } else {
-                //Intent intent = new Intent(getContext(), BufferedVideoPlayerActivity.class);
                 Intent intent = new Intent(context, FullscreenVideoActivity.class);
                 intent.putExtra("burning-series.videoURL", hosterReturn);
                 startActivity(intent);

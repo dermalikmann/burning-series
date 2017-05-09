@@ -38,17 +38,21 @@ import static de.m4lik.burningseries.services.ThemeHelperService.theme;
 
 public class ShowActivity extends ActivityBase {
 
-    public Integer selectedShow;
-    public Integer selectedSeason;
-    public Integer selectedEpisode;
-    public Integer seasonCount;
-    public Boolean withSpecials = false;
+    private Integer selectedShow;
+    private Integer selectedSeason;
+    private Integer selectedEpisode;
+    private String showName;
+    private String episodeName;
+
     public Boolean fav = false;
+
     @BindView(R.id.fab)
     FloatingActionButton fab;
-    String userSession;
+
     Intent i;
-    private String description;
+    String userSession;
+    Boolean fromWatchHistory;
+
     private String visibleFragment = "seasons";
 
     @Override
@@ -74,10 +78,16 @@ public class ShowActivity extends ActivityBase {
             this.setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_SENSOR_PORTRAIT);
         }
 
-        String title = i.getStringExtra("ShowName");
+        showName = i.getStringExtra("ShowName");
         selectedShow = i.getIntExtra("ShowID", 60);
+        fromWatchHistory = i.getBooleanExtra("ShowEpisode", false);
+        if (fromWatchHistory) {
+            selectedSeason = i.getIntExtra("SeasonID", 1);
+            selectedEpisode = i.getIntExtra("EpisodeID", 1);
+        }
+
         Uri imageUri = Uri.parse("https://bs.to/public/img/cover/" + selectedShow + ".jpg");
-        toolbar.setTitle(title);
+        toolbar.setTitle(showName);
 
         Log.v("BS", "Lade Cover.");
         Glide.with(getApplicationContext())
@@ -135,12 +145,17 @@ public class ShowActivity extends ActivityBase {
     }
 
     public void setDefaultFragment() {
-
-        getFragmentManager().beginTransaction()
-                .replace(R.id.fragmentContainerShow, new SeasonsFragment())
-                .commit();
-
-        visibleFragment = "seasons";
+        if (fromWatchHistory) {
+            getFragmentManager().beginTransaction()
+                    .replace(R.id.fragmentContainerShow, new HosterFragment())
+                    .commit();
+            visibleFragment = "hoster";
+        } else {
+            getFragmentManager().beginTransaction()
+                    .replace(R.id.fragmentContainerShow, new SeasonsFragment())
+                    .commit();
+            visibleFragment = "seasons";
+        }
     }
 
     @Override
@@ -181,10 +196,6 @@ public class ShowActivity extends ActivityBase {
      * Getter & Setter
      */
 
-    public String getDescription() {
-        return description;
-    }
-
     public Integer getSelectedShow() {
         return selectedShow;
     }
@@ -193,24 +204,36 @@ public class ShowActivity extends ActivityBase {
         return selectedSeason;
     }
 
-    public void setSelectedSeason(Integer selectedSeason) {
-        this.selectedSeason = selectedSeason;
-    }
-
     public Integer getSelectedEpisode() {
         return selectedEpisode;
+    }
+
+    public String getShowName() {
+        return showName;
+    }
+
+    public String getEpisodeName() {
+        return episodeName;
+    }
+
+    public void setSelectedShow(Integer selectedShow) {
+        this.selectedShow = selectedShow;
+    }
+
+    public void setSelectedSeason(Integer selectedSeason) {
+        this.selectedSeason = selectedSeason;
     }
 
     public void setSelectedEpisode(Integer selectedEpisode) {
         this.selectedEpisode = selectedEpisode;
     }
 
-    public Integer getSeasonCount() {
-        return seasonCount;
+    public void setShowName(String showName) {
+        this.showName = showName;
     }
 
-    public Boolean withSpecials() {
-        return withSpecials;
+    public void setEpisodeName(String episodeName) {
+        this.episodeName = episodeName;
     }
 
     /*

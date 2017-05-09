@@ -242,6 +242,7 @@
                 android:padding="5dp">
 
                 <TextView
+                    android:id="@+id/seasonTV"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:layout_marginBottom="16dp"
@@ -251,7 +252,7 @@
                     android:layout_marginStart="11dp"
                     android:layout_marginTop="11dp"
                     android:text="Episoden:"
-                    android:textAppearance="?android:attr/textAppearanceMedium"/>
+                    android:textAppearance="?android:attr/textAppearanceMedium" />
 
                 <android.support.v7.widget.RecyclerView
                     android:id="@+id/episodesRecyclerView"

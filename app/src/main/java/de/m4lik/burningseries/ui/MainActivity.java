@@ -51,6 +51,7 @@ import de.m4lik.burningseries.ui.base.ActivityBase;
 import de.m4lik.burningseries.ui.dialogs.UpdateDialog;
 import de.m4lik.burningseries.ui.mainFragments.FavsFragment;
 import de.m4lik.burningseries.ui.mainFragments.GenresFragment;
+import de.m4lik.burningseries.ui.mainFragments.HistoryFragment;
 import de.m4lik.burningseries.ui.mainFragments.NewsFragment;
 import de.m4lik.burningseries.ui.mainFragments.SeriesFragment;
 import de.m4lik.burningseries.util.Logger;
@@ -255,6 +256,10 @@ public class MainActivity extends ActivityBase
                 setFragment("favorites");
                 break;
 
+            case R.id.nav_history:
+                setFragment("history");
+                break;
+
             case R.id.login_menu_item:
                 intent = new Intent(this, LoginActivity.class);
                 startActivity(intent);
@@ -360,6 +365,12 @@ public class MainActivity extends ActivityBase
                 transaction.replace(R.id.fragmentContainerMain, new FavsFragment(), "favsFragment");
                 transaction.commit();
                 visibleFragment = "favorites";
+                break;
+            case "history":
+                searchItem.setVisible(false);
+                transaction.replace(R.id.fragmentContainerMain, new HistoryFragment(), "historyFragment");
+                transaction.commit();
+                visibleFragment = "history";
                 break;
             case "news":
                 searchItem.setVisible(false);

@@ -55,6 +55,19 @@ public enum Themes {
             R.drawable.list_item_background_light
     ),
 
+    PURPLE(R.string.theme_purple,
+            "9C27B0",
+            R.color.purple_primary,
+            R.color.purple_primary_dark,
+            R.style.BurningSeries_Purple,
+            R.style.BurningSeries_Purple_NoActionBar,
+            R.style.BurningSeries_Purple_NoActionBar_Fullscreen,
+            R.style.BurningSeries_Purple_NoActionBar_TranslucentStatus,
+            R.style.BurningSeries_Purple_NoActionBar_WhiteAccent,
+            R.drawable.cover_gradient_blue,
+            R.drawable.list_item_background_light
+    ),
+
     BLUE_DARK(R.string.theme_blue_dark,
             "4354a9",
             R.color.blue_primary,
@@ -69,7 +82,7 @@ public enum Themes {
     ),
 
     GREEN_DARK(R.string.theme_green_dark,
-            "4354a9",
+            "4CAF50",
             R.color.green_primary,
             R.color.green_primary_dark,
             R.style.BurningSeries_Green_Dark,
@@ -82,7 +95,7 @@ public enum Themes {
     ),
 
     ORANGE_DARK(R.string.theme_orange_dark,
-            "4354a9",
+            "F8782D",
             R.color.orange_primary,
             R.color.orange_primary_dark,
             R.style.BurningSeries_Orange_Dark,
@@ -91,6 +104,19 @@ public enum Themes {
             R.style.BurningSeries_Orange_Dark_NoActionBar_TranslucentStatus,
             R.style.BurningSeries_Orange_Dark_NoActionBar_WhiteAccent,
             R.drawable.cover_gradient_orange,
+            R.drawable.list_item_background_dark
+    ),
+
+    PURPLE_DARK(R.string.theme_purple_dark,
+            "4354a9",
+            R.color.purple_primary,
+            R.color.purple_primary_dark,
+            R.style.BurningSeries_Purple_Dark,
+            R.style.BurningSeries_Purple_Dark_NoActionBar,
+            R.style.BurningSeries_Purple_Dark_NoActionBar_Fullscreen,
+            R.style.BurningSeries_Purple_Dark_NoActionBar_TranslucentStatus,
+            R.style.BurningSeries_Purple_Dark_NoActionBar_WhiteAccent,
+            R.drawable.cover_gradient_blue,
             R.drawable.list_item_background_dark
     );
 

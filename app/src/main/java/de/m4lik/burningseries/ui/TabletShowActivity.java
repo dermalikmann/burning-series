@@ -4,23 +4,18 @@ import android.app.ProgressDialog;
 import android.content.ContentValues;
 import android.content.Context;
 import android.content.Intent;
-import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.graphics.drawable.Drawable;
 import android.net.Uri;
 import android.os.AsyncTask;
 import android.os.Bundle;
-import android.support.annotation.NonNull;
 import android.support.customtabs.CustomTabsIntent;
 import android.support.design.widget.Snackbar;
 import android.support.v4.content.ContextCompat;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.util.Log;
-import android.view.LayoutInflater;
 import android.view.View;
-import android.view.ViewGroup;
-import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.ImageView;
 import android.widget.ListView;
@@ -43,23 +38,23 @@ import de.m4lik.burningseries.api.objects.SeasonObj;
 import de.m4lik.burningseries.api.objects.VideoObj;
 import de.m4lik.burningseries.database.MainDBHelper;
 import de.m4lik.burningseries.database.SeriesContract;
-import de.m4lik.burningseries.databinding.ListItemEpisodesBinding;
-import de.m4lik.burningseries.databinding.ListItemHosterBinding;
 import de.m4lik.burningseries.hoster.Hoster;
 import de.m4lik.burningseries.ui.base.ActivityBase;
 import de.m4lik.burningseries.ui.dialogs.DialogBuilder;
 import de.m4lik.burningseries.ui.listitems.EpisodeListItem;
 import de.m4lik.burningseries.ui.listitems.HosterListItem;
 import de.m4lik.burningseries.ui.listitems.SeasonListItem;
+import de.m4lik.burningseries.ui.viewAdapters.EpisodesRecyclerAdapter;
+import de.m4lik.burningseries.ui.viewAdapters.HosterRecyclerAdapter;
+import de.m4lik.burningseries.ui.viewAdapters.SeasonsListAdapter;
 import de.m4lik.burningseries.util.AndroidUtility;
 import de.m4lik.burningseries.util.Settings;
+import de.m4lik.burningseries.util.ShowUtils;
 import de.m4lik.burningseries.util.listeners.RecyclerItemClickListener;
-import okhttp3.ResponseBody;
 import retrofit2.Call;
 import retrofit2.Callback;
 import retrofit2.Response;
 
-import static de.m4lik.burningseries.database.SeriesContract.seriesTable;
 import static de.m4lik.burningseries.services.ThemeHelperService.theme;
 
 public class TabletShowActivity extends ActivityBase {
@@ -163,7 +158,7 @@ public class TabletShowActivity extends ActivityBase {
 
         userSession = Settings.of(this).getUserSession();
 
-        fav = isFav();
+        fav = ShowUtils.isFav(this, currentShow);
 
         final Drawable favStar = ContextCompat.getDrawable(getApplicationContext(), R.drawable.ic_star_white);
         favStar.setBounds(0, 0, 50, 50);
@@ -176,11 +171,11 @@ public class TabletShowActivity extends ActivityBase {
 
         favButton.setOnClickListener(view -> {
             if (!fav) {
-                addToFavorites();
+                ShowUtils.addToFavorites(this, currentShow);
                 favButton.setCompoundDrawables(favStar, null, null, null);
                 fav = !fav;
             } else {
-                removeFromFavorites();
+                ShowUtils.removeFromFavorites(this, currentShow);
                 favButton.setCompoundDrawables(notFavStar, null, null, null);
                 fav = !fav;
             }
@@ -353,7 +348,7 @@ public class TabletShowActivity extends ActivityBase {
                         if (Settings.of(getApplicationContext()).alarmOnMobile() &&
                                 AndroidUtility.isOnMobile(getApplicationContext())) {
 
-                            DialogBuilder.start(TabletShowActivity.this)
+                            DialogBuilder.start(getApplicationContext())
                                     .title("Mobile Daten")
                                     .content("Achtung! Du bist über mobile Daten im Internet. Willst du Fortfahren?")
                                     .positive("Weiter", dialog -> {
@@ -439,168 +434,20 @@ public class TabletShowActivity extends ActivityBase {
             seasons.add(new SeasonListItem(i));
         }
 
-        seasonsListView.setAdapter(new SeasonsListAdapter());
+        seasonsListView.setAdapter(new SeasonsListAdapter(this, seasons));
         seasonsListView.setOnItemClickListener((parent, view, position, id) -> {
             showSeason(Integer.parseInt(((TextView) view.findViewById(R.id.seasonId)).getText().toString()));
         });
     }
 
     private void refreshEpisodesList() {
-        episodesRecyclerView.setAdapter(new EpisodesRecyclerAdapter(episodes));
+        episodesRecyclerView.setAdapter(new EpisodesRecyclerAdapter(this, episodes));
     }
 
     private void refreshHosterList() {
-        hosterRecyclerView.setAdapter(new HosterRecyclerAdapter(hosters));
+        hosterRecyclerView.setAdapter(new HosterRecyclerAdapter(this, hosters));
     }
 
-
-
-    /* Fav functions */
-
-    private boolean isFav() {
-
-        boolean fav;
-
-        MainDBHelper dbHelper = new MainDBHelper(getApplicationContext());
-        SQLiteDatabase db = dbHelper.getWritableDatabase();
-
-        String[] projection = {
-                seriesTable.COLUMN_NAME_ID
-        };
-
-        String selection = seriesTable.COLUMN_NAME_ID + " = ? AND "
-                + seriesTable.COLUMN_NAME_ISFAV + " = ?";
-        String[] selectionArgs = {currentShow.toString(), "1"};
-
-        Cursor c = db.query(
-                seriesTable.TABLE_NAME,
-                projection,
-                selection,
-                selectionArgs,
-                null,
-                null,
-                null
-        );
-
-        fav = c.getCount() == 1;
-
-        c.close();
-        db.close();
-
-        return fav;
-    }
-
-    private void addToFavorites() {
-
-        MainDBHelper dbHelper = new MainDBHelper(getApplicationContext());
-        SQLiteDatabase db = dbHelper.getWritableDatabase();
-
-        ContentValues cv = new ContentValues();
-        cv.put(seriesTable.COLUMN_NAME_ISFAV, 1);
-        db.update(seriesTable.TABLE_NAME, cv, seriesTable.COLUMN_NAME_ID + " = " + currentShow, null);
-
-
-        String[] projection = {
-                seriesTable.COLUMN_NAME_ID
-        };
-
-        String selection = seriesTable.COLUMN_NAME_ISFAV + " = ?";
-        String[] selectionArgs = {"1"};
-
-        Cursor c = db.query(
-                seriesTable.TABLE_NAME,
-                projection,
-                selection,
-                selectionArgs,
-                null,
-                null,
-                null
-        );
-
-        String favs = "";
-        while (c.moveToNext())
-            favs += c.getInt(c.getColumnIndex(seriesTable.COLUMN_NAME_ID)) + ",";
-        favs = favs.substring(0, favs.length() - 1);
-
-        c.close();
-        db.close();
-
-
-        if (!userSession.equals("")) {
-            API api = new API();
-            APIInterface apiInterface = api.getInterface();
-            api.setSession(userSession);
-            api.generateToken("user/series/set/" + favs);
-            Call<ResponseBody> call = apiInterface.setFavorites(api.getToken(), api.getUserAgent(), favs, api.getSession());
-            call.enqueue(new Callback<ResponseBody>() {
-                @Override
-                public void onResponse(Call<ResponseBody> call, Response<ResponseBody> response) {
-                    //TODO Some error handling. Just in case.
-                }
-
-                @Override
-                public void onFailure(Call<ResponseBody> call, Throwable t) {
-                    //TODO Some error handling. Just in case.
-                }
-            });
-        }
-
-    }
-
-    private void removeFromFavorites() {
-
-        MainDBHelper dbHelper = new MainDBHelper(getApplicationContext());
-        SQLiteDatabase db = dbHelper.getWritableDatabase();
-
-        ContentValues cv = new ContentValues();
-        cv.put(seriesTable.COLUMN_NAME_ISFAV, 0);
-        db.update(seriesTable.TABLE_NAME, cv, seriesTable.COLUMN_NAME_ID + " = " + currentShow, null);
-
-        String[] projection = {
-                seriesTable.COLUMN_NAME_ID
-        };
-
-        String selection = seriesTable.COLUMN_NAME_ISFAV + " = ?";
-        String[] selectionArgs = {"1"};
-
-        Cursor c = db.query(
-                seriesTable.TABLE_NAME,
-                projection,
-                selection,
-                selectionArgs,
-                null,
-                null,
-                null
-        );
-
-        String favs = "";
-        while (c.moveToNext())
-            favs += c.getInt(c.getColumnIndex(seriesTable.COLUMN_NAME_ID)) + ",";
-        if (!favs.equals(""))
-            favs = favs.substring(0, favs.length() - 1);
-
-        c.close();
-        db.close();
-
-
-        if (!userSession.equals("")) {
-            API api = new API();
-            APIInterface apiInterface = api.getInterface();
-            api.setSession(userSession);
-            api.generateToken("user/series/set/" + favs);
-            Call<ResponseBody> call = apiInterface.setFavorites(api.getToken(), api.getUserAgent(), favs, api.getSession());
-            call.enqueue(new Callback<ResponseBody>() {
-                @Override
-                public void onResponse(Call<ResponseBody> call, Response<ResponseBody> response) {
-                }
-
-                @Override
-                public void onFailure(Call<ResponseBody> call, Throwable t) {
-
-                }
-            });
-        }
-    }
 
 
     private void showVideo(Integer id) {
@@ -731,172 +578,6 @@ public class TabletShowActivity extends ActivityBase {
                 startActivity(intent);
             }
             super.onPostExecute(aVoid);
-        }
-    }
-
-
-
-    /* View classes */
-
-    private class SeasonsListAdapter extends ArrayAdapter<SeasonListItem> {
-
-        SeasonsListAdapter() {
-            super(getApplicationContext(), R.layout.list_item_seasons, seasons);
-        }
-
-        @NonNull
-        @Override
-        public View getView(int pos, View view, @NonNull ViewGroup parent) {
-            if (view == null) {
-                view = getLayoutInflater().inflate(R.layout.list_item_seasons, parent, false);
-            }
-
-            view.findViewById(R.id.listItemContainer).setBackground(getResources().getDrawable(theme().listItemBackground));
-
-            SeasonListItem current = seasons.get(pos);
-
-            TextView label = (TextView) view.findViewById(R.id.seasonLabel);
-            label.setText(getString(R.string.season) + current.getSeasonId());
-
-            TextView urlText = (TextView) view.findViewById(R.id.seasonId);
-            urlText.setText(current.getSeasonId().toString());
-
-            return view;
-        }
-    }
-
-    private class EpisodesRecyclerAdapter extends RecyclerView.Adapter<EpisodesRecyclerAdapter.EpisodesViewHolder> {
-
-        Context context = getApplicationContext();
-
-        List<EpisodeListItem> list = new ArrayList<>();
-
-        EpisodesRecyclerAdapter(List<EpisodeListItem> list) {
-            this.list = list;
-        }
-
-        @Override
-        public EpisodesViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
-            LayoutInflater layoutInflater = LayoutInflater.from(context);
-            ListItemEpisodesBinding binding = ListItemEpisodesBinding.inflate(layoutInflater, parent, false);
-            return new EpisodesViewHolder(binding);
-        }
-
-        @Override
-        public void onBindViewHolder(EpisodesViewHolder holder, int position) {
-            EpisodeListItem current = list.get(position);
-            holder.bind(current);
-        }
-
-        @Override
-        public int getItemCount() {
-            return list.size();
-        }
-
-        class EpisodesViewHolder extends RecyclerView.ViewHolder {
-
-            ListItemEpisodesBinding binding;
-
-            EpisodesViewHolder(ListItemEpisodesBinding binding) {
-                super(binding.getRoot());
-                this.binding = binding;
-            }
-
-            public void bind(EpisodeListItem item) {
-                binding.setEpisode(item);
-
-                View root = binding.getRoot();
-
-                boolean isDark = Settings.of(context).isDarkTheme();
-
-                root.findViewById(R.id.listItemContainer)
-                        .setBackground(ContextCompat.getDrawable(context, theme().listItemBackground));
-
-                if (!isDark) {
-                    ((TextView) root.findViewById(R.id.episodeTitleGer))
-                            .setTextColor(ContextCompat.getColor(context, item.isWatched() ?
-                                    android.R.color.darker_gray : android.R.color.black));
-                } else {
-                    ((TextView) root.findViewById(R.id.episodeTitleGer))
-                            .setTextColor(ContextCompat.getColor(context, android.R.color.darker_gray));
-                    ((TextView) root.findViewById(R.id.episodeTitle))
-                            .setTextColor(ContextCompat.getColor(context, android.R.color.darker_gray));
-                }
-
-
-                if (item.isWatched())
-                    ((ImageView) root.findViewById(R.id.watchedImageView))
-                            .setImageDrawable(ContextCompat.getDrawable(context, isDark ?
-                                    R.drawable.ic_watched_white : R.drawable.ic_watched));
-                else
-                    ((ImageView) root.findViewById(R.id.watchedImageView))
-                            .setImageDrawable(null);
-
-                binding.executePendingBindings();
-            }
-        }
-    }
-
-    private class HosterRecyclerAdapter extends RecyclerView.Adapter<HosterRecyclerAdapter.HosterViewHolder> {
-
-        Context context = getApplicationContext();
-
-        List<HosterListItem> list = new ArrayList<>();
-
-        HosterRecyclerAdapter(List<HosterListItem> list) {
-            this.list = list;
-        }
-
-        @Override
-        public HosterRecyclerAdapter.HosterViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
-            LayoutInflater layoutInflater = LayoutInflater.from(getApplicationContext());
-            ListItemHosterBinding binding = ListItemHosterBinding.inflate(layoutInflater, parent, false);
-            return new HosterViewHolder(binding);
-        }
-
-        @Override
-        public void onBindViewHolder(HosterViewHolder holder, int position) {
-            HosterListItem current = list.get(position);
-            holder.bind(current);
-        }
-
-        @Override
-        public int getItemCount() {
-            return list.size();
-        }
-
-        class HosterViewHolder extends RecyclerView.ViewHolder {
-
-            ListItemHosterBinding binding;
-
-            HosterViewHolder(ListItemHosterBinding binding) {
-                super(binding.getRoot());
-                this.binding = binding;
-            }
-
-            public void bind(HosterListItem item) {
-                binding.setHoster(item);
-
-                View root = binding.getRoot();
-                boolean isDark = Settings.of(context).isDarkTheme();
-
-                root.findViewById(R.id.listItemContainer).setBackground(ContextCompat.getDrawable(context, theme().listItemBackground));
-
-                if (isDark)
-                    ((TextView) root.findViewById(R.id.hosterLabel))
-                            .setTextColor(ContextCompat.getColor(context, android.R.color.darker_gray));
-
-                if (item.isSupported())
-                    ((ImageView) root.findViewById(R.id.supImgView))
-                            .setImageDrawable(ContextCompat.getDrawable(context, isDark ?
-                                    R.drawable.ic_ondemand_video_white : R.drawable.ic_ondemand_video));
-                else
-                    ((ImageView) root.findViewById(R.id.supImgView))
-                            .setImageDrawable(ContextCompat.getDrawable(context, isDark ?
-                                    R.drawable.ic_public_white : R.drawable.ic_public));
-
-                binding.executePendingBindings();
-            }
         }
     }
 }

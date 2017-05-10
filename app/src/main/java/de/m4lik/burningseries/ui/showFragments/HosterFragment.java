@@ -4,7 +4,6 @@ package de.m4lik.burningseries.ui.showFragments;
 import android.app.Fragment;
 import android.app.ProgressDialog;
 import android.content.ContentValues;
-import android.content.Context;
 import android.content.Intent;
 import android.database.sqlite.SQLiteDatabase;
 import android.net.Uri;
@@ -19,7 +18,6 @@ import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.ImageView;
 import android.widget.TextView;
 
 import java.util.ArrayList;
@@ -34,12 +32,12 @@ import de.m4lik.burningseries.api.APIInterface;
 import de.m4lik.burningseries.api.objects.EpisodeObj;
 import de.m4lik.burningseries.api.objects.VideoObj;
 import de.m4lik.burningseries.database.MainDBHelper;
-import de.m4lik.burningseries.databinding.ListItemHosterBinding;
 import de.m4lik.burningseries.hoster.Hoster;
 import de.m4lik.burningseries.ui.FullscreenVideoActivity;
 import de.m4lik.burningseries.ui.ShowActivity;
 import de.m4lik.burningseries.ui.dialogs.DialogBuilder;
 import de.m4lik.burningseries.ui.listitems.HosterListItem;
+import de.m4lik.burningseries.ui.viewAdapters.HosterRecyclerAdapter;
 import de.m4lik.burningseries.util.AndroidUtility;
 import de.m4lik.burningseries.util.Settings;
 import de.m4lik.burningseries.util.listeners.RecyclerItemClickListener;
@@ -67,7 +65,7 @@ public class HosterFragment extends Fragment implements Callback<EpisodeObj> {
 
     ProgressDialog progressDialog;
 
-    ArrayList<HosterListItem> hostersList = new ArrayList<>();
+    List<HosterListItem> hostersList = new ArrayList<>();
     String hosterReturn;
 
     @BindView(R.id.hosterRecyclerView)
@@ -130,7 +128,7 @@ public class HosterFragment extends Fragment implements Callback<EpisodeObj> {
     private void refreshList() {
 
         hosterRecyclerView.setLayoutManager(new LinearLayoutManager(getActivity(), LinearLayoutManager.VERTICAL, false));
-        hosterRecyclerView.setAdapter(new HosterRecyclerAdapter(hostersList));
+        hosterRecyclerView.setAdapter(new HosterRecyclerAdapter(getActivity(), hostersList));
         hosterRecyclerView.addOnItemTouchListener(
                 new RecyclerItemClickListener(getActivity(), hosterRecyclerView, new RecyclerItemClickListener.OnItemClickListener() {
                     @Override
@@ -279,69 +277,6 @@ public class HosterFragment extends Fragment implements Callback<EpisodeObj> {
             db.insert(historyTable.TABLE_NAME, null, cv);
 
             super.onPostExecute(aVoid);
-        }
-    }
-
-    private class HosterRecyclerAdapter extends RecyclerView.Adapter<HosterRecyclerAdapter.HosterViewHolder> {
-
-        Context context = getActivity();
-
-        List<HosterListItem> list = new ArrayList<>();
-
-        HosterRecyclerAdapter(List<HosterListItem> list) {
-            this.list = list;
-        }
-
-        @Override
-        public HosterRecyclerAdapter.HosterViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
-            LayoutInflater layoutInflater = LayoutInflater.from(getActivity());
-            ListItemHosterBinding binding = ListItemHosterBinding.inflate(layoutInflater, parent, false);
-            return new HosterViewHolder(binding);
-        }
-
-        @Override
-        public void onBindViewHolder(HosterViewHolder holder, int position) {
-            HosterListItem current = list.get(position);
-            holder.bind(current);
-        }
-
-        @Override
-        public int getItemCount() {
-            return list.size();
-        }
-
-        class HosterViewHolder extends RecyclerView.ViewHolder {
-
-            ListItemHosterBinding binding;
-
-            HosterViewHolder(ListItemHosterBinding binding) {
-                super(binding.getRoot());
-                this.binding = binding;
-            }
-
-            public void bind(HosterListItem item) {
-                binding.setHoster(item);
-
-                View root = binding.getRoot();
-                boolean isDark = Settings.of(context).isDarkTheme();
-
-                root.findViewById(R.id.listItemContainer).setBackground(ContextCompat.getDrawable(context, theme().listItemBackground));
-
-                if (isDark)
-                    ((TextView) root.findViewById(R.id.hosterLabel))
-                            .setTextColor(ContextCompat.getColor(context, android.R.color.darker_gray));
-
-                if (item.isSupported())
-                    ((ImageView) root.findViewById(R.id.supImgView))
-                            .setImageDrawable(ContextCompat.getDrawable(context, isDark ?
-                                    R.drawable.ic_ondemand_video_white : R.drawable.ic_ondemand_video));
-                else
-                    ((ImageView) root.findViewById(R.id.supImgView))
-                            .setImageDrawable(ContextCompat.getDrawable(context, isDark ?
-                                    R.drawable.ic_public_white : R.drawable.ic_public));
-
-                binding.executePendingBindings();
-            }
         }
     }
 }

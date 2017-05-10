@@ -1,8 +1,6 @@
 package de.m4lik.burningseries.ui.mainFragments;
 
 import android.content.Intent;
-import android.database.Cursor;
-import android.database.sqlite.SQLiteDatabase;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
 import android.support.v4.content.ContextCompat;
@@ -20,23 +18,13 @@ import java.util.List;
 import butterknife.BindView;
 import butterknife.ButterKnife;
 import de.m4lik.burningseries.R;
-import de.m4lik.burningseries.database.MainDBHelper;
+import de.m4lik.burningseries.database.DatabaseUtils;
 import de.m4lik.burningseries.databinding.ListItemHistoryBinding;
 import de.m4lik.burningseries.ui.ShowActivity;
 import de.m4lik.burningseries.ui.TabletShowActivity;
 import de.m4lik.burningseries.ui.listitems.HistoryListItem;
 import de.m4lik.burningseries.util.Settings;
 import de.m4lik.burningseries.util.listeners.RecyclerItemClickListener;
-
-import static de.m4lik.burningseries.database.SeriesContract.historyTable.COLUMN_NAME_DATE;
-import static de.m4lik.burningseries.database.SeriesContract.historyTable.COLUMN_NAME_EPISODE_ID;
-import static de.m4lik.burningseries.database.SeriesContract.historyTable.COLUMN_NAME_EPISODE_NAME;
-import static de.m4lik.burningseries.database.SeriesContract.historyTable.COLUMN_NAME_SEASON_ID;
-import static de.m4lik.burningseries.database.SeriesContract.historyTable.COLUMN_NAME_SHOW_ID;
-import static de.m4lik.burningseries.database.SeriesContract.historyTable.COLUMN_NAME_SHOW_NAME;
-import static de.m4lik.burningseries.database.SeriesContract.historyTable.COLUMN_NAME_TIME;
-import static de.m4lik.burningseries.database.SeriesContract.historyTable.TABLE_NAME;
-import static de.m4lik.burningseries.database.SeriesContract.historyTable._ID;
 
 
 /**
@@ -60,46 +48,8 @@ public class HistoryFragment extends Fragment {
 
         historyList.clear();
 
-        MainDBHelper dbHelper = new MainDBHelper(getActivity());
-        SQLiteDatabase db = dbHelper.getReadableDatabase();
-
-        String[] projection = {
-                COLUMN_NAME_SHOW_ID,
-                COLUMN_NAME_SEASON_ID,
-                COLUMN_NAME_EPISODE_ID,
-                COLUMN_NAME_SHOW_NAME,
-                COLUMN_NAME_EPISODE_NAME,
-                COLUMN_NAME_DATE,
-                COLUMN_NAME_TIME
-        };
-
-        String sortOrder =
-                _ID + " DESC";
-
-        Cursor c = db.query(
-                TABLE_NAME,
-                projection,
-                null,
-                null,
-                null,
-                null,
-                sortOrder
-        );
-
-        int i = 0;
-        while (c.moveToNext() && i < 20) {
-            historyList.add(new HistoryListItem(
-                    c.getInt(c.getColumnIndex(COLUMN_NAME_SHOW_ID)),
-                    c.getInt(c.getColumnIndex(COLUMN_NAME_SEASON_ID)),
-                    c.getInt(c.getColumnIndex(COLUMN_NAME_EPISODE_ID)),
-                    c.getString(c.getColumnIndex(COLUMN_NAME_SHOW_NAME)),
-                    c.getString(c.getColumnIndex(COLUMN_NAME_EPISODE_NAME))
-            ));
-            i++;
-        }
-
-        c.close();
-        db.close();
+        historyList = DatabaseUtils.with(getActivity())
+                .getWatchHistory();
 
         if (historyList.size() > 0) {
 
@@ -193,4 +143,3 @@ public class HistoryFragment extends Fragment {
         }
     }
 }
-

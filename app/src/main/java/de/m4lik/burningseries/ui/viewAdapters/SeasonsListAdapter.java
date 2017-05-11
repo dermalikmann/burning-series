@@ -43,7 +43,10 @@ public class SeasonsListAdapter extends ArrayAdapter<SeasonListItem> {
         SeasonListItem current = seasons.get(pos);
 
         TextView label = (TextView) view.findViewById(R.id.seasonLabel);
-        label.setText(context.getText(R.string.season).toString() + current.getSeasonId().toString());
+        if (current.getSeasonId() == 0)
+            label.setText(context.getText(R.string.specials));
+        else
+            label.setText(context.getText(R.string.season).toString() + current.getSeasonId());
 
         TextView urlText = (TextView) view.findViewById(R.id.seasonId);
         urlText.setText(current.getSeasonId().toString());

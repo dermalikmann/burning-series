@@ -44,6 +44,7 @@
     <string name="title_activity_full_screen_video_player">FullScreenVideoPlayer</string>
     <string name="settings">Einstellungen</string>
     <string name="season">"Staffel "</string>
+    <string name="specials">"Filme/Specials"</string>
 
     <!-- Activity labels -->
 

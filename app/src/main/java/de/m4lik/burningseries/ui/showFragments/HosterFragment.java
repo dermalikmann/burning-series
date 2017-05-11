@@ -37,7 +37,9 @@ import de.m4lik.burningseries.ui.FullscreenVideoActivity;
 import de.m4lik.burningseries.ui.ShowActivity;
 import de.m4lik.burningseries.ui.dialogs.DialogBuilder;
 import de.m4lik.burningseries.ui.listitems.HosterListItem;
+import de.m4lik.burningseries.ui.listitems.PlayerChooserListItem;
 import de.m4lik.burningseries.ui.viewAdapters.HosterRecyclerAdapter;
+import de.m4lik.burningseries.ui.viewAdapters.PlayerChooserListAdapter;
 import de.m4lik.burningseries.util.AndroidUtility;
 import de.m4lik.burningseries.util.Settings;
 import de.m4lik.burningseries.util.listeners.RecyclerItemClickListener;
@@ -154,7 +156,24 @@ public class HosterFragment extends Fragment implements Callback<EpisodeObj> {
                     }
 
                     @Override
-                    public void onLongItemClick(View view, int position) {}
+                    public void onLongItemClick(View view, int position) {
+                        List<PlayerChooserListItem> players = new ArrayList<>();
+                        players.add(new PlayerChooserListItem("Interner Player", "internal",
+                                Settings.of(getActivity()).isDarkTheme() ?
+                                        R.drawable.ic_ondemand_video_white : R.drawable.ic_ondemand_video));
+                        players.add(new PlayerChooserListItem("Externer Player", "external",
+                                Settings.of(getActivity()).isDarkTheme() ?
+                                        R.drawable.ic_live_tv_white : R.drawable.ic_live_tv));
+                        players.add(new PlayerChooserListItem("Im Browser öffnen", "browser",
+                                Settings.of(getActivity()).isDarkTheme() ?
+                                        R.drawable.ic_public_white : R.drawable.ic_public));
+
+                        DialogBuilder.start(getActivity())
+                                .adapter(new PlayerChooserListAdapter(getActivity(), players), (dialog, id) -> {
+
+                                })
+                                .show();
+                    }
                 })
         );
     }

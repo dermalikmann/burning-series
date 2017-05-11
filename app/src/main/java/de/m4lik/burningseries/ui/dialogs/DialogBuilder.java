@@ -7,8 +7,10 @@ import android.support.annotation.LayoutRes;
 import android.support.annotation.MainThread;
 import android.support.v7.app.AlertDialog;
 import android.view.View;
+import android.widget.ArrayAdapter;
 import android.widget.Button;
 
+import de.m4lik.burningseries.ui.listitems.PlayerChooserListItem;
 import de.m4lik.burningseries.util.AndroidUtility;
 
 /**
@@ -79,6 +81,11 @@ public class DialogBuilder {
 
     public DialogBuilder layout(@LayoutRes int view) {
         builder.setView(view);
+        return this;
+    }
+
+    public DialogBuilder adapter(ArrayAdapter<PlayerChooserListItem> adapter, DialogInterface.OnClickListener listener) {
+        builder.setAdapter(adapter, listener);
         return this;
     }
 

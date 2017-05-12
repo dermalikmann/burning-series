@@ -48,7 +48,6 @@ import de.m4lik.burningseries.util.listeners.RecyclerItemClickListener;
 import retrofit2.Call;
 import retrofit2.Callback;
 import retrofit2.Response;
-import rx.internal.util.ExceptionsUtils;
 
 import static de.m4lik.burningseries.database.SeriesContract.historyTable;
 import static de.m4lik.burningseries.services.ThemeHelperService.theme;
@@ -70,7 +69,7 @@ public class HosterFragment extends Fragment implements Callback<EpisodeObj> {
 
     ProgressDialog progressDialog;
 
-    List<HosterListItem> hostersList = new ArrayList<>();
+    List<HosterListItem> hosterList = new ArrayList<>();
     String hosterReturn;
 
     @BindView(R.id.hosterRecyclerView)
@@ -113,10 +112,10 @@ public class HosterFragment extends Fragment implements Callback<EpisodeObj> {
 
         for (EpisodeObj.Hoster hoster : episode.getHoster())
             if (Hoster.compatibleHosters.contains(hoster.getHoster()))
-                hostersList.add(new HosterListItem(hoster.getLinkId(), hoster.getHoster(), hoster.getPart(), true));
+                hosterList.add(new HosterListItem(hoster.getLinkId(), hoster.getHoster(), hoster.getPart(), true));
         for (EpisodeObj.Hoster hoster : episode.getHoster())
             if (!Hoster.compatibleHosters.contains(hoster.getHoster()))
-                hostersList.add(new HosterListItem(hoster.getLinkId(), hoster.getHoster(), hoster.getPart()));
+                hosterList.add(new HosterListItem(hoster.getLinkId(), hoster.getHoster(), hoster.getPart()));
 
         refreshList();
     }
@@ -133,12 +132,12 @@ public class HosterFragment extends Fragment implements Callback<EpisodeObj> {
     private void refreshList() {
 
         hosterRecyclerView.setLayoutManager(new LinearLayoutManager(getActivity(), LinearLayoutManager.VERTICAL, false));
-        hosterRecyclerView.setAdapter(new HosterRecyclerAdapter(getActivity(), hostersList));
+        hosterRecyclerView.setAdapter(new HosterRecyclerAdapter(getActivity(), hosterList));
         hosterRecyclerView.addOnItemTouchListener(
                 new RecyclerItemClickListener(getActivity(), hosterRecyclerView, new RecyclerItemClickListener.OnItemClickListener() {
                     @Override
                     public void onItemClick(View view, int position) {
-                        String playerType = hostersList.get(position).isSupported() ? "internal" : "appbrowser";
+                        String playerType = hosterList.get(position).isSupported() ? "internal" : "appbrowser";
                         if (Settings.of(getActivity()).alarmOnMobile() &&
                                 AndroidUtility.isOnMobile(getActivity())) {
 
@@ -155,7 +154,7 @@ public class HosterFragment extends Fragment implements Callback<EpisodeObj> {
                                     .show();
 
                         } else {
-                            showVideo(hostersList.get(position).getLinkId(), playerType);
+                            showVideo(hosterList.get(position).getLinkId(), playerType);
                         }
                     }
 
@@ -163,43 +162,43 @@ public class HosterFragment extends Fragment implements Callback<EpisodeObj> {
                     public void onLongItemClick(View view, int position) {
                         if (Settings.of(getActivity()).alarmOnMobile() &&
                                 AndroidUtility.isOnMobile(getActivity())) {
+                            List<PlayerChooserListItem> players = new ArrayList<>();
+
+                            if (hosterList.get(position).isSupported()) {
+                                players.add(new PlayerChooserListItem("Interner Player", "internal",
+                                        Settings.of(getActivity()).isDarkTheme() ?
+                                                R.drawable.ic_ondemand_video_white : R.drawable.ic_ondemand_video));
+
+                                players.add(new PlayerChooserListItem("Externer Player", "external",
+                                        Settings.of(getActivity()).isDarkTheme() ?
+                                                R.drawable.ic_live_tv_white : R.drawable.ic_live_tv));
+
+                                players.add(new PlayerChooserListItem("In-App Browser", "appbrowser",
+                                        Settings.of(getActivity()).isDarkTheme() ?
+                                                R.drawable.ic_open_in_browser_white : R.drawable.ic_open_in_browser));
+                            }
+
+                            players.add(new PlayerChooserListItem("Im Browser öffnen", "browser",
+                                    Settings.of(getActivity()).isDarkTheme() ?
+                                            R.drawable.ic_public_white : R.drawable.ic_public));
 
                             DialogBuilder.start(getActivity())
-                                    .title("Mobile Daten")
-                                    .content("Achtung! Du bist über mobile Daten im Internet. Willst du Fortfahren?")
-                                    .positive("Weiter", dialog -> {
-                                        List<PlayerChooserListItem> players = new ArrayList<>();
-
-                                        if (hostersList.get(position).isSupported()) {
-                                            players.add(new PlayerChooserListItem("Interner Player", "internal",
-                                                    Settings.of(getActivity()).isDarkTheme() ?
-                                                            R.drawable.ic_ondemand_video_white : R.drawable.ic_ondemand_video));
-
-                                            players.add(new PlayerChooserListItem("Externer Player", "external",
-                                                    Settings.of(getActivity()).isDarkTheme() ?
-                                                            R.drawable.ic_live_tv_white : R.drawable.ic_live_tv));
-
-                                            players.add(new PlayerChooserListItem("In-App Browser", "appbrowser",
-                                                    Settings.of(getActivity()).isDarkTheme() ?
-                                                            R.drawable.ic_open_in_browser_white : R.drawable.ic_open_in_browser));
-                                        }
-
-                                        players.add(new PlayerChooserListItem("Im Browser öffnen", "browser",
-                                                Settings.of(getActivity()).isDarkTheme() ?
-                                                        R.drawable.ic_public_white : R.drawable.ic_public));
+                                    .title(getString(R.string.choose_player_title))
+                                    .adapter(new PlayerChooserListAdapter(getActivity(), players), (dialog2, id) -> {
 
                                         DialogBuilder.start(getActivity())
-                                                .title(getString(R.string.choose_player_title))
-                                                .adapter(new PlayerChooserListAdapter(getActivity(), players), (dialog2, id) -> {
-                                                    showVideo(hostersList.get(position).getLinkId(), players.get(id).getType());
+                                                .title("Mobile Daten")
+                                                .content("Achtung! Du bist über mobile Daten im Internet. Willst du Fortfahren?")
+                                                .positive("Weiter", dialog -> {
+                                                    showVideo(hosterList.get(position).getLinkId(), players.get(id).getType());
                                                 })
-                                                .cancelable()
                                                 .negative()
+                                                .cancelable()
                                                 .build()
                                                 .show();
                                     })
-                                    .negative()
                                     .cancelable()
+                                    .negative()
                                     .build()
                                     .show();
                         }
@@ -260,7 +259,7 @@ public class HosterFragment extends Fragment implements Callback<EpisodeObj> {
             public void onFailure(Call<VideoObj> call, Throwable t) {
                 Snackbar snackbar = Snackbar.make(rootView, "Probleme beim Verbinden mit BS", Snackbar.LENGTH_SHORT);
                 View snackbarView = snackbar.getView();
-                snackbarView.setBackgroundColor(ContextCompat.getColor(getActivity().getApplicationContext(), theme().primaryColorDark));
+                snackbarView.setBackgroundColor(ContextCompat.getColor(getActivity(), theme().primaryColorDark));
                 snackbar.show();
 
 
@@ -323,31 +322,31 @@ public class HosterFragment extends Fragment implements Callback<EpisodeObj> {
                 case "1":
                     snackbar = Snackbar.make(rootView, "Hoster hat nicht geantwortet.", Snackbar.LENGTH_SHORT);
                     snackbarView = snackbar.getView();
-                    snackbarView.setBackgroundColor(ContextCompat.getColor(getActivity().getApplicationContext(), theme().primaryColorDark));
+                    snackbarView.setBackgroundColor(ContextCompat.getColor(getActivity(), theme().primaryColorDark));
                     snackbar.show();
                     return;
                 case "2":
                     snackbar = Snackbar.make(rootView, "Video wurde wahrscheinlich gelöscht.", Snackbar.LENGTH_SHORT);
                     snackbarView = snackbar.getView();
-                    snackbarView.setBackgroundColor(ContextCompat.getColor(getActivity().getApplicationContext(), theme().primaryColorDark));
+                    snackbarView.setBackgroundColor(ContextCompat.getColor(getActivity(), theme().primaryColorDark));
                     snackbar.show();
                     return;
                 case "3":
                     snackbar = Snackbar.make(rootView, "Fehler beim auflösen der Video URL.", Snackbar.LENGTH_SHORT);
                     snackbarView = snackbar.getView();
-                    snackbarView.setBackgroundColor(ContextCompat.getColor(getActivity().getApplicationContext(), theme().primaryColorDark));
+                    snackbarView.setBackgroundColor(ContextCompat.getColor(getActivity(), theme().primaryColorDark));
                     snackbar.show();
                     return;
                 case "4":
                     snackbar = Snackbar.make(rootView, "Hoster hat nicht geantwortet.", Snackbar.LENGTH_SHORT);
                     snackbarView = snackbar.getView();
-                    snackbarView.setBackgroundColor(ContextCompat.getColor(getActivity().getApplicationContext(), theme().primaryColorDark));
+                    snackbarView.setBackgroundColor(ContextCompat.getColor(getActivity(), theme().primaryColorDark));
                     snackbar.show();
                     return;
                 case "5":
                     snackbar = Snackbar.make(rootView, "Da ist etwas ganz schief gelaufen. Fehler bitte melden.", Snackbar.LENGTH_SHORT);
                     snackbarView = snackbar.getView();
-                    snackbarView.setBackgroundColor(ContextCompat.getColor(getActivity().getApplicationContext(), theme().primaryColorDark));
+                    snackbarView.setBackgroundColor(ContextCompat.getColor(getActivity(), theme().primaryColorDark));
                     snackbar.show();
                     return;
             }

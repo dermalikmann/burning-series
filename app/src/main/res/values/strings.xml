@@ -61,6 +61,8 @@
     <string name="please_wait">Bitte warten...</string>
     <string name="please_wait_update">Bitte warte. Das Update wird heruntergeladen</string>
 
+    <string name="choose_player_title">Player auswählen</string>
+
 
     <!-- Preferences -->
 
@@ -122,8 +124,5 @@
     <string name="title_activity_fullscreen_video">FullscreenVideoActivity</string>
     <string name="dummy_button">Dummy Button</string>
     <string name="dummy_content">DUMMY\nCONTENT</string>
-
-    <!-- TODO: Remove or change this placeholder text -->
-    <string name="hello_blank_fragment">Hello blank fragment</string>
 
 </resources>

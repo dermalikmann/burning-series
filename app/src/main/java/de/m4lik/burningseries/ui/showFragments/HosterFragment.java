@@ -20,6 +20,8 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.TextView;
 
+import java.io.PrintWriter;
+import java.io.StringWriter;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.List;
@@ -37,13 +39,16 @@ import de.m4lik.burningseries.ui.FullscreenVideoActivity;
 import de.m4lik.burningseries.ui.ShowActivity;
 import de.m4lik.burningseries.ui.dialogs.DialogBuilder;
 import de.m4lik.burningseries.ui.listitems.HosterListItem;
+import de.m4lik.burningseries.ui.listitems.PlayerChooserListItem;
 import de.m4lik.burningseries.ui.viewAdapters.HosterRecyclerAdapter;
+import de.m4lik.burningseries.ui.viewAdapters.PlayerChooserListAdapter;
 import de.m4lik.burningseries.util.AndroidUtility;
 import de.m4lik.burningseries.util.Settings;
 import de.m4lik.burningseries.util.listeners.RecyclerItemClickListener;
 import retrofit2.Call;
 import retrofit2.Callback;
 import retrofit2.Response;
+import rx.internal.util.ExceptionsUtils;
 
 import static de.m4lik.burningseries.database.SeriesContract.historyTable;
 import static de.m4lik.burningseries.services.ThemeHelperService.theme;
@@ -133,6 +138,7 @@ public class HosterFragment extends Fragment implements Callback<EpisodeObj> {
                 new RecyclerItemClickListener(getActivity(), hosterRecyclerView, new RecyclerItemClickListener.OnItemClickListener() {
                     @Override
                     public void onItemClick(View view, int position) {
+                        String playerType = hostersList.get(position).isSupported() ? "internal" : "appbrowser";
                         if (Settings.of(getActivity()).alarmOnMobile() &&
                                 AndroidUtility.isOnMobile(getActivity())) {
 
@@ -141,25 +147,68 @@ public class HosterFragment extends Fragment implements Callback<EpisodeObj> {
                                     .content("Achtung! Du bist über mobile Daten im Internet. Willst du Fortfahren?")
                                     .positive("Weiter", dialog -> {
                                         TextView idView = (TextView) view.findViewById(R.id.linkId);
-                                        showVideo(Integer.parseInt(idView.getText().toString()));
+                                        showVideo(Integer.parseInt(idView.getText().toString()), playerType);
                                     })
-                                    .negative("Abbrechen")
+                                    .negative()
+                                    .cancelable()
                                     .build()
                                     .show();
 
                         } else {
-                            TextView idView = (TextView) view.findViewById(R.id.linkId);
-                            showVideo(Integer.parseInt(idView.getText().toString()));
+                            showVideo(hostersList.get(position).getLinkId(), playerType);
                         }
                     }
 
                     @Override
-                    public void onLongItemClick(View view, int position) {}
+                    public void onLongItemClick(View view, int position) {
+                        if (Settings.of(getActivity()).alarmOnMobile() &&
+                                AndroidUtility.isOnMobile(getActivity())) {
+
+                            DialogBuilder.start(getActivity())
+                                    .title("Mobile Daten")
+                                    .content("Achtung! Du bist über mobile Daten im Internet. Willst du Fortfahren?")
+                                    .positive("Weiter", dialog -> {
+                                        List<PlayerChooserListItem> players = new ArrayList<>();
+
+                                        if (hostersList.get(position).isSupported()) {
+                                            players.add(new PlayerChooserListItem("Interner Player", "internal",
+                                                    Settings.of(getActivity()).isDarkTheme() ?
+                                                            R.drawable.ic_ondemand_video_white : R.drawable.ic_ondemand_video));
+
+                                            players.add(new PlayerChooserListItem("Externer Player", "external",
+                                                    Settings.of(getActivity()).isDarkTheme() ?
+                                                            R.drawable.ic_live_tv_white : R.drawable.ic_live_tv));
+
+                                            players.add(new PlayerChooserListItem("In-App Browser", "appbrowser",
+                                                    Settings.of(getActivity()).isDarkTheme() ?
+                                                            R.drawable.ic_open_in_browser_white : R.drawable.ic_open_in_browser));
+                                        }
+
+                                        players.add(new PlayerChooserListItem("Im Browser öffnen", "browser",
+                                                Settings.of(getActivity()).isDarkTheme() ?
+                                                        R.drawable.ic_public_white : R.drawable.ic_public));
+
+                                        DialogBuilder.start(getActivity())
+                                                .title(getString(R.string.choose_player_title))
+                                                .adapter(new PlayerChooserListAdapter(getActivity(), players), (dialog2, id) -> {
+                                                    showVideo(hostersList.get(position).getLinkId(), players.get(id).getType());
+                                                })
+                                                .cancelable()
+                                                .negative()
+                                                .build()
+                                                .show();
+                                    })
+                                    .negative()
+                                    .cancelable()
+                                    .build()
+                                    .show();
+                        }
+                    }
                 })
         );
     }
 
-    private void showVideo(Integer id) {
+    private void showVideo(Integer id, String type) {
 
         API api = new API();
         api.setSession(userSession);
@@ -171,12 +220,59 @@ public class HosterFragment extends Fragment implements Callback<EpisodeObj> {
             public void onResponse(Call<VideoObj> call, Response<VideoObj> response) {
                 VideoObj videoObj = response.body();
 
-                new GetVideo(videoObj).execute();
+                switch (type) {
+                    case "internal":
+                        new GetVideo(videoObj).execute();
+                        break;
+                    case "external":
+                        new GetVideo(videoObj, true).execute();
+                        break;
+                    case "browser":
+                        Intent browserIntent = new Intent(Intent.ACTION_VIEW, Uri.parse(videoObj.getFullUrl()));
+                        startActivity(browserIntent);
+                        break;
+                    case "appbrowser":
+                    default:
+                        CustomTabsIntent.Builder builder = new CustomTabsIntent.Builder();
+                        CustomTabsIntent customTabsIntent = builder.build();
+                        customTabsIntent.launchUrl(getActivity(), Uri.parse(videoObj.getFullUrl()));
+                        break;
+                }
+
+                MainDBHelper dbHelper = new MainDBHelper(getActivity());
+                SQLiteDatabase db = dbHelper.getWritableDatabase();
+
+                ContentValues cv = new ContentValues();
+                Calendar calendar = Calendar.getInstance();
+
+                cv.put(historyTable.COLUMN_NAME_SHOW_ID, selectedShow);
+                cv.put(historyTable.COLUMN_NAME_SEASON_ID, selectedSeason);
+                cv.put(historyTable.COLUMN_NAME_EPISODE_ID, selectedEpisode);
+                cv.put(historyTable.COLUMN_NAME_SHOW_NAME, showName);
+                cv.put(historyTable.COLUMN_NAME_EPISODE_NAME, episodeName);
+                cv.put(historyTable.COLUMN_NAME_DATE, calendar.get(Calendar.DAY_OF_MONTH) + "." + calendar.get(Calendar.MONTH));
+                cv.put(historyTable.COLUMN_NAME_TIME, calendar.get(Calendar.HOUR_OF_DAY) + ":" + calendar.get(Calendar.MINUTE));
+
+                db.insert(historyTable.TABLE_NAME, null, cv);
             }
 
             @Override
             public void onFailure(Call<VideoObj> call, Throwable t) {
+                Snackbar snackbar = Snackbar.make(rootView, "Probleme beim Verbinden mit BS", Snackbar.LENGTH_SHORT);
+                View snackbarView = snackbar.getView();
+                snackbarView.setBackgroundColor(ContextCompat.getColor(getActivity().getApplicationContext(), theme().primaryColorDark));
+                snackbar.show();
 
+
+                final StringWriter sw = new StringWriter();
+                final PrintWriter pw = new PrintWriter(sw, true);
+                t.printStackTrace(pw);
+
+                DialogBuilder.start(getActivity())
+                        .title("Error")
+                        .content(sw.getBuffer().toString())
+                        .negative()
+                        .build().show();
             }
         });
     }
@@ -184,9 +280,15 @@ public class HosterFragment extends Fragment implements Callback<EpisodeObj> {
     private class GetVideo extends AsyncTask<Void, Void, Void> {
 
         private VideoObj videoObj;
+        private Boolean external;
 
         GetVideo(VideoObj videoObj) {
+            this(videoObj, false);
+        }
+
+        GetVideo(VideoObj videoObj, Boolean external) {
             this.videoObj = videoObj;
+            this.external = external;
         }
 
         @Override
@@ -250,32 +352,14 @@ public class HosterFragment extends Fragment implements Callback<EpisodeObj> {
                     return;
             }
 
-            if (hosterReturn.equals("unkown_hoster")) {
-                CustomTabsIntent.Builder builder = new CustomTabsIntent.Builder();
-                CustomTabsIntent customTabsIntent = builder.build();
-                customTabsIntent.launchUrl(getActivity(), Uri.parse(videoObj.getFullUrl()));
-            } else {
+            if (!external) {
                 Intent intent = new Intent(getActivity().getApplicationContext(), FullscreenVideoActivity.class);
                 intent.putExtra("burning-series.videoURL", hosterReturn);
                 startActivity(intent);
+            } else {
+                Intent browserIntent = new Intent(Intent.ACTION_VIEW, Uri.parse(hosterReturn));
+                startActivity(browserIntent);
             }
-
-            MainDBHelper dbHelper = new MainDBHelper(getActivity());
-            SQLiteDatabase db = dbHelper.getWritableDatabase();
-
-            ContentValues cv = new ContentValues();
-            Calendar calendar = Calendar.getInstance();
-
-            cv.put(historyTable.COLUMN_NAME_SHOW_ID, selectedShow);
-            cv.put(historyTable.COLUMN_NAME_SEASON_ID, selectedSeason);
-            cv.put(historyTable.COLUMN_NAME_EPISODE_ID, selectedEpisode);
-            cv.put(historyTable.COLUMN_NAME_SHOW_NAME, showName);
-            cv.put(historyTable.COLUMN_NAME_EPISODE_NAME, episodeName);
-            cv.put(historyTable.COLUMN_NAME_DATE, calendar.get(Calendar.DAY_OF_MONTH) + "." + calendar.get(Calendar.MONTH));
-            cv.put(historyTable.COLUMN_NAME_TIME, calendar.get(Calendar.HOUR_OF_DAY) + ":" + calendar.get(Calendar.MINUTE));
-
-            db.insert(historyTable.TABLE_NAME, null, cv);
-
             super.onPostExecute(aVoid);
         }
     }

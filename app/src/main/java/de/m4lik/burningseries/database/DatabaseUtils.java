@@ -74,11 +74,13 @@ public class DatabaseUtils {
                 null
         );
 
-        List<Integer> favs= new ArrayList<>();
-        while (!c.isAfterLast()) {
-            favs.add(c.getInt(c.getColumnIndex(seriesTable.COLUMN_NAME_ISFAV)));
-            c.moveToNext();
-        }
+        List<Integer> favs = new ArrayList<>();
+        if (c.moveToFirst())
+            do {
+                favs.add(c.getInt(c.getColumnIndex(seriesTable.COLUMN_NAME_ISFAV)));
+                c.moveToNext();
+            } while (c.moveToNext());
+
         c.close();
         db.close();
 
@@ -210,15 +212,15 @@ public class DatabaseUtils {
                 sortOrder
         );
 
-        if (c.getCount() > 0)
-            while (c.moveToNext()) {
+        if (c.moveToFirst())
+            do {
                 list.add(new ShowListItem(
                         c.getString(c.getColumnIndex(seriesTable.COLUMN_NAME_TITLE)),
                         c.getInt(c.getColumnIndex(seriesTable.COLUMN_NAME_ID)),
                         c.getString(c.getColumnIndex(seriesTable.COLUMN_NAME_GENRE)),
                         c.getInt(c.getColumnIndex(seriesTable.COLUMN_NAME_ISFAV)) == 1
                 ));
-            }
+            } while (c.moveToNext());
 
         c.close();
         db.close();
@@ -249,14 +251,16 @@ public class DatabaseUtils {
                 sortOrder
         );
 
-        while (c.moveToNext()) {
-            list.add(new ShowListItem(
-                    c.getString(c.getColumnIndex(COLUMN_NAME_TITLE)),
-                    c.getInt(c.getColumnIndex(COLUMN_NAME_ID)),
-                    c.getString(c.getColumnIndex(COLUMN_NAME_GENRE)),
-                    c.getInt(c.getColumnIndex(COLUMN_NAME_ISFAV)) == 1
-            ));
-        }
+
+        if (c.moveToFirst())
+            do {
+                list.add(new ShowListItem(
+                        c.getString(c.getColumnIndex(COLUMN_NAME_TITLE)),
+                        c.getInt(c.getColumnIndex(COLUMN_NAME_ID)),
+                        c.getString(c.getColumnIndex(COLUMN_NAME_GENRE)),
+                        c.getInt(c.getColumnIndex(COLUMN_NAME_ISFAV)) == 1
+                ));
+            } while (c.moveToNext());
 
         c.close();
         db.close();

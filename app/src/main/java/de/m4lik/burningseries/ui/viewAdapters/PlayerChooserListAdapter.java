@@ -14,9 +14,6 @@ import java.util.List;
 
 import de.m4lik.burningseries.R;
 import de.m4lik.burningseries.ui.listitems.PlayerChooserListItem;
-import de.m4lik.burningseries.ui.listitems.SeasonListItem;
-
-import static de.m4lik.burningseries.services.ThemeHelperService.theme;
 
 /**
  * Created by malik on 09.05.17.
@@ -40,12 +37,10 @@ public class PlayerChooserListAdapter extends ArrayAdapter<PlayerChooserListItem
             view = LayoutInflater.from(context).inflate(R.layout.list_item_player, parent, false);
         }
 
-        view.findViewById(R.id.listItemContainer).setBackground(ContextCompat.getDrawable(context, theme().listItemBackground));
-
         PlayerChooserListItem current = players.get(pos);
 
         ((TextView) view.findViewById(R.id.playerLable)).setText(current.getLable());
-        ((TextView) view.findViewById(R.id.playerType)).setText(current.getId());
+        ((TextView) view.findViewById(R.id.playerType)).setText(current.getType());
         ((ImageView) view.findViewById(R.id.playerIcon)).setImageDrawable(ContextCompat.getDrawable(context, current.getIcon()));
 
         return view;

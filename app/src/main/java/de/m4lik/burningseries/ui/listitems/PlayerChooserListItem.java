@@ -9,12 +9,12 @@ import android.support.annotation.DrawableRes;
 public class PlayerChooserListItem {
 
     private String lable;
-    private String id;
+    private String type;
     @DrawableRes private int icon;
 
-    public PlayerChooserListItem(String lable, String id, int icon) {
+    public PlayerChooserListItem(String lable, String type, int icon) {
         this.lable = lable;
-        this.id = id;
+        this.type = type;
         this.icon = icon;
     }
 
@@ -22,8 +22,8 @@ public class PlayerChooserListItem {
         return lable;
     }
 
-    public String getId() {
-        return id;
+    public String getType() {
+        return type;
     }
 
     public int getIcon() {

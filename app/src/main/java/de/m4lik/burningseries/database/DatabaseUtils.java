@@ -259,9 +259,6 @@ public class DatabaseUtils {
 
     public Boolean isSeriesListEmpty() {
 
-        MainDBHelper dbHelper = new MainDBHelper(context);
-        SQLiteDatabase db = dbHelper.getReadableDatabase();
-
         Cursor c = db.query(
                 seriesTable.TABLE_NAME,
                 new String[]{seriesTable.COLUMN_NAME_ID},

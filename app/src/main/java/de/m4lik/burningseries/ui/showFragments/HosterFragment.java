@@ -14,10 +14,13 @@ import android.support.design.widget.Snackbar;
 import android.support.v4.content.ContextCompat;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.webkit.ValueCallback;
+import android.webkit.WebSettings;
+import android.webkit.WebView;
+import android.webkit.WebViewClient;
 import android.widget.TextView;
 
 import java.io.PrintWriter;
@@ -219,12 +222,22 @@ public class HosterFragment extends Fragment implements Callback<EpisodeObj> {
             public void onResponse(Call<VideoObj> call, Response<VideoObj> response) {
                 VideoObj videoObj = response.body();
 
+                String hoster = videoObj.getHoster().toLowerCase();
+
                 switch (type) {
                     case "internal":
-                        new GetVideo(videoObj).execute();
+                        if (hoster.equals("openload") || hoster.equals("openloadhd")) {
+                            Openload(videoObj.getUrl(), false);
+                        } else {
+                            new GetVideo(videoObj).execute();
+                        }
                         break;
                     case "external":
-                        new GetVideo(videoObj, true).execute();
+                        if (hoster.equals("openload") || hoster.equals("openloadhd")) {
+                            Openload(videoObj.getUrl(), true);
+                        } else {
+                            new GetVideo(videoObj, true).execute();
+                        }
                         break;
                     case "browser":
                         Intent browserIntent = new Intent(Intent.ACTION_VIEW, Uri.parse(videoObj.getFullUrl()));
@@ -278,6 +291,40 @@ public class HosterFragment extends Fragment implements Callback<EpisodeObj> {
         });
     }
 
+    private void Openload(String videoID, Boolean external) {
+        try {
+            String fullURL = "https://openload.co/embed/" + videoID;
+
+            WebView wv = new WebView(getActivity());
+            WebSettings webSettings = wv.getSettings();
+            webSettings.setJavaScriptEnabled(true);
+            wv.setWebViewClient(new WebViewClient() {
+                public void onPageFinished(WebView view, String url) {
+                    view.evaluateJavascript("document.getElementById('streamurl').innerHTML", new ValueCallback<String>() {
+                                @Override
+                                public void onReceiveValue(String valueFromJS) {
+                                    progressDialog.dismiss();
+                                    String vurl = "https://openload.co/stream/" + valueFromJS.replace("\"", "") + "?mime=true";
+                                    if (!external) {
+                                        Intent intent = new Intent(getActivity().getApplicationContext(), FullscreenVideoActivity.class);
+                                        intent.putExtra("burning-series.videoURL", vurl);
+                                        startActivity(intent);
+                                    } else {
+                                        Intent browserIntent = new Intent(Intent.ACTION_VIEW, Uri.parse(vurl));
+                                        startActivity(browserIntent);
+                                    }
+                                }
+                            }
+                    );
+                }
+            });
+
+            wv.loadUrl(fullURL);
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+    }
+
     private class GetVideo extends AsyncTask<Void, Void, Void> {
 
         private VideoObj videoObj;
@@ -308,7 +355,7 @@ public class HosterFragment extends Fragment implements Callback<EpisodeObj> {
         protected Void doInBackground(Void... params) {
             Hoster hoster = new Hoster();
             hosterReturn = hoster.get(videoObj.getHoster(), videoObj.getUrl());
-            Log.v("BS", hosterReturn);
+
             return null;
         }
 

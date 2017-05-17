@@ -15,6 +15,7 @@ import java.util.regex.Pattern;
  */
 
 class YouWatch extends Hoster {
+
     private static final Pattern a;
     private static final Pattern b;
     private static final Pattern c;

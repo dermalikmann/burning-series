@@ -1,6 +1,8 @@
 package de.m4lik.burningseries.hoster;
 
 
+import android.content.Context;
+
 import java.io.BufferedInputStream;
 import java.io.BufferedReader;
 import java.io.BufferedWriter;
@@ -29,11 +31,13 @@ public class Hoster {
 
     public static final List<String> compatibleHosters = new ArrayList<>();
     private static final String[] userAgents;
+    private Context context;
 
     static {
         compatibleHosters.add("PowerWatch");
         compatibleHosters.add("Vidto");
-        compatibleHosters.add("TheVideo");
+        compatibleHosters.add("OpenLoad");
+        compatibleHosters.add("OpenLoadHD");
         userAgents = new String[]{
                 "Mozilla/5.0 (Windows NT 6.3; rv:36.0) Gecko/20100101 Firefox/36.0",
                 "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_10; rv:33.0) Gecko/20100101 Firefox/33.0",
@@ -80,9 +84,12 @@ public class Hoster {
 
     public String get(String hoster, String videoID) {
         switch (hoster.toLowerCase()) {
-            case "powerwatch":
-                PowerWatch pw = new PowerWatch();
-                return pw.get(videoID);
+            /*case "powerwatch":
+                PowerWatch pw = new PowerWatch(context);
+                return pw.get(videoID);*/
+            /*case "youwatch":
+                YouWatch yw = new YouWatch(context);
+                return yw.get(videoID);*/
             case "vidto":
                 VidTo vt = new VidTo();
                 return vt.get(videoID);

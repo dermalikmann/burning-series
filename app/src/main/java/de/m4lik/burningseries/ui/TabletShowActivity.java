@@ -16,6 +16,9 @@ import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.util.Log;
 import android.view.View;
+import android.webkit.WebSettings;
+import android.webkit.WebView;
+import android.webkit.WebViewClient;
 import android.widget.Button;
 import android.widget.ImageView;
 import android.widget.ListView;
@@ -58,8 +61,8 @@ import retrofit2.Call;
 import retrofit2.Callback;
 import retrofit2.Response;
 
-import static de.m4lik.burningseries.services.ThemeHelperService.theme;
 import static de.m4lik.burningseries.database.SeriesContract.historyTable;
+import static de.m4lik.burningseries.services.ThemeHelperService.theme;
 
 public class TabletShowActivity extends ActivityBase {
 
@@ -505,12 +508,23 @@ public class TabletShowActivity extends ActivityBase {
             public void onResponse(Call<VideoObj> call, Response<VideoObj> response) {
                 VideoObj videoObj = response.body();
 
+                String hoster = videoObj.getHoster();
+                System.out.println(hoster);
+
                 switch (type) {
                     case "internal":
-                        new GetVideo(videoObj).execute();
+                        if (hoster.equals("openload") || hoster.equals("openloadhd")) {
+                            Openload(videoObj.getUrl(), false);
+                        } else {
+                            new GetVideo(videoObj).execute();
+                        }
                         break;
                     case "external":
-                        new GetVideo(videoObj, true).execute();
+                        if (hoster.equals("openload") || hoster.equals("openloadhd")) {
+                            Openload(videoObj.getUrl(), true);
+                        } else {
+                            new GetVideo(videoObj, true).execute();
+                        }
                         break;
                     case "browser":
                         Intent browserIntent = new Intent(Intent.ACTION_VIEW, Uri.parse(videoObj.getFullUrl()));
@@ -560,6 +574,36 @@ public class TabletShowActivity extends ActivityBase {
                         .build().show();
             }
         });
+    }
+
+    private void Openload(String videoID, Boolean external) {
+        try {
+            String fullURL = "https://openload.co/embed/" + videoID;
+
+            WebView wv = new WebView(this);
+            WebSettings webSettings = wv.getSettings();
+            webSettings.setJavaScriptEnabled(true);
+            wv.setWebViewClient(new WebViewClient() {
+                public void onPageFinished(WebView view, String url) {
+                    view.evaluateJavascript("document.getElementById('streamurl').innerHTML",
+                            valueFromJS -> {
+                                String vurl = "https://openload.co/stream/" + valueFromJS.replace("\"", "") + "?mime=true";
+                                if (!external) {
+                                    Intent intent = new Intent(getApplicationContext(), FullscreenVideoActivity.class);
+                                    intent.putExtra("burning-series.videoURL", vurl);
+                                    startActivity(intent);
+                                } else {
+                                    Intent browserIntent = new Intent(Intent.ACTION_VIEW, Uri.parse(vurl));
+                                    startActivity(browserIntent);
+                                }
+                            }
+                    );
+                }
+            });
+            wv.loadUrl(fullURL);
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
     }
 
     private class GetVideo extends AsyncTask<Void, Void, Void> {

@@ -90,7 +90,6 @@ public class SeasonsFragment extends Fragment implements Callback<SeasonObj> {
 
     @Override
     public void onFailure(Call<SeasonObj> call, Throwable t) {
-
         Snackbar.make(rootView.findViewById(android.R.id.content), "Fehler beim Laden der Seriendetails", Snackbar.LENGTH_SHORT);
     }
 

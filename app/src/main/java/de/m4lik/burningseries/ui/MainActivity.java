@@ -5,7 +5,6 @@ import android.app.ProgressDialog;
 import android.content.ContentValues;
 import android.content.Intent;
 import android.content.pm.ActivityInfo;
-import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
@@ -31,6 +30,7 @@ import android.view.MenuItem;
 import android.view.View;
 import android.widget.TextView;
 
+import com.google.firebase.remoteconfig.FirebaseRemoteConfig;
 import com.trello.rxlifecycle.android.RxLifecycleAndroid;
 
 import java.util.Arrays;
@@ -46,6 +46,7 @@ import de.m4lik.burningseries.api.APIInterface;
 import de.m4lik.burningseries.api.objects.GenreMap;
 import de.m4lik.burningseries.api.objects.GenreObj;
 import de.m4lik.burningseries.api.objects.ShowObj;
+import de.m4lik.burningseries.database.DatabaseUtils;
 import de.m4lik.burningseries.database.MainDBHelper;
 import de.m4lik.burningseries.ui.base.ActivityBase;
 import de.m4lik.burningseries.ui.dialogs.UpdateDialog;
@@ -80,7 +81,7 @@ public class MainActivity extends ActivityBase
     public static String userName;
     public static String userSession;
 
-    public static Menu menu;
+    public Menu menu;
 
     public String visibleFragment;
     public Boolean seriesList = false;
@@ -94,10 +95,6 @@ public class MainActivity extends ActivityBase
 
     @BindView(R.id.toolbar)
     Toolbar toolbar;
-
-    public static Menu getMenu() {
-        return menu;
-    }
 
     @Override
     protected void injectComponent(ActivityComponent appComponent) {
@@ -182,6 +179,45 @@ public class MainActivity extends ActivityBase
 
     }
 
+    private void fetchFirebase() {
+        System.out.println("Fetching now!");
+        FirebaseRemoteConfig remoteConfig = FirebaseRemoteConfig.getInstance();
+        remoteConfig.fetch()
+                .addOnCompleteListener(this, task -> {
+                    if (task.isSuccessful()) {
+                        System.out.println("Success");
+                        remoteConfig.activateFetched();
+                        setup();
+                    } else {
+                        Snackbar snackbar = Snackbar.make(findViewById(android.R.id.content), "Da ist was schiefgelaufen.\nVersuche es noch einmal...", Snackbar.LENGTH_SHORT);
+                        View snackbarView = snackbar.getView();
+                        snackbarView.setBackgroundColor(ContextCompat.getColor(getApplicationContext(), theme().primaryColorDark));
+                        snackbar.show();
+                    }
+                });
+    }
+
+    private void setup() {
+            if (DatabaseUtils.with(this).isSeriesListEmpty())
+                fetchSeries();
+            else
+                setFragment(Settings.of(getApplicationContext()).getStartupView());
+
+            SearchView searchView = (SearchView) MenuItemCompat.getActionView(this.menu.findItem(R.id.action_search));
+            searchView.setOnQueryTextListener(new SearchView.OnQueryTextListener() {
+                @Override
+                public boolean onQueryTextSubmit(String query) {
+                    return true;
+                }
+
+                @Override
+                public boolean onQueryTextChange(String newText) {
+                    SeriesFragment fragment = (SeriesFragment) getSupportFragmentManager().findFragmentByTag("seriesFragment");
+                    fragment.filterList(newText);
+                    return false;
+                }
+            });
+    }
 
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
@@ -189,41 +225,7 @@ public class MainActivity extends ActivityBase
         inflater.inflate(R.menu.menu_main, menu);
         this.menu = menu;
 
-        MainDBHelper dbHelper = new MainDBHelper(getApplicationContext());
-        SQLiteDatabase db = dbHelper.getReadableDatabase();
-
-        Cursor c = db.query(
-                seriesTable.TABLE_NAME,
-                new String[]{seriesTable.COLUMN_NAME_ID},
-                null,
-                null,
-                null,
-                null,
-                null
-        );
-
-        if (c.getCount() == 0)
-            fetchSeries();
-        else
-            setFragment(Settings.of(getApplicationContext()).getStartupView());
-
-        c.close();
-        db.close();
-
-        SearchView searchView = (SearchView) MenuItemCompat.getActionView(getMenu().findItem(R.id.action_search));
-        searchView.setOnQueryTextListener(new SearchView.OnQueryTextListener() {
-            @Override
-            public boolean onQueryTextSubmit(String query) {
-                return true;
-            }
-
-            @Override
-            public boolean onQueryTextChange(String newText) {
-                SeriesFragment fragment = (SeriesFragment) getSupportFragmentManager().findFragmentByTag("seriesFragment");
-                fragment.filterList(newText);
-                return false;
-            }
-        });
+        fetchFirebase();
 
         return true;
     }
@@ -348,7 +350,7 @@ public class MainActivity extends ActivityBase
         FragmentManager fragmentManager = getSupportFragmentManager();
         FragmentTransaction transaction = fragmentManager.beginTransaction();
 
-        MenuItem searchItem = getMenu().findItem(R.id.action_search);
+        MenuItem searchItem = menu.findItem(R.id.action_search);
 
         if (fragment == null)
             fragment = "series";

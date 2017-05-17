@@ -253,6 +253,8 @@ public class HosterFragment extends Fragment implements Callback<EpisodeObj> {
                 cv.put(historyTable.COLUMN_NAME_TIME, calendar.get(Calendar.HOUR_OF_DAY) + ":" + calendar.get(Calendar.MINUTE));
 
                 db.insert(historyTable.TABLE_NAME, null, cv);
+
+                db.close();
             }
 
             @Override

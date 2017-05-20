@@ -17,7 +17,6 @@ import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.webkit.ValueCallback;
 import android.webkit.WebSettings;
 import android.webkit.WebView;
 import android.webkit.WebViewClient;
@@ -140,7 +139,7 @@ public class HosterFragment extends Fragment implements Callback<EpisodeObj> {
                 new RecyclerItemClickListener(getActivity(), hosterRecyclerView, new RecyclerItemClickListener.OnItemClickListener() {
                     @Override
                     public void onItemClick(View view, int position) {
-                        String playerType = hosterList.get(position).isSupported() ? "internal" : "appbrowser";
+                        String defaultPlayer = hosterList.get(position).isSupported() ? "internal" : "appbrowser";
                         if (Settings.of(getActivity()).alarmOnMobile() &&
                                 AndroidUtility.isOnMobile(getActivity())) {
 
@@ -149,7 +148,7 @@ public class HosterFragment extends Fragment implements Callback<EpisodeObj> {
                                     .content("Achtung! Du bist über mobile Daten im Internet. Willst du Fortfahren?")
                                     .positive("Weiter", dialog -> {
                                         TextView idView = (TextView) view.findViewById(R.id.linkId);
-                                        showVideo(Integer.parseInt(idView.getText().toString()), playerType);
+                                        showVideo(Integer.parseInt(idView.getText().toString()), defaultPlayer);
                                     })
                                     .negative()
                                     .cancelable()
@@ -157,7 +156,7 @@ public class HosterFragment extends Fragment implements Callback<EpisodeObj> {
                                     .show();
 
                         } else {
-                            showVideo(hosterList.get(position).getLinkId(), playerType);
+                            showVideo(hosterList.get(position).getLinkId(), defaultPlayer);
                         }
                     }
 
@@ -299,27 +298,30 @@ public class HosterFragment extends Fragment implements Callback<EpisodeObj> {
             WebSettings webSettings = wv.getSettings();
             webSettings.setJavaScriptEnabled(true);
             wv.setWebViewClient(new WebViewClient() {
+                @Override
                 public void onPageFinished(WebView view, String url) {
-                    view.evaluateJavascript("document.getElementById('streamurl').innerHTML", new ValueCallback<String>() {
-                                @Override
-                                public void onReceiveValue(String valueFromJS) {
-                                    progressDialog.dismiss();
-                                    String vurl = "https://openload.co/stream/" + valueFromJS.replace("\"", "") + "?mime=true";
-                                    if (!external) {
-                                        Intent intent = new Intent(getActivity().getApplicationContext(), FullscreenVideoActivity.class);
-                                        intent.putExtra("burning-series.videoURL", vurl);
-                                        startActivity(intent);
-                                    } else {
-                                        Intent browserIntent = new Intent(Intent.ACTION_VIEW, Uri.parse(vurl));
-                                        startActivity(browserIntent);
-                                    }
-                                }
-                            }
+                    view.evaluateJavascript("document.getElementById('streamurl').innerHTML", valueFromJS -> {
+                        progressDialog.dismiss();
+                        String vurl = "https://openload.co/stream/" + valueFromJS.replace("\"", "") + "?mime=true";
+                        if (!external) {
+                            Intent intent = new Intent(getActivity().getApplicationContext(), FullscreenVideoActivity.class);
+                            intent.putExtra("burning-series.videoURL", vurl);
+                            startActivity(intent);
+                        } else {
+                            Intent browserIntent = new Intent(Intent.ACTION_VIEW, Uri.parse(vurl));
+                            startActivity(browserIntent);
+                        }
+                    }
                     );
                 }
             });
 
             wv.loadUrl(fullURL);
+
+            progressDialog = new ProgressDialog(getActivity());
+            progressDialog.setMessage("Hoster wird geöffnet...");
+
+            progressDialog.show();
         } catch (Exception e) {
             e.printStackTrace();
         }

@@ -14,6 +14,7 @@ import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.design.widget.NavigationView;
 import android.support.design.widget.Snackbar;
+import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentTransaction;
 import android.support.v4.content.ContextCompat;
@@ -31,6 +32,7 @@ import android.view.View;
 import android.widget.TextView;
 
 import com.google.firebase.remoteconfig.FirebaseRemoteConfig;
+import com.google.firebase.remoteconfig.FirebaseRemoteConfigSettings;
 import com.trello.rxlifecycle.android.RxLifecycleAndroid;
 
 import java.util.Arrays;
@@ -40,6 +42,7 @@ import java.util.Map;
 
 import butterknife.BindView;
 import de.m4lik.burningseries.ActivityComponent;
+import de.m4lik.burningseries.BuildConfig;
 import de.m4lik.burningseries.R;
 import de.m4lik.burningseries.api.API;
 import de.m4lik.burningseries.api.APIInterface;
@@ -78,15 +81,14 @@ import static de.m4lik.burningseries.services.ThemeHelperService.theme;
 public class MainActivity extends ActivityBase
         implements NavigationView.OnNavigationItemSelectedListener {
 
-    public static String userName;
-    public static String userSession;
+    private static String userName;
+    private static String userSession;
 
-    public Menu menu;
+    private Menu menu;
 
-    public String visibleFragment;
-    public Boolean seriesList = false;
+    private Boolean seriesList = false;
 
-    public boolean isTablet = false;
+    private boolean isTablet = false;
 
     ProgressDialog progressDialog;
 
@@ -182,6 +184,10 @@ public class MainActivity extends ActivityBase
     private void fetchFirebase() {
         System.out.println("Fetching now!");
         FirebaseRemoteConfig remoteConfig = FirebaseRemoteConfig.getInstance();
+        remoteConfig.setConfigSettings(
+                new FirebaseRemoteConfigSettings.Builder()
+                        .setDeveloperModeEnabled(BuildConfig.DEBUG)
+                        .build());
         remoteConfig.fetch()
                 .addOnCompleteListener(this, task -> {
                     if (task.isSuccessful()) {
@@ -198,25 +204,25 @@ public class MainActivity extends ActivityBase
     }
 
     private void setup() {
-            if (DatabaseUtils.with(this).isSeriesListEmpty())
-                fetchSeries();
-            else
-                setFragment(Settings.of(getApplicationContext()).getStartupView());
+        if (DatabaseUtils.with(this).isSeriesListEmpty())
+            fetchSeries();
+        else
+            setFragment(Settings.of(getApplicationContext()).getStartupView());
 
-            SearchView searchView = (SearchView) MenuItemCompat.getActionView(this.menu.findItem(R.id.action_search));
-            searchView.setOnQueryTextListener(new SearchView.OnQueryTextListener() {
-                @Override
-                public boolean onQueryTextSubmit(String query) {
-                    return true;
-                }
+        SearchView searchView = (SearchView) MenuItemCompat.getActionView(this.menu.findItem(R.id.action_search));
+        searchView.setOnQueryTextListener(new SearchView.OnQueryTextListener() {
+            @Override
+            public boolean onQueryTextSubmit(String query) {
+                return true;
+            }
 
-                @Override
-                public boolean onQueryTextChange(String newText) {
-                    SeriesFragment fragment = (SeriesFragment) getSupportFragmentManager().findFragmentByTag("seriesFragment");
-                    fragment.filterList(newText);
-                    return false;
-                }
-            });
+            @Override
+            public boolean onQueryTextChange(String newText) {
+                SeriesFragment fragment = (SeriesFragment) getSupportFragmentManager().findFragmentByTag("seriesFragment");
+                fragment.filterList(newText);
+                return false;
+            }
+        });
     }
 
     @Override
@@ -352,41 +358,42 @@ public class MainActivity extends ActivityBase
 
         MenuItem searchItem = menu.findItem(R.id.action_search);
 
+        Fragment replaceFragment;
+        String tag;
+
         if (fragment == null)
             fragment = "series";
 
         switch (fragment) {
             case "genres":
                 searchItem.setVisible(false);
-                transaction.replace(R.id.fragmentContainerMain, new GenresFragment(), "genresFragment");
-                transaction.commit();
-                visibleFragment = "genres";
+                replaceFragment = new GenresFragment();
+                tag = "genresFragment";
                 break;
             case "favorites":
                 searchItem.setVisible(false);
-                transaction.replace(R.id.fragmentContainerMain, new FavsFragment(), "favsFragment");
-                transaction.commit();
-                visibleFragment = "favorites";
+                replaceFragment = new FavsFragment();
+                tag = "favsFragment";
                 break;
             case "history":
                 searchItem.setVisible(false);
-                transaction.replace(R.id.fragmentContainerMain, new HistoryFragment(), "historyFragment");
-                transaction.commit();
-                visibleFragment = "history";
+                replaceFragment = new HistoryFragment();
+                tag = "historyFragment";
                 break;
             case "news":
                 searchItem.setVisible(false);
-                transaction.replace(R.id.fragmentContainerMain, new NewsFragment(), "newsFragment");
-                transaction.commit();
-                visibleFragment = "news";
+                replaceFragment = new NewsFragment();
+                tag = "newsFragment";
                 break;
             default:
                 searchItem.setVisible(true);
-                transaction.replace(R.id.fragmentContainerMain, new SeriesFragment(), "seriesFragment");
-                transaction.commit();
-                visibleFragment = "series";
+                replaceFragment = new SeriesFragment();
+                tag = "seriesFragment";
                 break;
         }
+
+        transaction.replace(R.id.fragmentContainerMain, replaceFragment, tag);
+        transaction.commit();
     }
 
     private void fetchSeries() {
@@ -438,6 +445,13 @@ public class MainActivity extends ActivityBase
         });
     }
 
+    /**
+     * Method to fetch user favorites from burning series
+     * @see API
+     * @see APIInterface
+     * @see retrofit2.Retrofit
+     */
+
     public void fetchFavorites() {
 
         API api = new API();
@@ -465,6 +479,10 @@ public class MainActivity extends ActivityBase
             }
         });
     }
+
+    /**
+     * Async task to write shows list to database
+     */
 
     private class SeriesDatabaseUpdate extends AsyncTask<Void, Void, Void> {
 
@@ -525,12 +543,16 @@ public class MainActivity extends ActivityBase
         protected void onPostExecute(Void aVoid) {
             if (userSession.equals("")) {
                 progressDialog.dismiss();
-                setFragment(visibleFragment);
+                setFragment("series");
             } else
                 fetchFavorites();
             super.onPostExecute(aVoid);
         }
     }
+
+    /**
+     * Async task to write favorites to database
+     */
 
     private class favoritesDatabaseUpdate extends AsyncTask<Void, Void, Void> {
 
@@ -566,11 +588,9 @@ public class MainActivity extends ActivityBase
         @Override
         protected void onPostExecute(Void aVoid) {
             progressDialog.dismiss();
-            setFragment(visibleFragment);
+            setFragment("series");
 
             super.onPostExecute(aVoid);
         }
     }
-
-
 }

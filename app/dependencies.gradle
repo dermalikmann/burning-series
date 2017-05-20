@@ -1,7 +1,7 @@
 ext {
     versionSupportLibrary = "25.3.1"
     versionRxBinding = "1.0.1"
-    versionPlayServices = "10.2.1"
+    versionPlayServices = "10.2.6"
     versionImmutables = "2.4.1"
     versionFirebase = "2.4.1"
 }

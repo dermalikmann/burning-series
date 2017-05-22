@@ -445,13 +445,20 @@ public class MainActivity extends ActivityBase
         });
     }
 
+    public Boolean getSeriesList() {
+        return seriesList;
+    }
+
+    public void setSeriesList(Boolean seriesList) {
+        this.seriesList = seriesList;
+    }
+
     /**
      * Method to fetch user favorites from burning series
      * @see API
      * @see APIInterface
      * @see retrofit2.Retrofit
      */
-
     public void fetchFavorites() {
 
         API api = new API();
@@ -483,7 +490,6 @@ public class MainActivity extends ActivityBase
     /**
      * Async task to write shows list to database
      */
-
     private class SeriesDatabaseUpdate extends AsyncTask<Void, Void, Void> {
 
         GenreMap genreMap;
@@ -553,7 +559,6 @@ public class MainActivity extends ActivityBase
     /**
      * Async task to write favorites to database
      */
-
     private class favoritesDatabaseUpdate extends AsyncTask<Void, Void, Void> {
 
         List<ShowObj> list;

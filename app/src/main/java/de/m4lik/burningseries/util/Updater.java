@@ -35,6 +35,7 @@ import retrofit2.Call;
 import retrofit2.Retrofit;
 import retrofit2.converter.gson.GsonConverterFactory;
 import retrofit2.http.GET;
+import retrofit2.http.Path;
 import rx.Observable;
 import rx.android.schedulers.AndroidSchedulers;
 import rx.functions.Actions;
@@ -52,38 +53,34 @@ public class Updater {
 
     private final int currentVersion;
     private final ImmutableList<String> endpoints;
+    private String channel;
 
     public Updater(Context context) {
         currentVersion = AndroidUtility.buildNumber();
-        Log.d("BSUD", "CV: " + currentVersion);
 
         boolean betaChannel = Settings.of(context).isBetaChannel();
-        endpoints = updateUrls(betaChannel);
+        endpoints = updateUrls();
+        channel = betaChannel ? "beta" : "stable";
     }
 
-    private static Retrofit newRestAdapter(String endpoint) {
-        com.google.gson.Gson gson = new GsonBuilder()
-                .registerTypeAdapterFactory(new GsonAdaptersUpdate())
-                .create();
+    private static Retrofit buildRetrofit(String baseURL) {
 
         return new Retrofit.Builder()
-                .baseUrl(endpoint)
-                .addConverterFactory(GsonConverterFactory.create(gson))
+                .baseUrl(baseURL)
+                .addConverterFactory(GsonConverterFactory.create(
+                        new GsonBuilder()
+                                .registerTypeAdapterFactory(new GsonAdaptersUpdate())
+                                .create()
+                ))
                 .build();
     }
 
     /**
      * Returns the Endpoint-URL that is to be queried
      */
-    private static ImmutableList<String> updateUrls(boolean betaChannel) {
+    private static ImmutableList<String> updateUrls() {
         List<String> urls = new ArrayList<>();
-
-        if (betaChannel) {
-            urls.add("http://bs.malikmann.de/version/beta/");
-        } else {
-            urls.add("http://bs.malikmann.de/version/stable/");
-        }
-
+        urls.add("http://bs.malikmann.de/");
         return ImmutableList.copyOf(urls);
     }
 
@@ -158,32 +155,25 @@ public class Updater {
     }
 
     private Observable<Update> check(final String endpoint) {
-        Log.d("BS-Updater", "Checking for new version");
-        return Async.fromCallable(() -> {
-            UpdateApi api = newRestAdapter(endpoint).create(UpdateApi.class);
-            return api.get().execute().body();
-        }, BackgroundScheduler.instance()).filter(
-                update -> {
-                    //TODO: FA event
-                    // filter out if up to date
-                    Log.d("BSUD", "NV: " + update.buildNumber());
-                    return update.buildNumber() > currentVersion;
-                }
-        ).map(update -> {
-            // rewrite url to make it absolute
-            String apk = update.apk();
-            if (!apk.startsWith("http")) {
-                apk = Uri.withAppendedPath(Uri.parse(endpoint), apk).toString();
-            }
+        return
+                Async.fromCallable(
+                        () -> {
+                            UpdateApi api = buildRetrofit(endpoint).create(UpdateApi.class);
+                            return api.check(channel).execute().body();
+                        }, BackgroundScheduler.instance()
+                ).filter(
+                        update -> update.buildNumber() > currentVersion
+                ).map(update -> {
+                    String apk = update.apk();
 
-            //TODO: FA event
-            return ImmutableUpdate.builder()
-                    .buildNumber(update.buildNumber())
-                    .versionName(update.versionName())
-                    .changelog(update.changelog())
-                    .apk(apk)
-                    .build();
-        });
+                    //TODO: FA event
+                    return ImmutableUpdate.builder()
+                            .buildNumber(update.buildNumber())
+                            .versionName(update.versionName())
+                            .changelog(update.changelog())
+                            .apk(apk)
+                            .build();
+                });
     }
 
     public Observable<Update> check() {
@@ -201,7 +191,10 @@ public class Updater {
     }
 
     private interface UpdateApi {
-        @GET("update.json")
+        @GET("/version/stable/update.json")
         Call<Update> get();
+
+        @GET("/version/{channel}/update.json")
+        Call<Update> check(@Path("channel") String channel);
     }
 }

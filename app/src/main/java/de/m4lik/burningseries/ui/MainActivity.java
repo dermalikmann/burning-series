@@ -148,6 +148,7 @@ public class MainActivity extends ActivityBase
 
         //Update check
         Observable.just(null)
+                .delay(10, TimeUnit.SECONDS, mainThread())
                 .compose(RxLifecycleAndroid.bindActivity(lifecycle()))
                 .subscribe(o -> UpdateDialog.checkForUpdates(MainActivity.this, false));
 

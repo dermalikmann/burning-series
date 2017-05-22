@@ -16,7 +16,6 @@ import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.util.Log;
 import android.view.View;
-import android.webkit.WebSettings;
 import android.webkit.WebView;
 import android.webkit.WebViewClient;
 import android.widget.Button;
@@ -28,9 +27,12 @@ import com.bumptech.glide.Glide;
 
 import java.io.PrintWriter;
 import java.io.StringWriter;
+import java.net.URL;
+import java.net.URLConnection;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.List;
+import java.util.Scanner;
 
 import butterknife.BindView;
 import de.m4lik.burningseries.ActivityComponent;
@@ -119,6 +121,8 @@ public class TabletShowActivity extends ActivityBase {
     TextView seasonTV;
 
     String userSession;
+
+    ProgressDialog progressDialog;
 
     List<SeasonListItem> seasons = new ArrayList<>();
     List<EpisodeListItem> episodes = new ArrayList<>();
@@ -514,14 +518,16 @@ public class TabletShowActivity extends ActivityBase {
                 switch (type) {
                     case "internal":
                         if (hoster.equals("openload") || hoster.equals("openloadhd")) {
-                            Openload(videoObj.getUrl(), false);
+                            //Openload(videoObj.getUrl(), false);
+                            new OpenloadParser(videoObj.getFullUrl(), false).execute();
                         } else {
                             new GetVideo(videoObj).execute();
                         }
                         break;
                     case "external":
                         if (hoster.equals("openload") || hoster.equals("openloadhd")) {
-                            Openload(videoObj.getUrl(), true);
+                            //Openload(videoObj.getUrl(), true);
+                            new OpenloadParser(videoObj.getFullUrl(), true).execute();
                         } else {
                             new GetVideo(videoObj, true).execute();
                         }
@@ -578,15 +584,15 @@ public class TabletShowActivity extends ActivityBase {
 
     private void Openload(String videoID, Boolean external) {
         try {
-            String fullURL = "https://openload.co/embed/" + videoID;
+            //String fullURL = "https://openload.co/embed/" + videoID;
 
-            WebView wv = new WebView(this);
-            WebSettings webSettings = wv.getSettings();
-            webSettings.setJavaScriptEnabled(true);
+            WebView wv = new WebView(TabletShowActivity.this);
+            wv.getSettings().setJavaScriptEnabled(true);
             wv.setWebViewClient(new WebViewClient() {
+                @Override
                 public void onPageFinished(WebView view, String url) {
-                    view.evaluateJavascript("document.getElementById('streamurl').innerHTML",
-                            valueFromJS -> {
+                    view.evaluateJavascript("document.getElementById('streamurl').innerHTML", valueFromJS -> {
+                                progressDialog.dismiss();
                                 String vurl = "https://openload.co/stream/" + valueFromJS.replace("\"", "") + "?mime=true";
                                 if (!external) {
                                     Intent intent = new Intent(TabletShowActivity.this, FullscreenVideoActivity.class);
@@ -600,9 +606,49 @@ public class TabletShowActivity extends ActivityBase {
                     );
                 }
             });
-            wv.loadUrl(fullURL);
+
+            //wv.loadUrl(fullURL);
+            wv.loadDataWithBaseURL("https://openload.co", videoID, null, null, null);
+
+            progressDialog = new ProgressDialog(TabletShowActivity.this);
+            progressDialog.setMessage("Hoster wird geöffnet...");
+
+            progressDialog.show();
         } catch (Exception e) {
             e.printStackTrace();
+        }
+    }
+
+    private class OpenloadParser extends AsyncTask<Void, Void, Void> {
+        String url;
+        String content;
+        Boolean external;
+
+        public OpenloadParser(String url, Boolean external) {
+            this.url = url;
+            this.external = external;
+        }
+
+        @Override
+        protected Void doInBackground(Void... params) {
+            content = null;
+            URLConnection connection = null;
+            try {
+                connection = new URL(url).openConnection();
+                Scanner scanner = new Scanner(connection.getInputStream());
+                scanner.useDelimiter("\\Z");
+                content = scanner.next();
+                content = content.replace("<video", "<video preload=none");
+            } catch (Exception ex) {
+                ex.printStackTrace();
+            }
+            return null;
+        }
+
+        @Override
+        protected void onPostExecute(Void aVoid) {
+            Openload(content, external);
+            super.onPostExecute(aVoid);
         }
     }
 

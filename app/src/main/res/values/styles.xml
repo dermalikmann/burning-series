@@ -116,6 +116,31 @@
         <item name="alertDialogTheme">@style/BurningSeries.Dialog.Dark.Orange</item>
     </style>
 
+    <style name="BurningSeries.Purple">
+        <item name="colorPrimary">@color/purple_primary</item>
+        <item name="colorPrimaryDark">@color/purple_primary_dark</item>
+        <item name="colorAccent">@color/purple_accent</item>
+        <!--<item name="drawerTheme">@style/DrawerTheme.purple</item>-->
+        <item name="popupTheme">@style/BurningSeries.Popup.Purple</item>
+        <item name="alertDialogTheme">@style/BurningSeries.Dialog.Purple</item>
+    </style>
+
+    <style name="BurningSeries.Purple.Dark" parent="Theme.AppCompat">
+        <item name="colorPrimary">@color/purple_primary</item>
+        <item name="colorPrimaryDark">@color/purple_primary_dark</item>
+        <item name="colorAccent">@color/purple_accent</item>
+        <item name="android:colorBackground">@color/background_dark</item>
+        <item name="android:textColorPrimary">@android:color/primary_text_dark</item>
+        <item name="android:textColorSecondary">@android:color/secondary_text_dark</item>
+        <item name="android:textColorTertiary">@android:color/tertiary_text_dark</item>
+        <item name="android:windowBackground">?android:attr/colorBackground</item>
+        <item name="android:colorForeground">@color/white</item>
+        <item name="colorButtonNormal">@color/purple_primary</item>
+        <item name="popupTheme">@style/BurningSeries.Popup.Dark.Purple</item>
+        <item name="dialogTheme">@style/BurningSeries.Dialog.Dark.Purple</item>
+        <item name="alertDialogTheme">@style/BurningSeries.Dialog.Dark.Purple</item>
+    </style>
+
     <!-- popup menus -->
 
     <style name="BurningSeries.Popup" parent="ThemeOverlay.AppCompat.Light"/>
@@ -145,6 +170,14 @@
         <item name="colorAccent">@color/orange_primary</item>
     </style>
 
+    <style name="BurningSeries.Popup.Purple">
+        <item name="colorAccent">@color/purple_primary</item>
+    </style>
+
+    <style name="BurningSeries.Popup.Dark.Purple">
+        <item name="colorAccent">@color/purple_primary</item>
+    </style>
+
     <!-- dialog menus -->
 
     <style name="BurningSeries.Dialog" parent="Theme.AppCompat.Light.Dialog.Alert"/>
@@ -172,6 +205,14 @@
 
     <style name="BurningSeries.Dialog.Dark.Orange">
         <item name="colorAccent">@color/orange_primary</item>
+    </style>
+
+    <style name="BurningSeries.Dialog.Purple">
+        <item name="colorAccent">@color/purple_primary</item>
+    </style>
+
+    <style name="BurningSeries.Dialog.Dark.Purple">
+        <item name="colorAccent">@color/purple_primary</item>
     </style>
 
     <!-- NoActionBar -->
@@ -218,6 +259,20 @@
         <item name="windowActionModeOverlay">true</item>
     </style>
 
+    <style name="BurningSeries.Purple.NoActionBar">
+        <item name="windowActionBar">false</item>
+        <item name="windowNoTitle">true</item>
+        <item name="android:windowActionBarOverlay">true</item>
+        <item name="windowActionModeOverlay">true</item>
+    </style>
+
+    <style name="BurningSeries.Purple.Dark.NoActionBar">
+        <item name="windowActionBar">false</item>
+        <item name="windowNoTitle">true</item>
+        <item name="android:windowActionBarOverlay">true</item>
+        <item name="windowActionModeOverlay">true</item>
+    </style>
+
     <!-- NoActionBar.WhiteAccent -->
 
     <style name="BurningSeries.Blue.NoActionBar.WhiteAccent">
@@ -256,6 +311,18 @@
         <item name="colorControlHighlight">@color/white</item>
     </style>
 
+    <style name="BurningSeries.Purple.NoActionBar.WhiteAccent">
+        <item name="colorControlNormal">@color/white</item>
+        <item name="colorControlActivated">@color/white</item>
+        <item name="colorControlHighlight">@color/white</item>
+    </style>
+
+    <style name="BurningSeries.Purple.Dark.NoActionBar.WhiteAccent">
+        <item name="colorControlNormal">@color/white</item>
+        <item name="colorControlActivated">@color/white</item>
+        <item name="colorControlHighlight">@color/white</item>
+    </style>
+
     <!-- Placeholder -->
 
     <style name="BurningSeries.Blue.NoActionBar.Fullscreen"/>
@@ -264,11 +331,15 @@
 
     <style name="BurningSeries.Orange.NoActionBar.Fullscreen"/>
 
+    <style name="BurningSeries.Purple.NoActionBar.Fullscreen"/>
+
     <style name="BurningSeries.Blue.NoActionBar.TranslucentStatus"/>
 
     <style name="BurningSeries.Green.NoActionBar.TranslucentStatus"/>
 
     <style name="BurningSeries.Orange.NoActionBar.TranslucentStatus"/>
+
+    <style name="BurningSeries.Purple.NoActionBar.TranslucentStatus"/>
 
 
 
@@ -277,12 +348,16 @@
     <style name="BurningSeries.Green.Dark.NoActionBar.Fullscreen"/>
 
     <style name="BurningSeries.Orange.Dark.NoActionBar.Fullscreen"/>
+    
+    <style name="BurningSeries.Purple.Dark.NoActionBar.Fullscreen"/>
 
     <style name="BurningSeries.Blue.Dark.NoActionBar.TranslucentStatus"/>
 
     <style name="BurningSeries.Green.Dark.NoActionBar.TranslucentStatus"/>
 
     <style name="BurningSeries.Orange.Dark.NoActionBar.TranslucentStatus"/>
+
+    <style name="BurningSeries.Purple.Dark.NoActionBar.TranslucentStatus"/>
 
     <!-- Navigation Drawer -->
 
@@ -296,6 +371,10 @@
 
     <style name="DrawerTheme.Orange" parent="Theme.AppCompat.Light">
         <item name="colorPrimary">@color/orange_primary</item>
+    </style>
+
+    <style name="DrawerTheme.Purple" parent="Theme.AppCompat.Light">
+        <item name="colorPrimary">@color/purple_primary</item>
     </style>
 
 </resources>

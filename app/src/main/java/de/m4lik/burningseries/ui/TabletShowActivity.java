@@ -4,23 +4,21 @@ import android.app.ProgressDialog;
 import android.content.ContentValues;
 import android.content.Context;
 import android.content.Intent;
-import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.graphics.drawable.Drawable;
 import android.net.Uri;
 import android.os.AsyncTask;
 import android.os.Bundle;
-import android.support.annotation.NonNull;
 import android.support.customtabs.CustomTabsIntent;
 import android.support.design.widget.Snackbar;
 import android.support.v4.content.ContextCompat;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.util.Log;
-import android.view.LayoutInflater;
 import android.view.View;
-import android.view.ViewGroup;
-import android.widget.ArrayAdapter;
+import android.webkit.WebSettings;
+import android.webkit.WebView;
+import android.webkit.WebViewClient;
 import android.widget.Button;
 import android.widget.ImageView;
 import android.widget.ListView;
@@ -28,7 +26,10 @@ import android.widget.TextView;
 
 import com.bumptech.glide.Glide;
 
+import java.io.PrintWriter;
+import java.io.StringWriter;
 import java.util.ArrayList;
+import java.util.Calendar;
 import java.util.List;
 
 import butterknife.BindView;
@@ -41,32 +42,39 @@ import de.m4lik.burningseries.api.objects.FullShowObj;
 import de.m4lik.burningseries.api.objects.SeasonObj;
 import de.m4lik.burningseries.api.objects.VideoObj;
 import de.m4lik.burningseries.database.MainDBHelper;
-import de.m4lik.burningseries.databinding.ListItemEpisodesBinding;
-import de.m4lik.burningseries.databinding.ListItemHosterBinding;
 import de.m4lik.burningseries.hoster.Hoster;
 import de.m4lik.burningseries.ui.base.ActivityBase;
 import de.m4lik.burningseries.ui.dialogs.DialogBuilder;
 import de.m4lik.burningseries.ui.listitems.EpisodeListItem;
 import de.m4lik.burningseries.ui.listitems.HosterListItem;
+import de.m4lik.burningseries.ui.listitems.PlayerChooserListItem;
 import de.m4lik.burningseries.ui.listitems.SeasonListItem;
+import de.m4lik.burningseries.ui.viewAdapters.EpisodesRecyclerAdapter;
+import de.m4lik.burningseries.ui.viewAdapters.HosterRecyclerAdapter;
+import de.m4lik.burningseries.ui.viewAdapters.PlayerChooserListAdapter;
+import de.m4lik.burningseries.ui.viewAdapters.SeasonsListAdapter;
 import de.m4lik.burningseries.util.AndroidUtility;
 import de.m4lik.burningseries.util.Settings;
+import de.m4lik.burningseries.util.ShowUtils;
 import de.m4lik.burningseries.util.listeners.RecyclerItemClickListener;
-import okhttp3.ResponseBody;
 import retrofit2.Call;
 import retrofit2.Callback;
 import retrofit2.Response;
 
-import static de.m4lik.burningseries.database.SeriesContract.seriesTable;
+import static de.m4lik.burningseries.database.SeriesContract.historyTable;
 import static de.m4lik.burningseries.services.ThemeHelperService.theme;
 
 public class TabletShowActivity extends ActivityBase {
 
     Integer currentShow;
     Integer currentSeason;
+    Integer currentEpisode;
+    String showName;
+    String episodeName;
 
     Boolean fav = false;
     Boolean loaded = false;
+    Boolean fromWatchHistory = false;
 
     @BindView(R.id.favButton)
     Button favButton;
@@ -104,11 +112,17 @@ public class TabletShowActivity extends ActivityBase {
     @BindView(R.id.coverImageView)
     ImageView coverImageView;
 
+    @BindView(R.id.episodeName)
+    TextView episodeNameTV;
+
+    @BindView(R.id.seasonTV)
+    TextView seasonTV;
+
     String userSession;
 
     List<SeasonListItem> seasons = new ArrayList<>();
     List<EpisodeListItem> episodes = new ArrayList<>();
-    List<HosterListItem> hosters = new ArrayList<>();
+    List<HosterListItem> hosterList = new ArrayList<>();
 
     Intent i;
 
@@ -129,11 +143,20 @@ public class TabletShowActivity extends ActivityBase {
 
         String title = i.getStringExtra("ShowName");
         currentShow = i.getIntExtra("ShowID", 60);
+
+        fromWatchHistory = i.getBooleanExtra("ShowEpisode", false);
+        if (fromWatchHistory) {
+            currentSeason = i.getIntExtra("SeasonID", 1);
+            currentEpisode = i.getIntExtra("EpisodeID", 1);
+            episodeName = i.getStringExtra("EpisodeName");
+        }
+
+        showName = title;
         Uri imageUri = Uri.parse("https://bs.to/public/img/cover/" + currentShow + ".jpg");
         getSupportActionBar().setTitle(title);
 
         Log.v("BS", "Lade Cover.");
-        Glide.with(getApplicationContext())
+        Glide.with(TabletShowActivity.this)
                 .load(imageUri)
                 .into(coverImageView);
 
@@ -142,11 +165,11 @@ public class TabletShowActivity extends ActivityBase {
 
         userSession = Settings.of(this).getUserSession();
 
-        fav = isFav();
+        fav = ShowUtils.isFav(this, currentShow);
 
-        final Drawable favStar = ContextCompat.getDrawable(getApplicationContext(), R.drawable.ic_star_white);
+        final Drawable favStar = ContextCompat.getDrawable(TabletShowActivity.this, R.drawable.ic_star_white);
         favStar.setBounds(0, 0, 50, 50);
-        final Drawable notFavStar = ContextCompat.getDrawable(getApplicationContext(), R.drawable.ic_star_border_white);
+        final Drawable notFavStar = ContextCompat.getDrawable(TabletShowActivity.this, R.drawable.ic_star_border_white);
         notFavStar.setBounds(0, 0, 50, 50);
         if (fav)
             favButton.setCompoundDrawables(favStar, null, null, null);
@@ -155,11 +178,11 @@ public class TabletShowActivity extends ActivityBase {
 
         favButton.setOnClickListener(view -> {
             if (!fav) {
-                addToFavorites();
+                ShowUtils.addToFavorites(this, currentShow);
                 favButton.setCompoundDrawables(favStar, null, null, null);
                 fav = !fav;
             } else {
-                removeFromFavorites();
+                ShowUtils.removeFromFavorites(this, currentShow);
                 favButton.setCompoundDrawables(notFavStar, null, null, null);
                 fav = !fav;
             }
@@ -187,12 +210,15 @@ public class TabletShowActivity extends ActivityBase {
                 if (!loaded)
                     refreshSeries(season);
 
+                seasonTV.setText("Staffel " + currentSeason + ":");
+
                 episodes = new ArrayList<>();
 
-                int i = 1;
                 for (SeasonObj.Episode episode : season.getEpisodes()) {
-                    episodes.add(new EpisodeListItem(i + " " + episode.getGermanTitle(), episode.getEnglishTitle(), episode.getEpisodeID(), episode.isWatched() == 1));
-                    i++;
+                    episodes.add(new EpisodeListItem(episode.getGermanTitle(),
+                            episode.getEnglishTitle(),
+                            episode.getEpisodeID(),
+                            episode.isWatched() == 1));
                 }
 
                 refreshEpisodesList();
@@ -206,7 +232,7 @@ public class TabletShowActivity extends ActivityBase {
                         Snackbar.LENGTH_SHORT
                 );
                 View snackbarView = snackbar.getView();
-                snackbarView.setBackgroundColor(ContextCompat.getColor(getApplicationContext(), theme().primaryColorDark));
+                snackbarView.setBackgroundColor(ContextCompat.getColor(TabletShowActivity.this, theme().primaryColorDark));
                 snackbar.show();
             }
         });
@@ -221,18 +247,19 @@ public class TabletShowActivity extends ActivityBase {
         episodeCall.enqueue(new Callback<EpisodeObj>() {
             @Override
             public void onResponse(Call<EpisodeObj> call, Response<EpisodeObj> response) {
+                currentEpisode = episode;
                 EpisodeObj episode = response.body();
 
-                hosters = new ArrayList<>();
+                hosterList = new ArrayList<>();
 
                 for (EpisodeObj.Hoster hoster : episode.getHoster())
                     if (Hoster.compatibleHosters.contains(hoster.getHoster())) {
-                        hosters.add(new HosterListItem(hoster.getLinkId(), hoster.getHoster(), hoster.getPart(), true));
+                        hosterList.add(new HosterListItem(hoster.getLinkId(), hoster.getHoster(), hoster.getPart(), true));
 
                     }
                 for (EpisodeObj.Hoster hoster : episode.getHoster())
                     if (!Hoster.compatibleHosters.contains(hoster.getHoster()))
-                        hosters.add(new HosterListItem(hoster.getLinkId(), hoster.getHoster(), hoster.getPart()));
+                        hosterList.add(new HosterListItem(hoster.getLinkId(), hoster.getHoster(), hoster.getPart()));
 
                 refreshHosterList();
             }
@@ -245,7 +272,7 @@ public class TabletShowActivity extends ActivityBase {
                         Snackbar.LENGTH_SHORT
                 );
                 View snackbarView = snackbar.getView();
-                snackbarView.setBackgroundColor(ContextCompat.getColor(getApplicationContext(), theme().primaryColorDark));
+                snackbarView.setBackgroundColor(ContextCompat.getColor(TabletShowActivity.this, theme().primaryColorDark));
                 snackbar.show();
             }
         });
@@ -253,14 +280,15 @@ public class TabletShowActivity extends ActivityBase {
     }
 
     private void setupEpisodeList() {
-        LinearLayoutManager llm = new LinearLayoutManager(getApplicationContext(), LinearLayoutManager.VERTICAL, false);
+        LinearLayoutManager llm = new LinearLayoutManager(TabletShowActivity.this, LinearLayoutManager.VERTICAL, false);
         episodesRecyclerView.setLayoutManager(llm);
         episodesRecyclerView.addOnItemTouchListener(
-                new RecyclerItemClickListener(getApplicationContext(), episodesRecyclerView, new RecyclerItemClickListener.OnItemClickListener() {
+                new RecyclerItemClickListener(TabletShowActivity.this, episodesRecyclerView, new RecyclerItemClickListener.OnItemClickListener() {
                     @Override
                     public void onItemClick(View view, int position) {
                         EpisodeListItem clickedEpisode = episodes.get(position);
-                        ((TextView) findViewById(R.id.episodeName)).setText(clickedEpisode.getTitleGer().equals("") ? clickedEpisode.getTitle() : clickedEpisode.getTitleGer());
+                        episodeName = clickedEpisode.getTitleGer().equals("") ? clickedEpisode.getTitle() : clickedEpisode.getTitleGer();
+                        episodeNameTV.setText(episodeName);
                         TextView idView = (TextView) view.findViewById(R.id.episodeId);
                         showEpisode(currentSeason, Integer.parseInt(idView.getText().toString()));
                     }
@@ -290,8 +318,8 @@ public class TabletShowActivity extends ActivityBase {
                                     public void onResponse(Call<VideoObj> call, Response<VideoObj> response) {
 
                                         TextView titleGerView = (TextView) view.findViewById(R.id.episodeTitleGer);
-                                        if (!Settings.of(getApplicationContext()).isDarkTheme())
-                                            titleGerView.setTextColor(ContextCompat.getColor(getApplicationContext(), android.R.color.black));
+                                        if (!Settings.of(TabletShowActivity.this).isDarkTheme())
+                                            titleGerView.setTextColor(ContextCompat.getColor(TabletShowActivity.this, android.R.color.black));
 
                                         ImageView fav1 = (ImageView) view.findViewById(R.id.watchedImageView);
                                         fav1.setImageDrawable(null);
@@ -313,48 +341,94 @@ public class TabletShowActivity extends ActivityBase {
                 })
         );
 
-        showSeason(1);
+        showSeason(fromWatchHistory ? currentSeason : 1);
     }
 
     private void setupHosterList() {
-        LinearLayoutManager llm = new LinearLayoutManager(getApplicationContext(), LinearLayoutManager.VERTICAL, false);
+        LinearLayoutManager llm = new LinearLayoutManager(TabletShowActivity.this, LinearLayoutManager.VERTICAL, false);
         hosterRecyclerView.setLayoutManager(llm);
         hosterRecyclerView.addOnItemTouchListener(
-                new RecyclerItemClickListener(getApplicationContext(), hosterRecyclerView, new RecyclerItemClickListener.OnItemClickListener() {
+                new RecyclerItemClickListener(TabletShowActivity.this, hosterRecyclerView, new RecyclerItemClickListener.OnItemClickListener() {
                     @Override
                     public void onItemClick(View view, int position) {
-
-                        if (Settings.of(getApplicationContext()).alarmOnMobile() &&
-                                AndroidUtility.isOnMobile(getApplicationContext())) {
+                        String playerType = hosterList.get(position).isSupported() ? "internal" : "appbrowser";
+                        if (Settings.of(TabletShowActivity.this).alarmOnMobile() &&
+                                AndroidUtility.isOnMobile(TabletShowActivity.this)) {
 
                             DialogBuilder.start(TabletShowActivity.this)
                                     .title("Mobile Daten")
                                     .content("Achtung! Du bist über mobile Daten im Internet. Willst du Fortfahren?")
                                     .positive("Weiter", dialog -> {
                                         TextView idView = (TextView) view.findViewById(R.id.linkId);
-                                        showVideo(Integer.parseInt(idView.getText().toString()));
+                                        showVideo(Integer.parseInt(idView.getText().toString()), playerType);
                                     })
-                                    .negative("Abbrechen")
+                                    .negative()
+                                    .cancelable()
                                     .build()
                                     .show();
 
                         } else {
-                            TextView idView = (TextView) view.findViewById(R.id.linkId);
-                            showVideo(Integer.parseInt(idView.getText().toString()));
+                            showVideo(hosterList.get(position).getLinkId(), playerType);
                         }
                     }
 
                     @Override
                     public void onLongItemClick(View view, int position) {
+                        if (Settings.of(TabletShowActivity.this).alarmOnMobile() &&
+                                AndroidUtility.isOnMobile(TabletShowActivity.this)) {
+                            List<PlayerChooserListItem> players = new ArrayList<>();
 
+                            if (hosterList.get(position).isSupported()) {
+                                players.add(new PlayerChooserListItem("Interner Player", "internal",
+                                        Settings.of(TabletShowActivity.this).isDarkTheme() ?
+                                                R.drawable.ic_ondemand_video_white : R.drawable.ic_ondemand_video));
+
+                                players.add(new PlayerChooserListItem("Externer Player", "external",
+                                        Settings.of(TabletShowActivity.this).isDarkTheme() ?
+                                                R.drawable.ic_live_tv_white : R.drawable.ic_live_tv));
+
+                                players.add(new PlayerChooserListItem("In-App Browser", "appbrowser",
+                                        Settings.of(TabletShowActivity.this).isDarkTheme() ?
+                                                R.drawable.ic_open_in_browser_white : R.drawable.ic_open_in_browser));
+                            }
+
+                            players.add(new PlayerChooserListItem("Im Browser öffnen", "browser",
+                                    Settings.of(TabletShowActivity.this).isDarkTheme() ?
+                                            R.drawable.ic_public_white : R.drawable.ic_public));
+
+                            DialogBuilder.start(TabletShowActivity.this)
+                                    .title(getString(R.string.choose_player_title))
+                                    .adapter(new PlayerChooserListAdapter(TabletShowActivity.this, players), (dialog2, id) -> {
+
+                                        DialogBuilder.start(TabletShowActivity.this)
+                                                .title("Mobile Daten")
+                                                .content("Achtung! Du bist über mobile Daten im Internet. Willst du Fortfahren?")
+                                                .positive("Weiter", dialog -> {
+                                                    showVideo(hosterList.get(position).getLinkId(), players.get(id).getType());
+                                                })
+                                                .negative()
+                                                .cancelable()
+                                                .build()
+                                                .show();
+                                    })
+                                    .cancelable()
+                                    .negative()
+                                    .build()
+                                    .show();
+                        }
                     }
                 })
         );
 
-        showEpisode(1, 1);
+        if (fromWatchHistory) {
+            episodeNameTV.setText(episodeName);
+            showEpisode(currentSeason, currentEpisode);
+        } else
+            showEpisode(1, 1);
     }
 
     private void refreshSeries(SeasonObj seasonObj) {
+        loaded = true;
         FullShowObj show = seasonObj.getSeries();
 
         descriptionTV.setText(show.getDescription());
@@ -408,171 +482,21 @@ public class TabletShowActivity extends ActivityBase {
             seasons.add(new SeasonListItem(i));
         }
 
-        seasonsListView.setAdapter(new SeasonsListAdapter());
+        seasonsListView.setAdapter(new SeasonsListAdapter(this, seasons));
         seasonsListView.setOnItemClickListener((parent, view, position, id) -> {
             showSeason(Integer.parseInt(((TextView) view.findViewById(R.id.seasonId)).getText().toString()));
         });
     }
 
     private void refreshEpisodesList() {
-        episodesRecyclerView.setAdapter(new EpisodesRecyclerAdapter(episodes));
+        episodesRecyclerView.setAdapter(new EpisodesRecyclerAdapter(this, episodes));
     }
 
     private void refreshHosterList() {
-        hosterRecyclerView.setAdapter(new HosterRecyclerAdapter(hosters));
+        hosterRecyclerView.setAdapter(new HosterRecyclerAdapter(this, hosterList));
     }
 
-
-
-    /* Fav functions */
-
-    private boolean isFav() {
-
-        boolean fav;
-
-        MainDBHelper dbHelper = new MainDBHelper(getApplicationContext());
-        SQLiteDatabase db = dbHelper.getWritableDatabase();
-
-        String[] projection = {
-                seriesTable.COLUMN_NAME_ID
-        };
-
-        String selection = seriesTable.COLUMN_NAME_ID + " = ? AND "
-                + seriesTable.COLUMN_NAME_ISFAV + " = ?";
-        String[] selectionArgs = {currentShow.toString(), "1"};
-
-        Cursor c = db.query(
-                seriesTable.TABLE_NAME,
-                projection,
-                selection,
-                selectionArgs,
-                null,
-                null,
-                null
-        );
-
-        fav = c.getCount() == 1;
-
-        c.close();
-        db.close();
-
-        return fav;
-    }
-
-    private void addToFavorites() {
-
-        MainDBHelper dbHelper = new MainDBHelper(getApplicationContext());
-        SQLiteDatabase db = dbHelper.getWritableDatabase();
-
-        ContentValues cv = new ContentValues();
-        cv.put(seriesTable.COLUMN_NAME_ISFAV, 1);
-        db.update(seriesTable.TABLE_NAME, cv, seriesTable.COLUMN_NAME_ID + " = " + currentShow, null);
-
-
-        String[] projection = {
-                seriesTable.COLUMN_NAME_ID
-        };
-
-        String selection = seriesTable.COLUMN_NAME_ISFAV + " = ?";
-        String[] selectionArgs = {"1"};
-
-        Cursor c = db.query(
-                seriesTable.TABLE_NAME,
-                projection,
-                selection,
-                selectionArgs,
-                null,
-                null,
-                null
-        );
-
-        String favs = "";
-        while (c.moveToNext())
-            favs += c.getInt(c.getColumnIndex(seriesTable.COLUMN_NAME_ID)) + ",";
-        favs = favs.substring(0, favs.length() - 1);
-
-        c.close();
-        db.close();
-
-
-        if (!userSession.equals("")) {
-            API api = new API();
-            APIInterface apiInterface = api.getInterface();
-            api.setSession(userSession);
-            api.generateToken("user/series/set/" + favs);
-            Call<ResponseBody> call = apiInterface.setFavorites(api.getToken(), api.getUserAgent(), favs, api.getSession());
-            call.enqueue(new Callback<ResponseBody>() {
-                @Override
-                public void onResponse(Call<ResponseBody> call, Response<ResponseBody> response) {
-                    //TODO Some error handling. Just in case.
-                }
-
-                @Override
-                public void onFailure(Call<ResponseBody> call, Throwable t) {
-                    //TODO Some error handling. Just in case.
-                }
-            });
-        }
-
-    }
-
-    private void removeFromFavorites() {
-
-        MainDBHelper dbHelper = new MainDBHelper(getApplicationContext());
-        SQLiteDatabase db = dbHelper.getWritableDatabase();
-
-        ContentValues cv = new ContentValues();
-        cv.put(seriesTable.COLUMN_NAME_ISFAV, 0);
-        db.update(seriesTable.TABLE_NAME, cv, seriesTable.COLUMN_NAME_ID + " = " + currentShow, null);
-
-        String[] projection = {
-                seriesTable.COLUMN_NAME_ID
-        };
-
-        String selection = seriesTable.COLUMN_NAME_ISFAV + " = ?";
-        String[] selectionArgs = {"1"};
-
-        Cursor c = db.query(
-                seriesTable.TABLE_NAME,
-                projection,
-                selection,
-                selectionArgs,
-                null,
-                null,
-                null
-        );
-
-        String favs = "";
-        while (c.moveToNext())
-            favs += c.getInt(c.getColumnIndex(seriesTable.COLUMN_NAME_ID)) + ",";
-        if (!favs.equals(""))
-            favs = favs.substring(0, favs.length() - 1);
-
-        c.close();
-        db.close();
-
-
-        if (!userSession.equals("")) {
-            API api = new API();
-            APIInterface apiInterface = api.getInterface();
-            api.setSession(userSession);
-            api.generateToken("user/series/set/" + favs);
-            Call<ResponseBody> call = apiInterface.setFavorites(api.getToken(), api.getUserAgent(), favs, api.getSession());
-            call.enqueue(new Callback<ResponseBody>() {
-                @Override
-                public void onResponse(Call<ResponseBody> call, Response<ResponseBody> response) {
-                }
-
-                @Override
-                public void onFailure(Call<ResponseBody> call, Throwable t) {
-
-                }
-            });
-        }
-    }
-
-
-    private void showVideo(Integer id) {
+    private void showVideo(Integer id, String type) {
 
         API api = new API();
         api.setSession(userSession);
@@ -584,36 +508,126 @@ public class TabletShowActivity extends ActivityBase {
             public void onResponse(Call<VideoObj> call, Response<VideoObj> response) {
                 VideoObj videoObj = response.body();
 
-                new GetVideo(videoObj).execute();
+                String hoster = videoObj.getHoster().toLowerCase();
+                System.out.println(hoster);
+
+                switch (type) {
+                    case "internal":
+                        if (hoster.equals("openload") || hoster.equals("openloadhd")) {
+                            Openload(videoObj.getUrl(), false);
+                        } else {
+                            new GetVideo(videoObj).execute();
+                        }
+                        break;
+                    case "external":
+                        if (hoster.equals("openload") || hoster.equals("openloadhd")) {
+                            Openload(videoObj.getUrl(), true);
+                        } else {
+                            new GetVideo(videoObj, true).execute();
+                        }
+                        break;
+                    case "browser":
+                        Intent browserIntent = new Intent(Intent.ACTION_VIEW, Uri.parse(videoObj.getFullUrl()));
+                        startActivity(browserIntent);
+                        break;
+                    case "appbrowser":
+                    default:
+                        CustomTabsIntent.Builder builder = new CustomTabsIntent.Builder();
+                        CustomTabsIntent customTabsIntent = builder.build();
+                        customTabsIntent.launchUrl(TabletShowActivity.this, Uri.parse(videoObj.getFullUrl()));
+                        break;
+                }
+
+                MainDBHelper dbHelper = new MainDBHelper(TabletShowActivity.this);
+                SQLiteDatabase db = dbHelper.getWritableDatabase();
+
+                ContentValues cv = new ContentValues();
+                Calendar calendar = Calendar.getInstance();
+
+                cv.put(historyTable.COLUMN_NAME_SHOW_ID, currentShow);
+                cv.put(historyTable.COLUMN_NAME_SEASON_ID, currentSeason);
+                cv.put(historyTable.COLUMN_NAME_EPISODE_ID, currentEpisode);
+                cv.put(historyTable.COLUMN_NAME_SHOW_NAME, showName);
+                cv.put(historyTable.COLUMN_NAME_EPISODE_NAME, episodeName);
+                cv.put(historyTable.COLUMN_NAME_DATE, calendar.get(Calendar.DAY_OF_MONTH) + "." + calendar.get(Calendar.MONTH));
+                cv.put(historyTable.COLUMN_NAME_TIME, calendar.get(Calendar.HOUR_OF_DAY) + ":" + calendar.get(Calendar.MINUTE));
+
+                db.insert(historyTable.TABLE_NAME, null, cv);
             }
 
             @Override
             public void onFailure(Call<VideoObj> call, Throwable t) {
+                Snackbar snackbar = Snackbar.make(findViewById(android.R.id.content), "Probleme beim Verbinden mit BS", Snackbar.LENGTH_SHORT);
+                View snackbarView = snackbar.getView();
+                snackbarView.setBackgroundColor(ContextCompat.getColor(TabletShowActivity.this, theme().primaryColorDark));
+                snackbar.show();
 
+
+                final StringWriter sw = new StringWriter();
+                final PrintWriter pw = new PrintWriter(sw, true);
+                t.printStackTrace(pw);
+
+                DialogBuilder.start(TabletShowActivity.this)
+                        .title("Error")
+                        .content(sw.getBuffer().toString())
+                        .negative()
+                        .build().show();
             }
         });
     }
 
+    private void Openload(String videoID, Boolean external) {
+        try {
+            String fullURL = "https://openload.co/embed/" + videoID;
+
+            WebView wv = new WebView(this);
+            WebSettings webSettings = wv.getSettings();
+            webSettings.setJavaScriptEnabled(true);
+            wv.setWebViewClient(new WebViewClient() {
+                public void onPageFinished(WebView view, String url) {
+                    view.evaluateJavascript("document.getElementById('streamurl').innerHTML",
+                            valueFromJS -> {
+                                String vurl = "https://openload.co/stream/" + valueFromJS.replace("\"", "") + "?mime=true";
+                                if (!external) {
+                                    Intent intent = new Intent(TabletShowActivity.this, FullscreenVideoActivity.class);
+                                    intent.putExtra("burning-series.videoURL", vurl);
+                                    startActivity(intent);
+                                } else {
+                                    Intent browserIntent = new Intent(Intent.ACTION_VIEW, Uri.parse(vurl));
+                                    startActivity(browserIntent);
+                                }
+                            }
+                    );
+                }
+            });
+            wv.loadUrl(fullURL);
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+    }
+
     private class GetVideo extends AsyncTask<Void, Void, Void> {
 
-        ProgressDialog progressDialog;
-        boolean externalPlayer;
-        String hosterReturn;
         private VideoObj videoObj;
+        private Boolean external;
+        private ProgressDialog progressDialog;
+        private String hosterReturn;
+        private Context context;
 
         GetVideo(VideoObj videoObj) {
             this(videoObj, false);
         }
 
-        GetVideo(VideoObj videoObj, boolean externalPlayer) {
+        GetVideo(VideoObj videoObj, Boolean external) {
             this.videoObj = videoObj;
-            this.externalPlayer = externalPlayer;
+            this.external = external;
+            this.context = TabletShowActivity.this;
         }
 
         @Override
         protected void onPreExecute() {
 
-            progressDialog = new ProgressDialog(TabletShowActivity.this);
+            progressDialog = new ProgressDialog(context);
             progressDialog.setMessage("Hoster wird geöffnet...");
 
             progressDialog.show();
@@ -635,221 +649,51 @@ public class TabletShowActivity extends ActivityBase {
 
             progressDialog.dismiss();
 
-            Context context = getApplicationContext();
-
             Snackbar snackbar;
             View snackbarView;
 
             switch (hosterReturn) {
                 case "1":
-                    snackbar = Snackbar.make(findViewById(R.id.showContent), "Hoster hat nicht geantwortet.", Snackbar.LENGTH_SHORT);
+                    snackbar = Snackbar.make(findViewById(android.R.id.content), "Hoster hat nicht geantwortet.", Snackbar.LENGTH_SHORT);
                     snackbarView = snackbar.getView();
                     snackbarView.setBackgroundColor(ContextCompat.getColor(context, theme().primaryColorDark));
                     snackbar.show();
                     return;
                 case "2":
-                    snackbar = Snackbar.make(findViewById(R.id.showContent), "Video wurde wahrscheinlich gelöscht.", Snackbar.LENGTH_SHORT);
+                    snackbar = Snackbar.make(findViewById(android.R.id.content), "Video wurde wahrscheinlich gelöscht.", Snackbar.LENGTH_SHORT);
                     snackbarView = snackbar.getView();
                     snackbarView.setBackgroundColor(ContextCompat.getColor(context, theme().primaryColorDark));
                     snackbar.show();
                     return;
                 case "3":
-                    snackbar = Snackbar.make(findViewById(R.id.showContent), "Fehler beim auflösen der Video URL.", Snackbar.LENGTH_SHORT);
+                    snackbar = Snackbar.make(findViewById(android.R.id.content), "Fehler beim auflösen der Video URL.", Snackbar.LENGTH_SHORT);
                     snackbarView = snackbar.getView();
                     snackbarView.setBackgroundColor(ContextCompat.getColor(context, theme().primaryColorDark));
                     snackbar.show();
                     return;
                 case "4":
-                    snackbar = Snackbar.make(findViewById(R.id.showContent), "Hoster hat nicht geantwortet.", Snackbar.LENGTH_SHORT);
+                    snackbar = Snackbar.make(findViewById(android.R.id.content), "Hoster hat nicht geantwortet.", Snackbar.LENGTH_SHORT);
                     snackbarView = snackbar.getView();
                     snackbarView.setBackgroundColor(ContextCompat.getColor(context, theme().primaryColorDark));
                     snackbar.show();
                     return;
                 case "5":
-                    snackbar = Snackbar.make(findViewById(R.id.showContent), "Da ist etwas ganz schief gelaufen. Fehler bitte melden.", Snackbar.LENGTH_SHORT);
+                    snackbar = Snackbar.make(findViewById(android.R.id.content), "Da ist etwas ganz schief gelaufen. Fehler bitte melden.", Snackbar.LENGTH_SHORT);
                     snackbarView = snackbar.getView();
                     snackbarView.setBackgroundColor(ContextCompat.getColor(context, theme().primaryColorDark));
                     snackbar.show();
                     return;
             }
 
-            if (hosterReturn.equals("unkown_hoster")) {
-                CustomTabsIntent.Builder builder = new CustomTabsIntent.Builder();
-                CustomTabsIntent customTabsIntent = builder.build();
-                customTabsIntent.launchUrl(context, Uri.parse(videoObj.getFullUrl()));
-            } else {
-                //Intent intent = new Intent(getContext(), BufferedVideoPlayerActivity.class);
+            if (!external) {
                 Intent intent = new Intent(context, FullscreenVideoActivity.class);
                 intent.putExtra("burning-series.videoURL", hosterReturn);
                 startActivity(intent);
+            } else {
+                Intent browserIntent = new Intent(Intent.ACTION_VIEW, Uri.parse(hosterReturn));
+                startActivity(browserIntent);
             }
             super.onPostExecute(aVoid);
-        }
-    }
-
-
-
-    /* View classes */
-
-    private class SeasonsListAdapter extends ArrayAdapter<SeasonListItem> {
-
-        SeasonsListAdapter() {
-            super(getApplicationContext(), R.layout.list_item_seasons, seasons);
-        }
-
-        @NonNull
-        @Override
-        public View getView(int pos, View view, @NonNull ViewGroup parent) {
-            if (view == null) {
-                view = getLayoutInflater().inflate(R.layout.list_item_seasons, parent, false);
-            }
-
-            view.findViewById(R.id.listItemContainer).setBackground(getResources().getDrawable(theme().listItemBackground));
-
-            SeasonListItem current = seasons.get(pos);
-
-            TextView label = (TextView) view.findViewById(R.id.seasonLabel);
-            label.setText(getString(R.string.season) + current.getSeasonId());
-
-            TextView urlText = (TextView) view.findViewById(R.id.seasonId);
-            urlText.setText(current.getSeasonId().toString());
-
-            return view;
-        }
-    }
-
-    private class EpisodesRecyclerAdapter extends RecyclerView.Adapter<EpisodesRecyclerAdapter.EpisodesViewHolder> {
-
-        Context context = getApplicationContext();
-
-        List<EpisodeListItem> list = new ArrayList<>();
-
-        EpisodesRecyclerAdapter(List<EpisodeListItem> list) {
-            this.list = list;
-        }
-
-        @Override
-        public EpisodesViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
-            LayoutInflater layoutInflater = LayoutInflater.from(context);
-            ListItemEpisodesBinding binding = ListItemEpisodesBinding.inflate(layoutInflater, parent, false);
-            return new EpisodesViewHolder(binding);
-        }
-
-        @Override
-        public void onBindViewHolder(EpisodesViewHolder holder, int position) {
-            EpisodeListItem current = list.get(position);
-            holder.bind(current);
-        }
-
-        @Override
-        public int getItemCount() {
-            return list.size();
-        }
-
-        class EpisodesViewHolder extends RecyclerView.ViewHolder {
-
-            ListItemEpisodesBinding binding;
-
-            EpisodesViewHolder(ListItemEpisodesBinding binding) {
-                super(binding.getRoot());
-                this.binding = binding;
-            }
-
-            public void bind(EpisodeListItem item) {
-                binding.setEpisode(item);
-
-                View root = binding.getRoot();
-
-                boolean isDark = Settings.of(context).isDarkTheme();
-
-                root.findViewById(R.id.listItemContainer)
-                        .setBackground(ContextCompat.getDrawable(context, theme().listItemBackground));
-
-                if (!isDark) {
-                    ((TextView) root.findViewById(R.id.episodeTitleGer))
-                            .setTextColor(ContextCompat.getColor(context, item.isWatched() ?
-                                    android.R.color.darker_gray : android.R.color.black));
-                } else {
-                    ((TextView) root.findViewById(R.id.episodeTitleGer))
-                            .setTextColor(ContextCompat.getColor(context, android.R.color.darker_gray));
-                    ((TextView) root.findViewById(R.id.episodeTitle))
-                            .setTextColor(ContextCompat.getColor(context, android.R.color.darker_gray));
-                }
-
-
-                if (item.isWatched())
-                    ((ImageView) root.findViewById(R.id.watchedImageView))
-                            .setImageDrawable(ContextCompat.getDrawable(context, isDark ?
-                                    R.drawable.ic_watched_white : R.drawable.ic_watched));
-                else
-                    ((ImageView) root.findViewById(R.id.watchedImageView))
-                            .setImageDrawable(null);
-
-                binding.executePendingBindings();
-            }
-        }
-    }
-
-    private class HosterRecyclerAdapter extends RecyclerView.Adapter<HosterRecyclerAdapter.HosterViewHolder> {
-
-        Context context = getApplicationContext();
-
-        List<HosterListItem> list = new ArrayList<>();
-
-        HosterRecyclerAdapter(List<HosterListItem> list) {
-            this.list = list;
-        }
-
-        @Override
-        public HosterRecyclerAdapter.HosterViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
-            LayoutInflater layoutInflater = LayoutInflater.from(getApplicationContext());
-            ListItemHosterBinding binding = ListItemHosterBinding.inflate(layoutInflater, parent, false);
-            return new HosterViewHolder(binding);
-        }
-
-        @Override
-        public void onBindViewHolder(HosterViewHolder holder, int position) {
-            HosterListItem current = list.get(position);
-            holder.bind(current);
-        }
-
-        @Override
-        public int getItemCount() {
-            return list.size();
-        }
-
-        class HosterViewHolder extends RecyclerView.ViewHolder {
-
-            ListItemHosterBinding binding;
-
-            HosterViewHolder(ListItemHosterBinding binding) {
-                super(binding.getRoot());
-                this.binding = binding;
-            }
-
-            public void bind(HosterListItem item) {
-                binding.setHoster(item);
-
-                View root = binding.getRoot();
-                boolean isDark = Settings.of(context).isDarkTheme();
-
-                root.findViewById(R.id.listItemContainer).setBackground(ContextCompat.getDrawable(context, theme().listItemBackground));
-
-                if (isDark)
-                    ((TextView) root.findViewById(R.id.hosterLabel))
-                            .setTextColor(ContextCompat.getColor(context, android.R.color.darker_gray));
-
-                if (item.isSupported())
-                    ((ImageView) root.findViewById(R.id.supImgView))
-                            .setImageDrawable(ContextCompat.getDrawable(context, isDark ?
-                                    R.drawable.ic_ondemand_video_white : R.drawable.ic_ondemand_video));
-                else
-                    ((ImageView) root.findViewById(R.id.supImgView))
-                            .setImageDrawable(ContextCompat.getDrawable(context, isDark ?
-                                    R.drawable.ic_public_white : R.drawable.ic_public));
-
-                binding.executePendingBindings();
-            }
         }
     }
 }

@@ -20,11 +20,11 @@
         android:paddingTop="5dp">
 
         <LinearLayout
+            android:id="@+id/listItemContainer"
             android:layout_width="match_parent"
             android:layout_height="match_parent"
-            android:orientation="horizontal"
-            android:id="@+id/listItemContainer"
-            android:background="@drawable/list_item_background_light">
+            android:background="@drawable/list_item_background_light"
+            android:orientation="horizontal">
 
             <ImageView
                 android:id="@+id/coverImage"
@@ -52,9 +52,9 @@
 
                 <TextView
                     android:id="@+id/seriesId"
-                    android:text="@{String.valueOf(show.id)}"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
+                    android:text="@{String.valueOf(show.id)}"
                     android:visibility="gone"/>
 
                 <LinearLayout
@@ -69,8 +69,8 @@
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:text="@{show.title}"
-                        tools:text="Title"
-                        android:textAppearance="?android:attr/textAppearanceMedium"/>
+                        android:textAppearance="?android:attr/textAppearanceMedium"
+                        tools:text="Title"/>
 
                     <TextView
                         android:id="@+id/seriesGenre"
@@ -78,8 +78,8 @@
                         android:layout_height="wrap_content"
                         android:layout_marginTop="5dp"
                         android:text="@{show.genre}"
-                        tools:text="Genre"
-                        android:textAppearance="?android:attr/textAppearanceSmall"/>
+                        android:textAppearance="?android:attr/textAppearanceSmall"
+                        tools:text="Genre"/>
 
                 </LinearLayout>
 

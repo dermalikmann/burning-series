@@ -22,10 +22,10 @@
                 android:id="@+id/coverImageView"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
+                android:adjustViewBounds="true"
                 android:background="@color/blue_primary_dark"
                 android:fitsSystemWindows="true"
-                android:scaleType="fitXY"
-                android:adjustViewBounds="true"/>
+                android:scaleType="fitXY"/>
 
             <Button
                 android:id="@+id/favButton"
@@ -35,10 +35,10 @@
                 android:text="Zu Favorieten hinzufügen"/>
 
             <LinearLayout
+                android:id="@+id/showDetails"
                 android:layout_width="match_parent"
                 android:layout_height="match_parent"
-                android:orientation="vertical"
-                android:id="@+id/showDetails">
+                android:orientation="vertical">
 
                 <TextView
                     android:layout_width="match_parent"
@@ -174,7 +174,7 @@
 
         <TextView
             android:id="@+id/descriptionTV"
-            android:layout_width="600dp"
+            android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_marginBottom="20dp"
             android:layout_marginEnd="40dp"
@@ -242,6 +242,7 @@
                 android:padding="5dp">
 
                 <TextView
+                    android:id="@+id/seasonTV"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:layout_marginBottom="16dp"
@@ -251,7 +252,7 @@
                     android:layout_marginStart="11dp"
                     android:layout_marginTop="11dp"
                     android:text="Episoden:"
-                    android:textAppearance="?android:attr/textAppearanceMedium"/>
+                    android:textAppearance="?android:attr/textAppearanceMedium" />
 
                 <android.support.v7.widget.RecyclerView
                     android:id="@+id/episodesRecyclerView"

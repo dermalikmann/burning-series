@@ -5,11 +5,7 @@ import android.content.SharedPreferences;
 import android.content.pm.ActivityInfo;
 import android.os.AsyncTask;
 import android.os.Bundle;
-import android.view.View;
-import android.view.ViewGroup;
-import android.widget.ArrayAdapter;
 import android.widget.ListView;
-import android.widget.TextView;
 
 import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
@@ -22,12 +18,11 @@ import de.m4lik.burningseries.ActivityComponent;
 import de.m4lik.burningseries.R;
 import de.m4lik.burningseries.ui.base.ActivityBase;
 import de.m4lik.burningseries.ui.listitems.StatsListItem;
+import de.m4lik.burningseries.ui.viewAdapters.StatsListAdapter;
 
 import static de.m4lik.burningseries.services.ThemeHelperService.theme;
 
 public class StatisticsActivity extends ActivityBase {
-
-    List<StatsListItem> statsList = new ArrayList<>();
 
     static SharedPreferences getStatsPrefs(Context context) {
         return context.getSharedPreferences("stats", Context.MODE_PRIVATE);
@@ -53,22 +48,7 @@ public class StatisticsActivity extends ActivityBase {
             this.setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_SENSOR_PORTRAIT);
         }
 
-        Context c = getApplicationContext();
-        statsList.add(new StatsListItem("Registrierte User", getStatsPrefs(c).getString("regUsers", "")));
-        statsList.add(new StatsListItem("Neuster User", getStatsPrefs(c).getString("newestUser", "")));
-        statsList.add(new StatsListItem("User online", getStatsPrefs(c).getString("online", "")));
-        statsList.add(new StatsListItem("Nachrichten (heute)", getStatsPrefs(c).getString("messages", "")));
-        statsList.add(new StatsListItem("Shoutboxeinträge (heute)", getStatsPrefs(c).getString("shoutbox", "")));
-        statsList.add(new StatsListItem("Serien", getStatsPrefs(c).getString("shows", "")));
-        statsList.add(new StatsListItem("Episoden", getStatsPrefs(c).getString("episodes", "")));
-        statsList.add(new StatsListItem("Episoden pro Serie", getStatsPrefs(c).getString("eps", "")));
-        statsList.add(new StatsListItem("Links", getStatsPrefs(c).getString("links", "")));
-        statsList.add(new StatsListItem("Verlinkt (heute)", getStatsPrefs(c).getString("linked", "")));
-        statsList.add(new StatsListItem("Gelöschte Links (heute)", getStatsPrefs(c).getString("deleted", "")));
-        statsList.add(new StatsListItem("Links pro Episode", getStatsPrefs(c).getString("lpe", "")));
-        statsList.add(new StatsListItem("Links pro Serie", getStatsPrefs(c).getString("lps", "")));
-
-        ((ListView) findViewById(R.id.statsListView)).setAdapter(new StatsListViewAdapter());
+        fillStats();
 
         new Stats().execute();
     }
@@ -119,46 +99,29 @@ public class StatisticsActivity extends ActivityBase {
 
         @Override
         protected void onPostExecute(Void aVoid) {
-
-            statsList = new ArrayList<>();
-
-            Context c = getApplicationContext();
-            statsList.add(new StatsListItem("Registrierte User", getStatsPrefs(c).getString("regUsers", "")));
-            statsList.add(new StatsListItem("Neuster User", getStatsPrefs(c).getString("newestUser", "")));
-            statsList.add(new StatsListItem("User online", getStatsPrefs(c).getString("online", "")));
-            statsList.add(new StatsListItem("Nachrichten (heute)", getStatsPrefs(c).getString("messages", "")));
-            statsList.add(new StatsListItem("Shoutboxeinträge (heute)", getStatsPrefs(c).getString("shoutbox", "")));
-            statsList.add(new StatsListItem("Serien", getStatsPrefs(c).getString("shows", "")));
-            statsList.add(new StatsListItem("Episoden", getStatsPrefs(c).getString("episodes", "")));
-            statsList.add(new StatsListItem("Episoden pro Serie", getStatsPrefs(c).getString("eps", "")));
-            statsList.add(new StatsListItem("Links", getStatsPrefs(c).getString("links", "")));
-            statsList.add(new StatsListItem("Verlinkt (heute)", getStatsPrefs(c).getString("linked", "")));
-            statsList.add(new StatsListItem("Gelöschte Links (heute)", getStatsPrefs(c).getString("deleted", "")));
-            statsList.add(new StatsListItem("Links pro Episode", getStatsPrefs(c).getString("lpe", "")));
-            statsList.add(new StatsListItem("Links pro Serie", getStatsPrefs(c).getString("lps", "")));
-
-            ((ListView) findViewById(R.id.statsListView)).setAdapter(new StatsListViewAdapter());
         }
     }
 
-    private class StatsListViewAdapter extends ArrayAdapter<StatsListItem> {
+    public void fillStats() {
 
-        StatsListViewAdapter() {
-            super(getApplicationContext(), R.layout.list_item_stats, statsList);
-        }
+        List<StatsListItem> statsList = new ArrayList<>();
 
-        @Override
-        public View getView(int pos, View view, ViewGroup parent) {
-            if (view == null) {
-                view = getLayoutInflater().inflate(R.layout.list_item_stats, parent, false);
-            }
+        Context c = getApplicationContext();
+        statsList.add(new StatsListItem("Registrierte User", getStatsPrefs(c).getString("regUsers", "")));
+        statsList.add(new StatsListItem("Neuster User", getStatsPrefs(c).getString("newestUser", "")));
+        statsList.add(new StatsListItem("User online", getStatsPrefs(c).getString("online", "")));
+        statsList.add(new StatsListItem("Nachrichten (heute)", getStatsPrefs(c).getString("messages", "")));
+        statsList.add(new StatsListItem("Shoutboxeinträge (heute)", getStatsPrefs(c).getString("shoutbox", "")));
+        statsList.add(new StatsListItem("Serien", getStatsPrefs(c).getString("shows", "")));
+        statsList.add(new StatsListItem("Episoden", getStatsPrefs(c).getString("episodes", "")));
+        statsList.add(new StatsListItem("Episoden pro Serie", getStatsPrefs(c).getString("eps", "")));
+        statsList.add(new StatsListItem("Links", getStatsPrefs(c).getString("links", "")));
+        statsList.add(new StatsListItem("Verlinkt (heute)", getStatsPrefs(c).getString("linked", "")));
+        statsList.add(new StatsListItem("Gelöschte Links (heute)", getStatsPrefs(c).getString("deleted", "")));
+        statsList.add(new StatsListItem("Links pro Episode", getStatsPrefs(c).getString("lpe", "")));
+        statsList.add(new StatsListItem("Links pro Serie", getStatsPrefs(c).getString("lps", "")));
 
-            StatsListItem current = statsList.get(pos);
+        ((ListView) findViewById(R.id.statsListView)).setAdapter(new StatsListAdapter(this, statsList));
 
-            ((TextView) view.findViewById(R.id.statsKey)).setText(current.getKey());
-            ((TextView) view.findViewById(R.id.statsValue)).setText(current.getValue());
-
-            return view;
-        }
     }
 }

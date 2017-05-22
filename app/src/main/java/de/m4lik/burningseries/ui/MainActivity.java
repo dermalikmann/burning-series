@@ -5,7 +5,6 @@ import android.app.ProgressDialog;
 import android.content.ContentValues;
 import android.content.Intent;
 import android.content.pm.ActivityInfo;
-import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
@@ -15,6 +14,7 @@ import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.design.widget.NavigationView;
 import android.support.design.widget.Snackbar;
+import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentTransaction;
 import android.support.v4.content.ContextCompat;
@@ -31,6 +31,8 @@ import android.view.MenuItem;
 import android.view.View;
 import android.widget.TextView;
 
+import com.google.firebase.remoteconfig.FirebaseRemoteConfig;
+import com.google.firebase.remoteconfig.FirebaseRemoteConfigSettings;
 import com.trello.rxlifecycle.android.RxLifecycleAndroid;
 
 import java.util.Arrays;
@@ -40,17 +42,20 @@ import java.util.Map;
 
 import butterknife.BindView;
 import de.m4lik.burningseries.ActivityComponent;
+import de.m4lik.burningseries.BuildConfig;
 import de.m4lik.burningseries.R;
 import de.m4lik.burningseries.api.API;
 import de.m4lik.burningseries.api.APIInterface;
 import de.m4lik.burningseries.api.objects.GenreMap;
 import de.m4lik.burningseries.api.objects.GenreObj;
 import de.m4lik.burningseries.api.objects.ShowObj;
+import de.m4lik.burningseries.database.DatabaseUtils;
 import de.m4lik.burningseries.database.MainDBHelper;
 import de.m4lik.burningseries.ui.base.ActivityBase;
 import de.m4lik.burningseries.ui.dialogs.UpdateDialog;
 import de.m4lik.burningseries.ui.mainFragments.FavsFragment;
 import de.m4lik.burningseries.ui.mainFragments.GenresFragment;
+import de.m4lik.burningseries.ui.mainFragments.HistoryFragment;
 import de.m4lik.burningseries.ui.mainFragments.NewsFragment;
 import de.m4lik.burningseries.ui.mainFragments.SeriesFragment;
 import de.m4lik.burningseries.util.Logger;
@@ -76,15 +81,14 @@ import static de.m4lik.burningseries.services.ThemeHelperService.theme;
 public class MainActivity extends ActivityBase
         implements NavigationView.OnNavigationItemSelectedListener {
 
-    public static String userName;
-    public static String userSession;
+    private static String userName;
+    private static String userSession;
 
-    public static Menu menu;
+    private Menu menu;
 
-    public String visibleFragment;
-    public Boolean seriesList = false;
+    private Boolean seriesList = false;
 
-    public boolean isTablet = false;
+    private boolean isTablet = false;
 
     ProgressDialog progressDialog;
 
@@ -93,10 +97,6 @@ public class MainActivity extends ActivityBase
 
     @BindView(R.id.toolbar)
     Toolbar toolbar;
-
-    public static Menu getMenu() {
-        return menu;
-    }
 
     @Override
     protected void injectComponent(ActivityComponent appComponent) {
@@ -181,35 +181,35 @@ public class MainActivity extends ActivityBase
 
     }
 
+    private void fetchFirebase() {
+        System.out.println("Fetching now!");
+        FirebaseRemoteConfig remoteConfig = FirebaseRemoteConfig.getInstance();
+        remoteConfig.setConfigSettings(
+                new FirebaseRemoteConfigSettings.Builder()
+                        .setDeveloperModeEnabled(BuildConfig.DEBUG)
+                        .build());
+        remoteConfig.fetch()
+                .addOnCompleteListener(this, task -> {
+                    if (task.isSuccessful()) {
+                        System.out.println("Success");
+                        remoteConfig.activateFetched();
+                        setup();
+                    } else {
+                        Snackbar snackbar = Snackbar.make(findViewById(android.R.id.content), "Da ist was schiefgelaufen.\nVersuche es noch einmal...", Snackbar.LENGTH_SHORT);
+                        View snackbarView = snackbar.getView();
+                        snackbarView.setBackgroundColor(ContextCompat.getColor(getApplicationContext(), theme().primaryColorDark));
+                        snackbar.show();
+                    }
+                });
+    }
 
-    @Override
-    public boolean onCreateOptionsMenu(Menu menu) {
-        MenuInflater inflater = getMenuInflater();
-        inflater.inflate(R.menu.menu_main, menu);
-        this.menu = menu;
-
-        MainDBHelper dbHelper = new MainDBHelper(getApplicationContext());
-        SQLiteDatabase db = dbHelper.getReadableDatabase();
-
-        Cursor c = db.query(
-                seriesTable.TABLE_NAME,
-                new String[]{seriesTable.COLUMN_NAME_ID},
-                null,
-                null,
-                null,
-                null,
-                null
-        );
-
-        if (c.getCount() == 0)
+    private void setup() {
+        if (DatabaseUtils.with(this).isSeriesListEmpty())
             fetchSeries();
         else
             setFragment(Settings.of(getApplicationContext()).getStartupView());
 
-        c.close();
-        db.close();
-
-        SearchView searchView = (SearchView) MenuItemCompat.getActionView(getMenu().findItem(R.id.action_search));
+        SearchView searchView = (SearchView) MenuItemCompat.getActionView(this.menu.findItem(R.id.action_search));
         searchView.setOnQueryTextListener(new SearchView.OnQueryTextListener() {
             @Override
             public boolean onQueryTextSubmit(String query) {
@@ -223,6 +223,15 @@ public class MainActivity extends ActivityBase
                 return false;
             }
         });
+    }
+
+    @Override
+    public boolean onCreateOptionsMenu(Menu menu) {
+        MenuInflater inflater = getMenuInflater();
+        inflater.inflate(R.menu.menu_main, menu);
+        this.menu = menu;
+
+        fetchFirebase();
 
         return true;
     }
@@ -253,6 +262,10 @@ public class MainActivity extends ActivityBase
 
             case R.id.nav_favs:
                 setFragment("favorites");
+                break;
+
+            case R.id.nav_history:
+                setFragment("history");
                 break;
 
             case R.id.login_menu_item:
@@ -343,7 +356,10 @@ public class MainActivity extends ActivityBase
         FragmentManager fragmentManager = getSupportFragmentManager();
         FragmentTransaction transaction = fragmentManager.beginTransaction();
 
-        MenuItem searchItem = getMenu().findItem(R.id.action_search);
+        MenuItem searchItem = menu.findItem(R.id.action_search);
+
+        Fragment replaceFragment;
+        String tag;
 
         if (fragment == null)
             fragment = "series";
@@ -351,29 +367,33 @@ public class MainActivity extends ActivityBase
         switch (fragment) {
             case "genres":
                 searchItem.setVisible(false);
-                transaction.replace(R.id.fragmentContainerMain, new GenresFragment(), "genresFragment");
-                transaction.commit();
-                visibleFragment = "genres";
+                replaceFragment = new GenresFragment();
+                tag = "genresFragment";
                 break;
             case "favorites":
                 searchItem.setVisible(false);
-                transaction.replace(R.id.fragmentContainerMain, new FavsFragment(), "favsFragment");
-                transaction.commit();
-                visibleFragment = "favorites";
+                replaceFragment = new FavsFragment();
+                tag = "favsFragment";
+                break;
+            case "history":
+                searchItem.setVisible(false);
+                replaceFragment = new HistoryFragment();
+                tag = "historyFragment";
                 break;
             case "news":
                 searchItem.setVisible(false);
-                transaction.replace(R.id.fragmentContainerMain, new NewsFragment(), "newsFragment");
-                transaction.commit();
-                visibleFragment = "news";
+                replaceFragment = new NewsFragment();
+                tag = "newsFragment";
                 break;
             default:
                 searchItem.setVisible(true);
-                transaction.replace(R.id.fragmentContainerMain, new SeriesFragment(), "seriesFragment");
-                transaction.commit();
-                visibleFragment = "series";
+                replaceFragment = new SeriesFragment();
+                tag = "seriesFragment";
                 break;
         }
+
+        transaction.replace(R.id.fragmentContainerMain, replaceFragment, tag);
+        transaction.commit();
     }
 
     private void fetchSeries() {
@@ -425,6 +445,20 @@ public class MainActivity extends ActivityBase
         });
     }
 
+    public Boolean getSeriesList() {
+        return seriesList;
+    }
+
+    public void setSeriesList(Boolean seriesList) {
+        this.seriesList = seriesList;
+    }
+
+    /**
+     * Method to fetch user favorites from burning series
+     * @see API
+     * @see APIInterface
+     * @see retrofit2.Retrofit
+     */
     public void fetchFavorites() {
 
         API api = new API();
@@ -453,6 +487,9 @@ public class MainActivity extends ActivityBase
         });
     }
 
+    /**
+     * Async task to write shows list to database
+     */
     private class SeriesDatabaseUpdate extends AsyncTask<Void, Void, Void> {
 
         GenreMap genreMap;
@@ -512,13 +549,16 @@ public class MainActivity extends ActivityBase
         protected void onPostExecute(Void aVoid) {
             if (userSession.equals("")) {
                 progressDialog.dismiss();
-                setFragment(visibleFragment);
+                setFragment("series");
             } else
                 fetchFavorites();
             super.onPostExecute(aVoid);
         }
     }
 
+    /**
+     * Async task to write favorites to database
+     */
     private class favoritesDatabaseUpdate extends AsyncTask<Void, Void, Void> {
 
         List<ShowObj> list;
@@ -553,11 +593,9 @@ public class MainActivity extends ActivityBase
         @Override
         protected void onPostExecute(Void aVoid) {
             progressDialog.dismiss();
-            setFragment(visibleFragment);
+            setFragment("series");
 
             super.onPostExecute(aVoid);
         }
     }
-
-
 }

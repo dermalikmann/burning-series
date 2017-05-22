@@ -24,16 +24,14 @@ import de.m4lik.burningseries.api.APIInterface;
 import de.m4lik.burningseries.api.objects.EpisodeObj;
 import de.m4lik.burningseries.api.objects.SeasonObj;
 import de.m4lik.burningseries.api.objects.VideoObj;
-import de.m4lik.burningseries.databinding.ListItemEpisodesBinding;
 import de.m4lik.burningseries.ui.ShowActivity;
 import de.m4lik.burningseries.ui.listitems.EpisodeListItem;
+import de.m4lik.burningseries.ui.viewAdapters.EpisodesRecyclerAdapter;
 import de.m4lik.burningseries.util.Settings;
 import de.m4lik.burningseries.util.listeners.RecyclerItemClickListener;
 import retrofit2.Call;
 import retrofit2.Callback;
 import retrofit2.Response;
-
-import static de.m4lik.burningseries.services.ThemeHelperService.theme;
 
 /**
  * A simple {@link Fragment} subclass.
@@ -54,10 +52,7 @@ public class EpisodesFragment extends Fragment implements Callback<SeasonObj> {
 
     boolean loaded = false;
 
-    public EpisodesFragment() {
-
-    }
-
+    public EpisodesFragment() {}
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
@@ -88,7 +83,7 @@ public class EpisodesFragment extends Fragment implements Callback<SeasonObj> {
 
         Integer i = 1;
         for (SeasonObj.Episode episode : season.getEpisodes()) {
-            episodesList.add(new EpisodeListItem(episode.getGermanTitle() + " " + i, episode.getEnglishTitle(), episode.getEpisodeID(), episode.isWatched() == 1));
+            episodesList.add(new EpisodeListItem(episode.getGermanTitle(), episode.getEnglishTitle(), episode.getEpisodeID(), episode.isWatched() == 1));
             i++;
         }
 
@@ -104,7 +99,7 @@ public class EpisodesFragment extends Fragment implements Callback<SeasonObj> {
 
     private void refreshList() {
 
-        episodesRecyclerView.setAdapter(new EpisodesRecyclerAdapter(episodesList));
+        episodesRecyclerView.setAdapter(new EpisodesRecyclerAdapter(getActivity(), episodesList));
         LinearLayoutManager llm = new LinearLayoutManager(getActivity());
         llm.setOrientation(LinearLayoutManager.VERTICAL);
         episodesRecyclerView.setLayoutManager(llm);
@@ -115,14 +110,15 @@ public class EpisodesFragment extends Fragment implements Callback<SeasonObj> {
 
                     @Override
                     public void onItemClick(View view, int position) {
-                        TextView idView = (TextView) view.findViewById(R.id.episodeId);
-                        showEpisode(Integer.parseInt(idView.getText().toString()));
+                        Integer id = episodesList.get(position).getId();
+                        String name = episodesList.get(position).getTitleGer().equals("") ? episodesList.get(position).getTitle() : episodesList.get(position).getTitleGer();
+                        showEpisode(id, name);
                     }
 
                     @Override
                     public void onLongItemClick(View view, int position) {
-                        final TextView idView = (TextView) view.findViewById(R.id.episodeId);
-                        Integer selectedEpisode = Integer.parseInt(idView.getText().toString());
+                        EpisodeListItem episode = episodesList.get(position);
+                        Integer selectedEpisode = episode.getId();
 
                         final API api = new API();
                         api.setSession(userSession);
@@ -168,66 +164,9 @@ public class EpisodesFragment extends Fragment implements Callback<SeasonObj> {
 
     }
 
-    private void showEpisode(Integer id) {
+    private void showEpisode(Integer id, String name) {
         ((ShowActivity) getActivity()).setSelectedEpisode(id);
+        ((ShowActivity) getActivity()).setEpisodeName(name);
         ((ShowActivity) getActivity()).switchEpisodesToHosters();
-    }
-
-    private class EpisodesRecyclerAdapter extends RecyclerView.Adapter<EpisodesRecyclerAdapter.EpisodesViewHolder> {
-
-        List<EpisodeListItem> list;
-
-        EpisodesRecyclerAdapter(List<EpisodeListItem> list) {
-            this.list = list;
-        }
-
-        @Override
-        public EpisodesViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
-            LayoutInflater layoutInflater = LayoutInflater.from(getActivity());
-            ListItemEpisodesBinding binding = ListItemEpisodesBinding.inflate(layoutInflater, parent, false);
-            return new EpisodesViewHolder(binding);
-        }
-
-        @Override
-        public void onBindViewHolder(EpisodesViewHolder holder, int position) {
-            EpisodeListItem current = list.get(position);
-            holder.bind(current);
-        }
-
-        @Override
-        public int getItemCount() {
-            return list.size();
-        }
-
-        class EpisodesViewHolder extends RecyclerView.ViewHolder {
-
-            ListItemEpisodesBinding binding;
-
-            EpisodesViewHolder(ListItemEpisodesBinding binding) {
-                super(binding.getRoot());
-                this.binding = binding;
-            }
-
-            public void bind(EpisodeListItem item) {
-                binding.setEpisode(item);
-
-                View root = binding.getRoot();
-
-                root.findViewById(R.id.listItemContainer).setBackground(ContextCompat.getDrawable(getActivity(), theme().listItemBackground));
-
-                if (!Settings.of(getActivity()).isDarkTheme())
-                    ((TextView) root.findViewById(R.id.episodeTitleGer)).setTextColor(ContextCompat.getColor(getActivity(), item.isWatched() ? android.R.color.darker_gray : android.R.color.black));
-
-                if (item.isWatched())
-                    if (!Settings.of(getActivity()).isDarkTheme())
-                        ((ImageView) root.findViewById(R.id.watchedImageView)).setImageDrawable(ContextCompat.getDrawable(getActivity(), R.drawable.ic_watched));
-                    else
-                        ((ImageView) root.findViewById(R.id.watchedImageView)).setImageDrawable(ContextCompat.getDrawable(getActivity(), R.drawable.ic_watched_white));
-                else
-                    ((ImageView) root.findViewById(R.id.watchedImageView)).setImageDrawable(null);
-
-                binding.executePendingBindings();
-            }
-        }
     }
 }

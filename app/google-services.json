@@ -1,0 +1,42 @@
+{
+  "project_info": {
+    "project_number": "141463060148",
+    "firebase_url": "https://burning-series-public.firebaseio.com",
+    "project_id": "burning-series-public",
+    "storage_bucket": "burning-series-public.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:141463060148:android:c61108a8b2ccf12d",
+        "android_client_info": {
+          "package_name": "de.m4lik.burningseries"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "141463060148-75de65n4182ndr4f1bk9g4qd8ashnspk.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyCXJdFfblrOWsftKIMiP8YjJrqxM0ApK2w"
+        }
+      ],
+      "services": {
+        "analytics_service": {
+          "status": 1
+        },
+        "appinvite_service": {
+          "status": 1,
+          "other_platform_oauth_client": []
+        },
+        "ads_service": {
+          "status": 2
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

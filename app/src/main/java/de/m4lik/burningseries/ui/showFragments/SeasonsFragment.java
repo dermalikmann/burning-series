@@ -2,7 +2,6 @@ package de.m4lik.burningseries.ui.showFragments;
 
 import android.app.Fragment;
 import android.os.Bundle;
-import android.support.annotation.NonNull;
 import android.support.design.widget.Snackbar;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -13,6 +12,7 @@ import android.widget.ListView;
 import android.widget.TextView;
 
 import java.util.ArrayList;
+import java.util.List;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
@@ -22,12 +22,11 @@ import de.m4lik.burningseries.api.APIInterface;
 import de.m4lik.burningseries.api.objects.SeasonObj;
 import de.m4lik.burningseries.ui.ShowActivity;
 import de.m4lik.burningseries.ui.listitems.SeasonListItem;
+import de.m4lik.burningseries.ui.viewAdapters.SeasonsListAdapter;
 import de.m4lik.burningseries.util.Settings;
 import retrofit2.Call;
 import retrofit2.Callback;
 import retrofit2.Response;
-
-import static de.m4lik.burningseries.services.ThemeHelperService.theme;
 
 public class SeasonsFragment extends Fragment implements Callback<SeasonObj> {
 
@@ -39,7 +38,7 @@ public class SeasonsFragment extends Fragment implements Callback<SeasonObj> {
     @BindView(R.id.descriptionTV)
     TextView descriptionView;
 
-    ArrayList<SeasonListItem> seasonsList = new ArrayList<>();
+    List<SeasonListItem> seasonsList = new ArrayList<>();
 
     Boolean loaded = false;
 
@@ -91,13 +90,12 @@ public class SeasonsFragment extends Fragment implements Callback<SeasonObj> {
 
     @Override
     public void onFailure(Call<SeasonObj> call, Throwable t) {
-
         Snackbar.make(rootView.findViewById(android.R.id.content), "Fehler beim Laden der Seriendetails", Snackbar.LENGTH_SHORT);
     }
 
 
     private void refreshList() {
-        ArrayAdapter<SeasonListItem> adapter = new SeasonsListAdapter();
+        ArrayAdapter<SeasonListItem> adapter = new SeasonsListAdapter(getActivity(), seasonsList);
         seasonsListView.setAdapter(adapter);
 
         Integer numOfItems = adapter.getCount();
@@ -124,35 +122,5 @@ public class SeasonsFragment extends Fragment implements Callback<SeasonObj> {
     private void showSeason(Integer id) {
         ((ShowActivity) getActivity()).setSelectedSeason(id);
         ((ShowActivity) getActivity()).switchSeasonsToEpisodes();
-    }
-
-    private class SeasonsListAdapter extends ArrayAdapter<SeasonListItem> {
-
-        SeasonsListAdapter() {
-            super(getActivity().getApplicationContext(), R.layout.list_item_seasons, seasonsList);
-        }
-
-        @NonNull
-        @Override
-        public View getView(int pos, View view, @NonNull ViewGroup parent) {
-            if (view == null) {
-                view = getActivity().getLayoutInflater().inflate(R.layout.list_item_seasons, parent, false);
-            }
-
-            view.findViewById(R.id.listItemContainer).setBackground(getResources().getDrawable(theme().listItemBackground));
-
-            SeasonListItem current = seasonsList.get(pos);
-
-            TextView label = (TextView) view.findViewById(R.id.seasonLabel);
-            if (current.getSeasonId() == 0)
-                label.setText("Filme/Specials");
-            else
-                label.setText(getString(R.string.season) + current.getSeasonId());
-
-            TextView urlText = (TextView) view.findViewById(R.id.seasonId);
-            urlText.setText(current.getSeasonId().toString());
-
-            return view;
-        }
     }
 }

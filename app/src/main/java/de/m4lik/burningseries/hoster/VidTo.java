@@ -14,6 +14,7 @@ import java.util.regex.Pattern;
  * Created by Malik on 04.11.2016.
  */
 class VidTo extends Hoster {
+
     protected static final Pattern hdPattern;
     protected static final Pattern sdPattern;
     protected static final Pattern ldPattern;

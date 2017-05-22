@@ -16,6 +16,9 @@ import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.util.Log;
 import android.view.View;
+import android.webkit.WebSettings;
+import android.webkit.WebView;
+import android.webkit.WebViewClient;
 import android.widget.Button;
 import android.widget.ImageView;
 import android.widget.ListView;
@@ -58,8 +61,8 @@ import retrofit2.Call;
 import retrofit2.Callback;
 import retrofit2.Response;
 
-import static de.m4lik.burningseries.services.ThemeHelperService.theme;
 import static de.m4lik.burningseries.database.SeriesContract.historyTable;
+import static de.m4lik.burningseries.services.ThemeHelperService.theme;
 
 public class TabletShowActivity extends ActivityBase {
 
@@ -153,7 +156,7 @@ public class TabletShowActivity extends ActivityBase {
         getSupportActionBar().setTitle(title);
 
         Log.v("BS", "Lade Cover.");
-        Glide.with(getApplicationContext())
+        Glide.with(TabletShowActivity.this)
                 .load(imageUri)
                 .into(coverImageView);
 
@@ -164,9 +167,9 @@ public class TabletShowActivity extends ActivityBase {
 
         fav = ShowUtils.isFav(this, currentShow);
 
-        final Drawable favStar = ContextCompat.getDrawable(getApplicationContext(), R.drawable.ic_star_white);
+        final Drawable favStar = ContextCompat.getDrawable(TabletShowActivity.this, R.drawable.ic_star_white);
         favStar.setBounds(0, 0, 50, 50);
-        final Drawable notFavStar = ContextCompat.getDrawable(getApplicationContext(), R.drawable.ic_star_border_white);
+        final Drawable notFavStar = ContextCompat.getDrawable(TabletShowActivity.this, R.drawable.ic_star_border_white);
         notFavStar.setBounds(0, 0, 50, 50);
         if (fav)
             favButton.setCompoundDrawables(favStar, null, null, null);
@@ -229,7 +232,7 @@ public class TabletShowActivity extends ActivityBase {
                         Snackbar.LENGTH_SHORT
                 );
                 View snackbarView = snackbar.getView();
-                snackbarView.setBackgroundColor(ContextCompat.getColor(getApplicationContext(), theme().primaryColorDark));
+                snackbarView.setBackgroundColor(ContextCompat.getColor(TabletShowActivity.this, theme().primaryColorDark));
                 snackbar.show();
             }
         });
@@ -269,7 +272,7 @@ public class TabletShowActivity extends ActivityBase {
                         Snackbar.LENGTH_SHORT
                 );
                 View snackbarView = snackbar.getView();
-                snackbarView.setBackgroundColor(ContextCompat.getColor(getApplicationContext(), theme().primaryColorDark));
+                snackbarView.setBackgroundColor(ContextCompat.getColor(TabletShowActivity.this, theme().primaryColorDark));
                 snackbar.show();
             }
         });
@@ -277,10 +280,10 @@ public class TabletShowActivity extends ActivityBase {
     }
 
     private void setupEpisodeList() {
-        LinearLayoutManager llm = new LinearLayoutManager(getApplicationContext(), LinearLayoutManager.VERTICAL, false);
+        LinearLayoutManager llm = new LinearLayoutManager(TabletShowActivity.this, LinearLayoutManager.VERTICAL, false);
         episodesRecyclerView.setLayoutManager(llm);
         episodesRecyclerView.addOnItemTouchListener(
-                new RecyclerItemClickListener(getApplicationContext(), episodesRecyclerView, new RecyclerItemClickListener.OnItemClickListener() {
+                new RecyclerItemClickListener(TabletShowActivity.this, episodesRecyclerView, new RecyclerItemClickListener.OnItemClickListener() {
                     @Override
                     public void onItemClick(View view, int position) {
                         EpisodeListItem clickedEpisode = episodes.get(position);
@@ -315,8 +318,8 @@ public class TabletShowActivity extends ActivityBase {
                                     public void onResponse(Call<VideoObj> call, Response<VideoObj> response) {
 
                                         TextView titleGerView = (TextView) view.findViewById(R.id.episodeTitleGer);
-                                        if (!Settings.of(getApplicationContext()).isDarkTheme())
-                                            titleGerView.setTextColor(ContextCompat.getColor(getApplicationContext(), android.R.color.black));
+                                        if (!Settings.of(TabletShowActivity.this).isDarkTheme())
+                                            titleGerView.setTextColor(ContextCompat.getColor(TabletShowActivity.this, android.R.color.black));
 
                                         ImageView fav1 = (ImageView) view.findViewById(R.id.watchedImageView);
                                         fav1.setImageDrawable(null);
@@ -342,15 +345,15 @@ public class TabletShowActivity extends ActivityBase {
     }
 
     private void setupHosterList() {
-        LinearLayoutManager llm = new LinearLayoutManager(getApplicationContext(), LinearLayoutManager.VERTICAL, false);
+        LinearLayoutManager llm = new LinearLayoutManager(TabletShowActivity.this, LinearLayoutManager.VERTICAL, false);
         hosterRecyclerView.setLayoutManager(llm);
         hosterRecyclerView.addOnItemTouchListener(
-                new RecyclerItemClickListener(getApplicationContext(), hosterRecyclerView, new RecyclerItemClickListener.OnItemClickListener() {
+                new RecyclerItemClickListener(TabletShowActivity.this, hosterRecyclerView, new RecyclerItemClickListener.OnItemClickListener() {
                     @Override
                     public void onItemClick(View view, int position) {
                         String playerType = hosterList.get(position).isSupported() ? "internal" : "appbrowser";
-                        if (Settings.of(getApplicationContext()).alarmOnMobile() &&
-                                AndroidUtility.isOnMobile(getApplicationContext())) {
+                        if (Settings.of(TabletShowActivity.this).alarmOnMobile() &&
+                                AndroidUtility.isOnMobile(TabletShowActivity.this)) {
 
                             DialogBuilder.start(TabletShowActivity.this)
                                     .title("Mobile Daten")
@@ -371,31 +374,31 @@ public class TabletShowActivity extends ActivityBase {
 
                     @Override
                     public void onLongItemClick(View view, int position) {
-                        if (Settings.of(getApplicationContext()).alarmOnMobile() &&
-                                AndroidUtility.isOnMobile(getApplicationContext())) {
+                        if (Settings.of(TabletShowActivity.this).alarmOnMobile() &&
+                                AndroidUtility.isOnMobile(TabletShowActivity.this)) {
                             List<PlayerChooserListItem> players = new ArrayList<>();
 
                             if (hosterList.get(position).isSupported()) {
                                 players.add(new PlayerChooserListItem("Interner Player", "internal",
-                                        Settings.of(getApplicationContext()).isDarkTheme() ?
+                                        Settings.of(TabletShowActivity.this).isDarkTheme() ?
                                                 R.drawable.ic_ondemand_video_white : R.drawable.ic_ondemand_video));
 
                                 players.add(new PlayerChooserListItem("Externer Player", "external",
-                                        Settings.of(getApplicationContext()).isDarkTheme() ?
+                                        Settings.of(TabletShowActivity.this).isDarkTheme() ?
                                                 R.drawable.ic_live_tv_white : R.drawable.ic_live_tv));
 
                                 players.add(new PlayerChooserListItem("In-App Browser", "appbrowser",
-                                        Settings.of(getApplicationContext()).isDarkTheme() ?
+                                        Settings.of(TabletShowActivity.this).isDarkTheme() ?
                                                 R.drawable.ic_open_in_browser_white : R.drawable.ic_open_in_browser));
                             }
 
                             players.add(new PlayerChooserListItem("Im Browser öffnen", "browser",
-                                    Settings.of(getApplicationContext()).isDarkTheme() ?
+                                    Settings.of(TabletShowActivity.this).isDarkTheme() ?
                                             R.drawable.ic_public_white : R.drawable.ic_public));
 
                             DialogBuilder.start(TabletShowActivity.this)
                                     .title(getString(R.string.choose_player_title))
-                                    .adapter(new PlayerChooserListAdapter(getApplicationContext(), players), (dialog2, id) -> {
+                                    .adapter(new PlayerChooserListAdapter(TabletShowActivity.this, players), (dialog2, id) -> {
 
                                         DialogBuilder.start(TabletShowActivity.this)
                                                 .title("Mobile Daten")
@@ -505,12 +508,23 @@ public class TabletShowActivity extends ActivityBase {
             public void onResponse(Call<VideoObj> call, Response<VideoObj> response) {
                 VideoObj videoObj = response.body();
 
+                String hoster = videoObj.getHoster().toLowerCase();
+                System.out.println(hoster);
+
                 switch (type) {
                     case "internal":
-                        new GetVideo(videoObj).execute();
+                        if (hoster.equals("openload") || hoster.equals("openloadhd")) {
+                            Openload(videoObj.getUrl(), false);
+                        } else {
+                            new GetVideo(videoObj).execute();
+                        }
                         break;
                     case "external":
-                        new GetVideo(videoObj, true).execute();
+                        if (hoster.equals("openload") || hoster.equals("openloadhd")) {
+                            Openload(videoObj.getUrl(), true);
+                        } else {
+                            new GetVideo(videoObj, true).execute();
+                        }
                         break;
                     case "browser":
                         Intent browserIntent = new Intent(Intent.ACTION_VIEW, Uri.parse(videoObj.getFullUrl()));
@@ -520,11 +534,11 @@ public class TabletShowActivity extends ActivityBase {
                     default:
                         CustomTabsIntent.Builder builder = new CustomTabsIntent.Builder();
                         CustomTabsIntent customTabsIntent = builder.build();
-                        customTabsIntent.launchUrl(getApplicationContext(), Uri.parse(videoObj.getFullUrl()));
+                        customTabsIntent.launchUrl(TabletShowActivity.this, Uri.parse(videoObj.getFullUrl()));
                         break;
                 }
 
-                MainDBHelper dbHelper = new MainDBHelper(getApplicationContext());
+                MainDBHelper dbHelper = new MainDBHelper(TabletShowActivity.this);
                 SQLiteDatabase db = dbHelper.getWritableDatabase();
 
                 ContentValues cv = new ContentValues();
@@ -545,7 +559,7 @@ public class TabletShowActivity extends ActivityBase {
             public void onFailure(Call<VideoObj> call, Throwable t) {
                 Snackbar snackbar = Snackbar.make(findViewById(android.R.id.content), "Probleme beim Verbinden mit BS", Snackbar.LENGTH_SHORT);
                 View snackbarView = snackbar.getView();
-                snackbarView.setBackgroundColor(ContextCompat.getColor(getApplicationContext(), theme().primaryColorDark));
+                snackbarView.setBackgroundColor(ContextCompat.getColor(TabletShowActivity.this, theme().primaryColorDark));
                 snackbar.show();
 
 
@@ -553,13 +567,43 @@ public class TabletShowActivity extends ActivityBase {
                 final PrintWriter pw = new PrintWriter(sw, true);
                 t.printStackTrace(pw);
 
-                DialogBuilder.start(getApplicationContext())
+                DialogBuilder.start(TabletShowActivity.this)
                         .title("Error")
                         .content(sw.getBuffer().toString())
                         .negative()
                         .build().show();
             }
         });
+    }
+
+    private void Openload(String videoID, Boolean external) {
+        try {
+            String fullURL = "https://openload.co/embed/" + videoID;
+
+            WebView wv = new WebView(this);
+            WebSettings webSettings = wv.getSettings();
+            webSettings.setJavaScriptEnabled(true);
+            wv.setWebViewClient(new WebViewClient() {
+                public void onPageFinished(WebView view, String url) {
+                    view.evaluateJavascript("document.getElementById('streamurl').innerHTML",
+                            valueFromJS -> {
+                                String vurl = "https://openload.co/stream/" + valueFromJS.replace("\"", "") + "?mime=true";
+                                if (!external) {
+                                    Intent intent = new Intent(TabletShowActivity.this, FullscreenVideoActivity.class);
+                                    intent.putExtra("burning-series.videoURL", vurl);
+                                    startActivity(intent);
+                                } else {
+                                    Intent browserIntent = new Intent(Intent.ACTION_VIEW, Uri.parse(vurl));
+                                    startActivity(browserIntent);
+                                }
+                            }
+                    );
+                }
+            });
+            wv.loadUrl(fullURL);
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
     }
 
     private class GetVideo extends AsyncTask<Void, Void, Void> {
@@ -577,7 +621,7 @@ public class TabletShowActivity extends ActivityBase {
         GetVideo(VideoObj videoObj, Boolean external) {
             this.videoObj = videoObj;
             this.external = external;
-            this.context = getApplicationContext();
+            this.context = TabletShowActivity.this;
         }
 
         @Override
@@ -612,37 +656,37 @@ public class TabletShowActivity extends ActivityBase {
                 case "1":
                     snackbar = Snackbar.make(findViewById(android.R.id.content), "Hoster hat nicht geantwortet.", Snackbar.LENGTH_SHORT);
                     snackbarView = snackbar.getView();
-                    snackbarView.setBackgroundColor(ContextCompat.getColor(context.getApplicationContext(), theme().primaryColorDark));
+                    snackbarView.setBackgroundColor(ContextCompat.getColor(context, theme().primaryColorDark));
                     snackbar.show();
                     return;
                 case "2":
                     snackbar = Snackbar.make(findViewById(android.R.id.content), "Video wurde wahrscheinlich gelöscht.", Snackbar.LENGTH_SHORT);
                     snackbarView = snackbar.getView();
-                    snackbarView.setBackgroundColor(ContextCompat.getColor(context.getApplicationContext(), theme().primaryColorDark));
+                    snackbarView.setBackgroundColor(ContextCompat.getColor(context, theme().primaryColorDark));
                     snackbar.show();
                     return;
                 case "3":
                     snackbar = Snackbar.make(findViewById(android.R.id.content), "Fehler beim auflösen der Video URL.", Snackbar.LENGTH_SHORT);
                     snackbarView = snackbar.getView();
-                    snackbarView.setBackgroundColor(ContextCompat.getColor(context.getApplicationContext(), theme().primaryColorDark));
+                    snackbarView.setBackgroundColor(ContextCompat.getColor(context, theme().primaryColorDark));
                     snackbar.show();
                     return;
                 case "4":
                     snackbar = Snackbar.make(findViewById(android.R.id.content), "Hoster hat nicht geantwortet.", Snackbar.LENGTH_SHORT);
                     snackbarView = snackbar.getView();
-                    snackbarView.setBackgroundColor(ContextCompat.getColor(context.getApplicationContext(), theme().primaryColorDark));
+                    snackbarView.setBackgroundColor(ContextCompat.getColor(context, theme().primaryColorDark));
                     snackbar.show();
                     return;
                 case "5":
                     snackbar = Snackbar.make(findViewById(android.R.id.content), "Da ist etwas ganz schief gelaufen. Fehler bitte melden.", Snackbar.LENGTH_SHORT);
                     snackbarView = snackbar.getView();
-                    snackbarView.setBackgroundColor(ContextCompat.getColor(context.getApplicationContext(), theme().primaryColorDark));
+                    snackbarView.setBackgroundColor(ContextCompat.getColor(context, theme().primaryColorDark));
                     snackbar.show();
                     return;
             }
 
             if (!external) {
-                Intent intent = new Intent(context.getApplicationContext(), FullscreenVideoActivity.class);
+                Intent intent = new Intent(context, FullscreenVideoActivity.class);
                 intent.putExtra("burning-series.videoURL", hosterReturn);
                 startActivity(intent);
             } else {

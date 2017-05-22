@@ -14,19 +14,8 @@ import de.m4lik.burningseries.ui.listitems.ShowListItem;
 
 import static android.provider.BaseColumns._ID;
 import static de.m4lik.burningseries.database.SeriesContract.genresTable;
-import static de.m4lik.burningseries.database.SeriesContract.historyTable.COLUMN_NAME_DATE;
-import static de.m4lik.burningseries.database.SeriesContract.historyTable.COLUMN_NAME_EPISODE_ID;
-import static de.m4lik.burningseries.database.SeriesContract.historyTable.COLUMN_NAME_EPISODE_NAME;
-import static de.m4lik.burningseries.database.SeriesContract.historyTable.COLUMN_NAME_SEASON_ID;
-import static de.m4lik.burningseries.database.SeriesContract.historyTable.COLUMN_NAME_SHOW_ID;
-import static de.m4lik.burningseries.database.SeriesContract.historyTable.COLUMN_NAME_SHOW_NAME;
-import static de.m4lik.burningseries.database.SeriesContract.historyTable.COLUMN_NAME_TIME;
-import static de.m4lik.burningseries.database.SeriesContract.historyTable.TABLE_NAME;
+import static de.m4lik.burningseries.database.SeriesContract.historyTable;
 import static de.m4lik.burningseries.database.SeriesContract.seriesTable;
-import static de.m4lik.burningseries.database.SeriesContract.seriesTable.COLUMN_NAME_GENRE;
-import static de.m4lik.burningseries.database.SeriesContract.seriesTable.COLUMN_NAME_ID;
-import static de.m4lik.burningseries.database.SeriesContract.seriesTable.COLUMN_NAME_ISFAV;
-import static de.m4lik.burningseries.database.SeriesContract.seriesTable.COLUMN_NAME_TITLE;
 
 /**
  * Created by malik on 09.05.17.
@@ -77,7 +66,7 @@ public class DatabaseUtils {
         List<Integer> favs = new ArrayList<>();
         if (c.moveToFirst())
             do {
-                favs.add(c.getInt(c.getColumnIndex(seriesTable.COLUMN_NAME_ISFAV)));
+                favs.add(c.getInt(c.getColumnIndex(seriesTable.COLUMN_NAME_ID)));
                 c.moveToNext();
             } while (c.moveToNext());
 
@@ -112,20 +101,20 @@ public class DatabaseUtils {
         List<HistoryListItem> list = new ArrayList<>();
 
         String[] projection = {
-                COLUMN_NAME_SHOW_ID,
-                COLUMN_NAME_SEASON_ID,
-                COLUMN_NAME_EPISODE_ID,
-                COLUMN_NAME_SHOW_NAME,
-                COLUMN_NAME_EPISODE_NAME,
-                COLUMN_NAME_DATE,
-                COLUMN_NAME_TIME
+                historyTable.COLUMN_NAME_SHOW_ID,
+                historyTable.COLUMN_NAME_SEASON_ID,
+                historyTable.COLUMN_NAME_EPISODE_ID,
+                historyTable.COLUMN_NAME_SHOW_NAME,
+                historyTable.COLUMN_NAME_EPISODE_NAME,
+                historyTable.COLUMN_NAME_DATE,
+                historyTable.COLUMN_NAME_TIME
         };
 
         String sortOrder =
                 _ID + " DESC";
 
         Cursor c = db.query(
-                TABLE_NAME,
+                historyTable.TABLE_NAME,
                 projection,
                 null,
                 null,
@@ -137,11 +126,11 @@ public class DatabaseUtils {
         int i = 0;
         while (c.moveToNext() && i < 20) {
             list.add(new HistoryListItem(
-                    c.getInt(c.getColumnIndex(COLUMN_NAME_SHOW_ID)),
-                    c.getInt(c.getColumnIndex(COLUMN_NAME_SEASON_ID)),
-                    c.getInt(c.getColumnIndex(COLUMN_NAME_EPISODE_ID)),
-                    c.getString(c.getColumnIndex(COLUMN_NAME_SHOW_NAME)),
-                    c.getString(c.getColumnIndex(COLUMN_NAME_EPISODE_NAME))
+                    c.getInt(c.getColumnIndex(historyTable.COLUMN_NAME_SHOW_ID)),
+                    c.getInt(c.getColumnIndex(historyTable.COLUMN_NAME_SEASON_ID)),
+                    c.getInt(c.getColumnIndex(historyTable.COLUMN_NAME_EPISODE_ID)),
+                    c.getString(c.getColumnIndex(historyTable.COLUMN_NAME_SHOW_NAME)),
+                    c.getString(c.getColumnIndex(historyTable.COLUMN_NAME_EPISODE_NAME))
             ));
             i++;
         }
@@ -232,14 +221,14 @@ public class DatabaseUtils {
         List<ShowListItem> list = new ArrayList<>();
 
         String[] projection = {
-                COLUMN_NAME_ID,
-                COLUMN_NAME_TITLE,
-                COLUMN_NAME_GENRE,
-                COLUMN_NAME_ISFAV
+                seriesTable.COLUMN_NAME_ID,
+                seriesTable.COLUMN_NAME_TITLE,
+                seriesTable.COLUMN_NAME_GENRE,
+                seriesTable.COLUMN_NAME_ISFAV
         };
 
         String sortOrder =
-                COLUMN_NAME_TITLE + " ASC";
+                seriesTable.COLUMN_NAME_TITLE + " ASC";
 
         Cursor c = db.query(
                 seriesTable.TABLE_NAME,
@@ -255,10 +244,10 @@ public class DatabaseUtils {
         if (c.moveToFirst())
             do {
                 list.add(new ShowListItem(
-                        c.getString(c.getColumnIndex(COLUMN_NAME_TITLE)),
-                        c.getInt(c.getColumnIndex(COLUMN_NAME_ID)),
-                        c.getString(c.getColumnIndex(COLUMN_NAME_GENRE)),
-                        c.getInt(c.getColumnIndex(COLUMN_NAME_ISFAV)) == 1
+                        c.getString(c.getColumnIndex(seriesTable.COLUMN_NAME_TITLE)),
+                        c.getInt(c.getColumnIndex(seriesTable.COLUMN_NAME_ID)),
+                        c.getString(c.getColumnIndex(seriesTable.COLUMN_NAME_GENRE)),
+                        c.getInt(c.getColumnIndex(seriesTable.COLUMN_NAME_ISFAV)) == 1
                 ));
             } while (c.moveToNext());
 
@@ -266,5 +255,25 @@ public class DatabaseUtils {
         db.close();
 
         return list;
+    }
+
+    public Boolean isSeriesListEmpty() {
+
+        Cursor c = db.query(
+                seriesTable.TABLE_NAME,
+                new String[]{seriesTable.COLUMN_NAME_ID},
+                null,
+                null,
+                null,
+                null,
+                null
+        );
+
+        int count = c.getCount();
+        c.close();
+        db.close();
+
+        return count == 0;
+
     }
 }

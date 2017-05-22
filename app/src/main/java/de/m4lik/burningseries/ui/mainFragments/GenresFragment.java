@@ -14,6 +14,7 @@ import butterknife.BindView;
 import butterknife.ButterKnife;
 import de.m4lik.burningseries.R;
 import de.m4lik.burningseries.database.DatabaseUtils;
+import de.m4lik.burningseries.ui.MainActivity;
 import de.m4lik.burningseries.ui.ShowActivity;
 import de.m4lik.burningseries.ui.TabletShowActivity;
 import de.m4lik.burningseries.ui.viewAdapters.GenresRecyclerAdapter;
@@ -29,7 +30,6 @@ public class GenresFragment extends Fragment {
     @BindView(R.id.genresRecyclerView)
     RecyclerView genresRecyclerView;
 
-    boolean genreShown = false;
     private RecyclerItemClickListener seriesClickListener = new RecyclerItemClickListener(getActivity(), genresRecyclerView, new RecyclerItemClickListener.OnItemClickListener() {
         @Override
         public void onItemClick(View view, int position) {
@@ -51,7 +51,7 @@ public class GenresFragment extends Fragment {
         @Override
         public void onItemClick(View view, int position) {
             populateSeriesList(((TextView) view.findViewById(R.id.genreLable)).getText().toString());
-            genreShown = true;
+            ((MainActivity) getActivity()).setSeriesList(true);
         }
 
         @Override

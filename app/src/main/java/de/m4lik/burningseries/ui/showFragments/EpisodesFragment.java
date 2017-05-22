@@ -117,8 +117,8 @@ public class EpisodesFragment extends Fragment implements Callback<SeasonObj> {
 
                     @Override
                     public void onLongItemClick(View view, int position) {
-                        final TextView idView = (TextView) view.findViewById(R.id.episodeId);
-                        Integer selectedEpisode = Integer.parseInt(idView.getText().toString());
+                        EpisodeListItem episode = episodesList.get(position);
+                        Integer selectedEpisode = episode.getId();
 
                         final API api = new API();
                         api.setSession(userSession);

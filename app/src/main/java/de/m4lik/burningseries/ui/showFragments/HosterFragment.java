@@ -14,17 +14,22 @@ import android.support.design.widget.Snackbar;
 import android.support.v4.content.ContextCompat;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.webkit.WebSettings;
+import android.webkit.WebView;
+import android.webkit.WebViewClient;
 import android.widget.TextView;
 
 import java.io.PrintWriter;
 import java.io.StringWriter;
+import java.net.URL;
+import java.net.URLConnection;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.List;
+import java.util.Scanner;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
@@ -137,7 +142,7 @@ public class HosterFragment extends Fragment implements Callback<EpisodeObj> {
                 new RecyclerItemClickListener(getActivity(), hosterRecyclerView, new RecyclerItemClickListener.OnItemClickListener() {
                     @Override
                     public void onItemClick(View view, int position) {
-                        String playerType = hosterList.get(position).isSupported() ? "internal" : "appbrowser";
+                        String defaultPlayer = hosterList.get(position).isSupported() ? "internal" : "appbrowser";
                         if (Settings.of(getActivity()).alarmOnMobile() &&
                                 AndroidUtility.isOnMobile(getActivity())) {
 
@@ -146,7 +151,7 @@ public class HosterFragment extends Fragment implements Callback<EpisodeObj> {
                                     .content("Achtung! Du bist über mobile Daten im Internet. Willst du Fortfahren?")
                                     .positive("Weiter", dialog -> {
                                         TextView idView = (TextView) view.findViewById(R.id.linkId);
-                                        showVideo(Integer.parseInt(idView.getText().toString()), playerType);
+                                        showVideo(Integer.parseInt(idView.getText().toString()), defaultPlayer);
                                     })
                                     .negative()
                                     .cancelable()
@@ -154,7 +159,7 @@ public class HosterFragment extends Fragment implements Callback<EpisodeObj> {
                                     .show();
 
                         } else {
-                            showVideo(hosterList.get(position).getLinkId(), playerType);
+                            showVideo(hosterList.get(position).getLinkId(), defaultPlayer);
                         }
                     }
 
@@ -219,12 +224,24 @@ public class HosterFragment extends Fragment implements Callback<EpisodeObj> {
             public void onResponse(Call<VideoObj> call, Response<VideoObj> response) {
                 VideoObj videoObj = response.body();
 
+                String hoster = videoObj.getHoster().toLowerCase();
+
                 switch (type) {
                     case "internal":
-                        new GetVideo(videoObj).execute();
+                        if (hoster.equals("openload") || hoster.equals("openloadhd")) {
+                            //Openload(videoObj.getUrl(), false);
+                            new OpenloadParser(videoObj.getFullUrl(), false).execute();
+                        } else {
+                            new GetVideo(videoObj).execute();
+                        }
                         break;
                     case "external":
-                        new GetVideo(videoObj, true).execute();
+                        if (hoster.equals("openload") || hoster.equals("openloadhd")) {
+                            //Openload(videoObj.getUrl(), true);
+                            new OpenloadParser(videoObj.getFullUrl(), true).execute();
+                        } else {
+                            new GetVideo(videoObj, true).execute();
+                        }
                         break;
                     case "browser":
                         Intent browserIntent = new Intent(Intent.ACTION_VIEW, Uri.parse(videoObj.getFullUrl()));
@@ -253,6 +270,8 @@ public class HosterFragment extends Fragment implements Callback<EpisodeObj> {
                 cv.put(historyTable.COLUMN_NAME_TIME, calendar.get(Calendar.HOUR_OF_DAY) + ":" + calendar.get(Calendar.MINUTE));
 
                 db.insert(historyTable.TABLE_NAME, null, cv);
+
+                db.close();
             }
 
             @Override
@@ -274,6 +293,78 @@ public class HosterFragment extends Fragment implements Callback<EpisodeObj> {
                         .build().show();
             }
         });
+    }
+
+    //private void Openload(String videoID, Boolean external) {
+    private void Openload(String videoID, Boolean external) {
+        try {
+            //String fullURL = "https://openload.co/embed/" + videoID;
+
+            WebView wv = new WebView(getActivity());
+            wv.getSettings().setJavaScriptEnabled(true);
+            wv.setWebViewClient(new WebViewClient() {
+                @Override
+                public void onPageFinished(WebView view, String url) {
+
+                    view.evaluateJavascript("document.getElementById('streamurl').innerHTML", valueFromJS -> {
+                                progressDialog.dismiss();
+                        String vurl = "https://openload.co/stream/" + valueFromJS.replace("\"", "") + "?mime=true";
+                        if (!external) {
+                            Intent intent = new Intent(getActivity().getApplicationContext(), FullscreenVideoActivity.class);
+                            intent.putExtra("burning-series.videoURL", vurl);
+                            startActivity(intent);
+                        } else {
+                            Intent browserIntent = new Intent(Intent.ACTION_VIEW, Uri.parse(vurl));
+                            startActivity(browserIntent);
+                        }
+                    }
+                    );
+                }
+            });
+
+            //wv.loadUrl(fullURL);
+            wv.loadDataWithBaseURL("https://openload.co", videoID, null, null, null);
+
+            progressDialog = new ProgressDialog(getActivity());
+            progressDialog.setMessage("Hoster wird geöffnet...");
+
+            progressDialog.show();
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+    }
+
+    private class OpenloadParser extends AsyncTask<Void, Void, Void> {
+        String url;
+        String content;
+        Boolean external;
+
+        public OpenloadParser(String url, Boolean external) {
+            this.url = url;
+            this.external = external;
+        }
+
+        @Override
+        protected Void doInBackground(Void... params) {
+            content = null;
+            URLConnection connection = null;
+            try {
+                connection =  new URL(url).openConnection();
+                Scanner scanner = new Scanner(connection.getInputStream());
+                scanner.useDelimiter("\\Z");
+                content = scanner.next();
+                content = content.replace("<video", "<video preload=none");
+            }catch ( Exception ex ) {
+                ex.printStackTrace();
+            }
+            return null;
+        }
+
+        @Override
+        protected void onPostExecute(Void aVoid) {
+            Openload(content, external);
+            super.onPostExecute(aVoid);
+        }
     }
 
     private class GetVideo extends AsyncTask<Void, Void, Void> {
@@ -306,7 +397,7 @@ public class HosterFragment extends Fragment implements Callback<EpisodeObj> {
         protected Void doInBackground(Void... params) {
             Hoster hoster = new Hoster();
             hosterReturn = hoster.get(videoObj.getHoster(), videoObj.getUrl());
-            Log.v("BS", hosterReturn);
+
             return null;
         }
 

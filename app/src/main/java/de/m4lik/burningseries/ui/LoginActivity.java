@@ -124,7 +124,7 @@ public class LoginActivity extends AppCompatActivity implements Callback<Respons
             if (json.contains("\"error\"")) {
                 userEditText.setError(getString(R.string.error_invalid_credentials));
             } else {
-                /**
+                /*
                  * {"user":"name","session":"sessionstring"} -> sessionstring
                  */
 
@@ -164,9 +164,6 @@ public class LoginActivity extends AppCompatActivity implements Callback<Respons
      */
     @TargetApi(Build.VERSION_CODES.HONEYCOMB_MR2)
     private void showProgress(final boolean show) {
-        // On Honeycomb MR2 we have the ViewPropertyAnimator APIs, which allow
-        // for very easy animations. If available, use these APIs to fade-in
-        // the progress spinner.
         int shortAnimTime = getResources().getInteger(android.R.integer.config_shortAnimTime);
 
         mLoginFormView.setVisibility(show ? View.GONE : View.VISIBLE);

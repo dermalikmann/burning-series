@@ -10,6 +10,7 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 class TheVideo extends Hoster {
+
     protected static final Pattern filenamePattern;
     protected static final Pattern hashPattern;
     protected static final Pattern mpriPattern;

@@ -2,9 +2,6 @@
 .idea
 *.iml
 
-# google-service
-google-services.json
-
 # Generated files
 bin/
 gen/

@@ -17,7 +17,6 @@ import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.webkit.WebSettings;
 import android.webkit.WebView;
 import android.webkit.WebViewClient;
 import android.widget.TextView;
@@ -295,29 +294,25 @@ public class HosterFragment extends Fragment implements Callback<EpisodeObj> {
         });
     }
 
-    //private void Openload(String videoID, Boolean external) {
     private void Openload(String videoID, Boolean external) {
         try {
-            //String fullURL = "https://openload.co/embed/" + videoID;
-
             WebView wv = new WebView(getActivity());
             wv.getSettings().setJavaScriptEnabled(true);
             wv.setWebViewClient(new WebViewClient() {
                 @Override
                 public void onPageFinished(WebView view, String url) {
-
                     view.evaluateJavascript("document.getElementById('streamurl').innerHTML", valueFromJS -> {
                                 progressDialog.dismiss();
-                        String vurl = "https://openload.co/stream/" + valueFromJS.replace("\"", "") + "?mime=true";
-                        if (!external) {
-                            Intent intent = new Intent(getActivity().getApplicationContext(), FullscreenVideoActivity.class);
-                            intent.putExtra("burning-series.videoURL", vurl);
-                            startActivity(intent);
-                        } else {
-                            Intent browserIntent = new Intent(Intent.ACTION_VIEW, Uri.parse(vurl));
-                            startActivity(browserIntent);
-                        }
-                    }
+                                String vurl = "https://openload.co/stream/" + valueFromJS.replace("\"", "") + "?mime=true";
+                                if (!external) {
+                                    Intent intent = new Intent(getActivity().getApplicationContext(), FullscreenVideoActivity.class);
+                                    intent.putExtra("burning-series.videoURL", vurl);
+                                    startActivity(intent);
+                                } else {
+                                    Intent browserIntent = new Intent(Intent.ACTION_VIEW, Uri.parse(vurl));
+                                    startActivity(browserIntent);
+                                }
+                            }
                     );
                 }
             });
@@ -349,12 +344,12 @@ public class HosterFragment extends Fragment implements Callback<EpisodeObj> {
             content = null;
             URLConnection connection = null;
             try {
-                connection =  new URL(url).openConnection();
+                connection = new URL(url).openConnection();
                 Scanner scanner = new Scanner(connection.getInputStream());
                 scanner.useDelimiter("\\Z");
                 content = scanner.next();
                 content = content.replace("<video", "<video preload=none");
-            }catch ( Exception ex ) {
+            } catch (Exception ex) {
                 ex.printStackTrace();
             }
             return null;

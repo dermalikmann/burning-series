@@ -14,7 +14,7 @@ buildscript {
 
 android {
     compileSdkVersion 25
-    buildToolsVersion "25.0.2"
+    buildToolsVersion "25.0.3"
 
     def versionPropsFile = file('version.properties')
     def versionBuild
@@ -45,7 +45,7 @@ android {
         minSdkVersion 19
         targetSdkVersion 25
         versionCode versionBuild
-        versionName "0.10.10"
+        versionName "1.0"
         vectorDrawables.useSupportLibrary = true
         //multiDexEnabled true
     }
@@ -81,7 +81,7 @@ android {
     }
 
     gradle.taskGraph.whenReady { taskGraph ->
-        if (taskGraph.hasTask(generateDebugSources)) {  /* when run debug task */
+        if (taskGraph.hasTask(assembleDebug)) {  /* when run debug task */
             println("Increasing Build number")
             autoIncrementBuildNumber()
         } else if (taskGraph.hasTask(assembleRelease)) { /* when run release task */

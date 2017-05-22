@@ -1,6 +1,6 @@
 # Burning Series App (Rework)
-[![App Version](https://img.shields.io/badge/Version-v0.10.10-blue.svg?style=flat)](https://github.com/M4lik/burning-series/releases/tag/v0.10.10)
-[![Status](https://img.shields.io/badge/Status-Pre--Release-orange.svg?style=flat)]()
+[![App Version](https://img.shields.io/badge/Version-v1.0-blue.svg?style=flat)](https://github.com/M4lik/burning-series/releases/tag/v0.10.10)
+[![Status](https://img.shields.io/badge/Status-Release-green.svg?style=flat)]()
 [![Linzenz](https://img.shields.io/badge/Lizenz-MIT_License-green.svg?style=flat)]()
 
 Hier geht's zum [Download](https://github.com/M4lik/burning-series/releases/tag/v0.10.10)

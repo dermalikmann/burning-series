@@ -39,6 +39,7 @@ import java.util.Arrays;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
+import java.util.concurrent.TimeUnit;
 
 import butterknife.BindView;
 import de.m4lik.burningseries.ActivityComponent;
@@ -51,6 +52,7 @@ import de.m4lik.burningseries.api.objects.GenreObj;
 import de.m4lik.burningseries.api.objects.ShowObj;
 import de.m4lik.burningseries.database.DatabaseUtils;
 import de.m4lik.burningseries.database.MainDBHelper;
+import de.m4lik.burningseries.services.SyncBroadcastReceiver;
 import de.m4lik.burningseries.ui.base.ActivityBase;
 import de.m4lik.burningseries.ui.dialogs.UpdateDialog;
 import de.m4lik.burningseries.ui.mainFragments.FavsFragment;
@@ -71,6 +73,7 @@ import static de.m4lik.burningseries.database.SeriesContract.SQL_TRUNCATE_SERIES
 import static de.m4lik.burningseries.database.SeriesContract.genresTable;
 import static de.m4lik.burningseries.database.SeriesContract.seriesTable;
 import static de.m4lik.burningseries.services.ThemeHelperService.theme;
+import static rx.android.schedulers.AndroidSchedulers.mainThread;
 
 /**
  * MainActivity class
@@ -223,6 +226,16 @@ public class MainActivity extends ActivityBase
                 return false;
             }
         });
+    }
+
+    @Override
+    protected void onStart() {
+        super.onStart();
+
+        // schedule a sync operation every minute
+        Observable.interval(0, 1, TimeUnit.MINUTES, mainThread())
+                .compose(RxLifecycleAndroid.bindActivity(lifecycle()))
+                .subscribe(event -> SyncBroadcastReceiver.syncNow(MainActivity.this));
     }
 
     @Override

@@ -36,6 +36,7 @@
     <string name="prompt_user">User</string>
     <string name="prompt_password">Passwort</string>
     <string name="action_sign_in">Einloggen</string>
+    <string name="action_sign_up">Register</string>
     <string name="error_user_empty">Bitte Username eingeben</string>
     <string name="error_password_empty">Bitte Passwort eingeben</string>
     <string name="error_invalid_credentials">Falsche Benutzername oder falsches Passwort</string>

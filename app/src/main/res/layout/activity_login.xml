@@ -9,7 +9,7 @@
     android:paddingLeft="@dimen/activity_horizontal_margin"
     android:paddingRight="@dimen/activity_horizontal_margin"
     android:paddingTop="@dimen/activity_vertical_margin"
-    tools:context="de.m4lik.burningseries.ui.LoginActivity">
+    tools:context=".ui.LoginActivity">
 
     <!-- Login progress -->
     <ProgressBar
@@ -26,9 +26,22 @@
         android:layout_height="match_parent"
         android:orientation="vertical">
 
+        <ImageView
+            android:layout_width="match_parent"
+            android:layout_height="0dp"
+            android:layout_weight="1"
+            android:paddingBottom="10dp"
+            android:paddingLeft="64dp"
+            android:paddingRight="64dp"
+            android:paddingTop="10dp"
+            android:src="@mipmap/login_logo"
+            tools:ignore="ContentDescription"/>
+
         <android.support.design.widget.TextInputLayout
             android:layout_width="match_parent"
-            android:layout_height="wrap_content">
+            android:layout_height="wrap_content"
+            android:layout_marginLeft="30dp"
+            android:layout_marginRight="30dp">
 
             <EditText
                 android:id="@+id/user"
@@ -42,7 +55,9 @@
 
         <android.support.design.widget.TextInputLayout
             android:layout_width="match_parent"
-            android:layout_height="wrap_content">
+            android:layout_height="wrap_content"
+            android:layout_marginLeft="30dp"
+            android:layout_marginRight="30dp">
 
             <EditText
                 android:id="@+id/password"
@@ -56,13 +71,34 @@
         </android.support.design.widget.TextInputLayout>
 
         <Button
-            android:id="@+id/email_sign_in_button"
+            android:id="@+id/login_button"
             style="?android:textAppearanceSmall"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
+            android:layout_marginLeft="30dp"
+            android:layout_marginRight="30dp"
             android:layout_marginTop="16dp"
             android:text="@string/action_sign_in"
             android:textStyle="bold"/>
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginBottom="16dp"
+            android:layout_marginLeft="16dp"
+            android:layout_marginRight="16dp"
+            android:layout_marginTop="8dp"
+            android:orientation="horizontal">
+
+            <Button
+                android:id="@+id/register"
+                style="@style/Widget.AppCompat.Button.Borderless"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_marginRight="4dp"
+                android:layout_weight="1"
+                android:text="@string/action_sign_up"/>
+        </LinearLayout>
 
     </LinearLayout>
 

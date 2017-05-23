@@ -140,6 +140,10 @@
             android:key="pref_pseudo_debug_update_check"
             android:title="Background update check"/>
 
+        <Preference
+            android:key="pref_pseudo_cause_crash"
+            android:title="Cause crash to test Fabric/Crashlytics"/>
+
     </PreferenceCategory>
 
     <PreferenceCategory android:title="Info">

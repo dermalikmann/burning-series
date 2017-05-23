@@ -31,6 +31,7 @@ import android.view.MenuItem;
 import android.view.View;
 import android.widget.TextView;
 
+import com.crashlytics.android.Crashlytics;
 import com.google.firebase.remoteconfig.FirebaseRemoteConfig;
 import com.google.firebase.remoteconfig.FirebaseRemoteConfigSettings;
 import com.trello.rxlifecycle.android.RxLifecycleAndroid;
@@ -156,6 +157,7 @@ public class MainActivity extends ActivityBase
         userTextView.setText(userName);
 
         if (userSession.equals("")) {
+            Crashlytics.setUserIdentifier(userName);
             navigationView.getMenu().findItem(R.id.login_menu_item).setVisible(true);
             navigationView.getMenu().findItem(R.id.logout_menu_item).setVisible(false);
         } else {

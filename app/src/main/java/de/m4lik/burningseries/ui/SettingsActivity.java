@@ -171,6 +171,10 @@ public class SettingsActivity extends ActivityBase {
                 return true;
             }
 
+            if ("pref_pseudo_cause_crash".equals(preferenceKey)) {
+                throw new RuntimeException("Crashed on purpose!");
+            }
+
             if ("pref_pseudo_debug_notification".equals(preferenceKey)) {
                 Context context = getActivity().getApplicationContext();
 

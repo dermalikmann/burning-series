@@ -51,23 +51,23 @@ public class DatabaseUtils {
                 seriesTable.COLUMN_NAME_ID
         };
 
-        String selection = seriesTable.COLUMN_NAME_ISFAV + " = 1";
+        String sortOrder =
+                seriesTable.COLUMN_NAME_TITLE + " ASC";
 
         Cursor c = db.query(
                 seriesTable.TABLE_NAME,
                 projection,
-                selection,
+                seriesTable.COLUMN_NAME_ISFAV + " = 1",
                 null,
                 null,
                 null,
-                null
+                sortOrder
         );
 
         List<Integer> favs = new ArrayList<>();
         if (c.moveToFirst())
             do {
                 favs.add(c.getInt(c.getColumnIndex(seriesTable.COLUMN_NAME_ID)));
-                c.moveToNext();
             } while (c.moveToNext());
 
         c.close();

@@ -138,6 +138,8 @@ public class HistoryFragment extends Fragment {
                 if (Settings.of(getActivity()).isDarkTheme())
                     ((ImageView) binding.getRoot().findViewById(R.id.goImageView)).setImageDrawable(ContextCompat.getDrawable(getActivity(), R.drawable.ic_action_arrow_right_white));
 
+                binding.getRoot().findViewById(R.id.seriesTitle).setSelected(true);
+
                 binding.executePendingBindings();
             }
         }

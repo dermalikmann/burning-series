@@ -513,7 +513,6 @@ public class TabletShowActivity extends ActivityBase {
                 VideoObj videoObj = response.body();
 
                 String hoster = videoObj.getHoster().toLowerCase();
-                System.out.println(hoster);
 
                 switch (type) {
                     case "internal":

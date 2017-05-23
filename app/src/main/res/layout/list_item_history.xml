@@ -67,37 +67,26 @@
                     android:textSize="16sp"
                     tools:text="1 Episode Title" />
 
+                <TextView
+                    android:id="@+id/seriesTitle"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginLeft="20dp"
+                    android:layout_marginRight="25dp"
+                    android:ellipsize="marquee"
+                    android:layout_gravity="left"
+                    android:maxLines="1"
+                    android:text="@{historyItem.showName + ` > Staffel ` + String.valueOf(historyItem.seasonId)}"
+                    android:textAppearance="?android:attr/textAppearanceSmall"
+                    android:textSize="12sp"
+                    tools:text="Serie > Staffel #" />
+
                 <LinearLayout
                     android:orientation="horizontal"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:layout_marginLeft="20dp"
                     android:layout_marginTop="5dp">
-
-                    <TextView
-                        android:id="@+id/seriesTitle"
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:text="@{historyItem.showName}"
-                        android:textAppearance="?android:attr/textAppearanceSmall"
-                        android:textSize="12sp"
-                        tools:text="Serien Name"/>
-
-                    <TextView
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:textAppearance="?android:attr/textAppearanceSmall"
-                        android:textSize="12sp"
-                        android:text=" > Staffel "/>
-
-                    <TextView
-                        android:id="@+id/seasonNumber"
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:textAppearance="?android:attr/textAppearanceSmall"
-                        android:textSize="12sp"
-                        android:text="@{String.valueOf(historyItem.seasonId)}"
-                        tools:text="#"/>
 
                 </LinearLayout>
 

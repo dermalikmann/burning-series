@@ -19,15 +19,13 @@ import butterknife.BindView;
 import butterknife.ButterKnife;
 import de.m4lik.burningseries.R;
 import de.m4lik.burningseries.database.MainDBHelper;
-import de.m4lik.burningseries.database.SeriesContract;
 import de.m4lik.burningseries.ui.ShowActivity;
 import de.m4lik.burningseries.ui.TabletShowActivity;
 import de.m4lik.burningseries.ui.listitems.ShowListItem;
 import de.m4lik.burningseries.ui.viewAdapters.SeriesRecyclerAdapter;
 import de.m4lik.burningseries.util.listeners.RecyclerItemClickListener;
 
-import static de.m4lik.burningseries.database.SeriesContract.seriesTable.COLUMN_NAME_ISFAV;
-import static de.m4lik.burningseries.database.SeriesContract.seriesTable.COLUMN_NAME_TITLE;
+import static de.m4lik.burningseries.database.SeriesContract.seriesTable;
 
 
 /**
@@ -40,7 +38,8 @@ public class FavsFragment extends Fragment {
 
     List<ShowListItem> favs = new ArrayList<>();
 
-    public FavsFragment() {}
+    public FavsFragment() {
+    }
 
 
     @Override
@@ -55,35 +54,37 @@ public class FavsFragment extends Fragment {
         SQLiteDatabase db = dbHelper.getReadableDatabase();
 
         String[] projection = {
-                SeriesContract.seriesTable.COLUMN_NAME_ID,
-                COLUMN_NAME_TITLE,
-                SeriesContract.seriesTable.COLUMN_NAME_GENRE,
-                COLUMN_NAME_ISFAV
+                seriesTable.COLUMN_NAME_ID,
+                seriesTable.COLUMN_NAME_TITLE,
+                seriesTable.COLUMN_NAME_GENRE,
+                seriesTable.COLUMN_NAME_ISFAV
         };
 
         String sortOrder =
-                COLUMN_NAME_TITLE + " ASC";
+                seriesTable.COLUMN_NAME_TITLE + " ASC";
 
         Cursor c = db.query(
-                SeriesContract.seriesTable.TABLE_NAME,
+                seriesTable.TABLE_NAME,
                 projection,
-                SeriesContract.seriesTable.COLUMN_NAME_ISFAV + " = ?",
+                seriesTable.COLUMN_NAME_ISFAV + " = ?",
                 new String[]{"1"},
                 null,
                 null,
                 sortOrder
         );
 
-        while (c.moveToNext()) {
-            favs.add(new ShowListItem(
-                    c.getString(c.getColumnIndex(COLUMN_NAME_TITLE)),
-                    c.getInt(c.getColumnIndex(SeriesContract.seriesTable.COLUMN_NAME_ID)),
-                    c.getString(c.getColumnIndex(SeriesContract.seriesTable.COLUMN_NAME_GENRE)),
-                    c.getInt(c.getColumnIndex(COLUMN_NAME_ISFAV)) == 1
-            ));
-        }
+        if (c.moveToFirst())
+            do {
+                favs.add(new ShowListItem(
+                        c.getString(c.getColumnIndex(seriesTable.COLUMN_NAME_TITLE)),
+                        c.getInt(c.getColumnIndex(seriesTable.COLUMN_NAME_ID)),
+                        c.getString(c.getColumnIndex(seriesTable.COLUMN_NAME_GENRE)),
+                        c.getInt(c.getColumnIndex(seriesTable.COLUMN_NAME_ISFAV)) == 1
+                ));
+            } while (c.moveToNext());
 
         c.close();
+        db.close();
 
         LinearLayoutManager llm = new LinearLayoutManager(getActivity());
         llm.setOrientation(LinearLayoutManager.VERTICAL);

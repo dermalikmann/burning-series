@@ -186,7 +186,6 @@ public class MainActivity extends ActivityBase
     }
 
     private void fetchFirebase() {
-        System.out.println("Fetching now!");
         FirebaseRemoteConfig remoteConfig = FirebaseRemoteConfig.getInstance();
         remoteConfig.setConfigSettings(
                 new FirebaseRemoteConfigSettings.Builder()
@@ -195,7 +194,6 @@ public class MainActivity extends ActivityBase
         remoteConfig.fetch()
                 .addOnCompleteListener(this, task -> {
                     if (task.isSuccessful()) {
-                        System.out.println("Success");
                         remoteConfig.activateFetched();
                         setup();
                     } else {

@@ -561,10 +561,10 @@ public class MainActivity extends ActivityBase
 
         @Override
         protected void onPostExecute(Void aVoid) {
-            if (userSession.equals("")) {
-                progressDialog.dismiss();
+            progressDialog.dismiss();
+            if (userSession.equals(""))
                 setFragment("series");
-            } else
+            else
                 fetchFavorites();
             super.onPostExecute(aVoid);
         }
@@ -582,23 +582,44 @@ public class MainActivity extends ActivityBase
         }
 
         @Override
+        protected void onPreExecute() {
+            progressDialog = new ProgressDialog(MainActivity.this);
+            progressDialog.setMessage("Favoriten werden geladen.\nBitte kurz warten...");
+            progressDialog.setCancelable(false);
+            progressDialog.setCanceledOnTouchOutside(false);
+            progressDialog.show();
+        }
+
+        @Override
         protected Void doInBackground(Void... voids) {
 
 
             MainDBHelper dbHelper = new MainDBHelper(getApplicationContext());
             SQLiteDatabase db = dbHelper.getWritableDatabase();
 
-            for (ShowObj show : list) {
-                ContentValues cv = new ContentValues();
-                cv.put(seriesTable.COLUMN_NAME_ISFAV, 1);
-                db.update(
-                        seriesTable.TABLE_NAME,
-                        cv,
-                        seriesTable.COLUMN_NAME_ID + " = ?",
-                        new String[]{show.getId().toString()}
-                );
-            }
+            Iterator itr = list.iterator();
+            int i = 0;
+            while (i < list.size()) {
+                int j = 1;
 
+                db.beginTransaction();
+                while (j <= 50 && itr.hasNext()) {
+                    ShowObj show = (ShowObj) itr.next();
+                    ContentValues cv = new ContentValues();
+                    cv.put(seriesTable.COLUMN_NAME_ISFAV, 1);
+                    db.update(
+                            seriesTable.TABLE_NAME,
+                            cv,
+                            seriesTable.COLUMN_NAME_ID + " = ?",
+                            new String[]{show.getId().toString()}
+                    );
+
+                    j++;
+                    i++;
+                }
+                db.setTransactionSuccessful();
+                db.endTransaction();
+            }
 
             db.close();
             return null;

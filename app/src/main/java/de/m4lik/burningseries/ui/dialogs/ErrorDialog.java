@@ -7,6 +7,8 @@ import android.support.v4.app.DialogFragment;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
 
+import com.crashlytics.android.Crashlytics;
+
 import java.lang.ref.WeakReference;
 
 import rx.functions.Action1;
@@ -86,7 +88,7 @@ public class ErrorDialog extends DialogFragment {
             dialog.show(fragmentManager, "ErrorDialog");
 
         } catch (Exception error) {
-            //TODO: FA/FC event
+            Crashlytics.logException(error);
         }
     }
 
@@ -102,7 +104,7 @@ public class ErrorDialog extends DialogFragment {
             }
 
         } catch (Throwable error) {
-            //TODO: FA/FC event
+            Crashlytics.logException(error);
         }
     }
 

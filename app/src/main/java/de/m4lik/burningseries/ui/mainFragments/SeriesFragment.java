@@ -88,10 +88,10 @@ public class SeriesFragment extends Fragment {
 
                     @Override
                     public void onItemClick(View view, int position) {
-                        String nameString = ((TextView) view.findViewById(R.id.seriesTitle)).getText().toString();
-                        String idString = ((TextView) view.findViewById(R.id.seriesId)).getText().toString();
-                        Logger.seriesSelection(getContext(), idString, nameString);
-                        showSeries(Integer.parseInt(idString), nameString);
+                        String title = ((TextView) view.findViewById(R.id.seriesTitle)).getText().toString();
+                        Integer id = Integer.parseInt(((TextView) view.findViewById(R.id.seriesId)).getText().toString());
+                        Logger.seriesSelection(id, title);
+                        showSeries(id, title);
                     }
 
                     @Override

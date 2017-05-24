@@ -1,9 +1,9 @@
 package de.m4lik.burningseries.services;
 
-import android.app.DownloadManager;
 import android.content.Context;
 import android.support.annotation.Nullable;
 
+import com.crashlytics.android.Crashlytics;
 import com.google.common.io.ByteStreams;
 import com.google.common.io.CountingInputStream;
 import com.google.common.io.PatternFilenameFilter;
@@ -14,7 +14,6 @@ import java.io.OutputStream;
 
 import javax.inject.Inject;
 
-import de.m4lik.burningseries.util.Settings;
 import okhttp3.Call;
 import okhttp3.OkHttpClient;
 import okhttp3.Request;
@@ -31,17 +30,12 @@ import rx.subscriptions.Subscriptions;
 public class DownloadService {
 
     private final Context context;
-    private final Settings settings;
-    private final DownloadManager downloadManager;
     private final OkHttpClient okHttpClient;
 
     @Inject
-    public DownloadService(DownloadManager downloadManager, Context context, OkHttpClient okHttpClient) {
+    public DownloadService(Context context, OkHttpClient okHttpClient) {
         this.context = context;
-        this.downloadManager = downloadManager;
         this.okHttpClient = okHttpClient;
-
-        this.settings = Settings.of(context);
     }
 
     public Observable<Status> downloadUpdate(final String uri) {
@@ -49,14 +43,13 @@ public class DownloadService {
             try {
                 File directory = new File(context.getCacheDir(), "updates");
                 if (!directory.exists() && !directory.mkdirs()) {
-                    //TODO: Add FirebaseAnalytics event
+                    Crashlytics.log("Could not create apk directory: " + directory);
                 }
 
                 // clear all previous files
                 File[] files = directory.listFiles(new PatternFilenameFilter("bs-update.*apk"));
                 for (File file : files) {
-                    if (!file.delete()) {
-                        //TODO: Add FirebaseAnalytics event
+                    if (!file.delete()) {Crashlytics.log("Could not delete file: " + file);
                     }
                 }
 

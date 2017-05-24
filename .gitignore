@@ -22,3 +22,6 @@ local.properties
 
 # Android Studio captures folder
 captures/
+
+# Fabric.io
+fabric.properties

@@ -13,6 +13,9 @@ import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
 
+import com.crashlytics.android.answers.Answers;
+import com.crashlytics.android.answers.LoginEvent;
+
 import java.io.IOException;
 
 import butterknife.BindView;
@@ -123,10 +126,16 @@ public class LoginActivity extends AppCompatActivity implements Callback<Respons
             String json = response.body().string();
             if (json.contains("\"error\"")) {
                 userEditText.setError(getString(R.string.error_invalid_credentials));
+                Answers.getInstance().logLogin(new LoginEvent()
+                        .putMethod("Username")
+                        .putSuccess(false));
             } else {
                 /*
                  * {"user":"name","session":"sessionstring"} -> sessionstring
                  */
+                Answers.getInstance().logLogin(new LoginEvent()
+                        .putMethod("Username")
+                        .putSuccess(true));
 
                 SyncBroadcastReceiver.scheduleNextSync(this);
 

@@ -2,7 +2,7 @@ package de.m4lik.burningseries.hoster;
 
 import android.util.Log;
 
-import com.google.firebase.crash.FirebaseCrash;
+import com.crashlytics.android.Crashlytics;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -94,7 +94,7 @@ class TheVideo extends Hoster {
                             urlMatcher = vldPattern.matcher(PostRequest);
                             if (!urlMatcher.find()) {
                                 //We ain't found shit, Sir!
-                                FirebaseCrash.logcat(Log.ERROR, "HOSTER", "Error while finding video URL (" + fullURL + ")");
+                                Crashlytics.log(Log.ERROR, "HOSTER", "Error while finding video URL (" + fullURL + ")");
                                 return "3";
                             }
                             return urlMatcher.group(1) + videoToken;
@@ -106,12 +106,14 @@ class TheVideo extends Hoster {
                 return urlMatcher.group(1) + videoToken;
             } catch (Exception e) {
                 e.printStackTrace();
-                FirebaseCrash.logcat(Log.ERROR, "HOSTER", "Error while fetching video URL (" + fullURL + ")");
+                Crashlytics.log(Log.ERROR, "HOSTER", "Error while fetching video URL (" + fullURL + ")");
+                Crashlytics.logException(e);
                 return "4";
             }
         } catch (Exception e) {
             e.printStackTrace();
-            FirebaseCrash.logcat(Log.ERROR, "HOSTER", "Error while fetching video URL (" + fullURL + ")");
+            Crashlytics.log(Log.ERROR, "HOSTER", "Error while fetching video URL (" + fullURL + ")");
+            Crashlytics.logException(e);
             return "1";
         }
     }

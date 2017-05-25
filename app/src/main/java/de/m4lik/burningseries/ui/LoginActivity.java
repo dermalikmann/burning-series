@@ -5,14 +5,17 @@ import android.animation.AnimatorListenerAdapter;
 import android.annotation.TargetApi;
 import android.content.Context;
 import android.content.Intent;
+import android.content.pm.ActivityInfo;
 import android.os.Build;
 import android.os.Bundle;
+import android.support.v4.content.ContextCompat;
 import android.support.v7.app.AppCompatActivity;
 import android.text.TextUtils;
 import android.util.Log;
 import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
+import android.widget.ImageView;
 
 import com.crashlytics.android.Crashlytics;
 import com.crashlytics.android.answers.Answers;
@@ -60,9 +63,17 @@ public class LoginActivity extends AppCompatActivity implements Callback<Respons
         setContentView(R.layout.activity_login);
         ButterKnife.bind(this);
 
+        if (getApplicationContext().getResources().getBoolean(R.bool.isTablet))
+            this.setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_SENSOR_LANDSCAPE);
+        else
+            this.setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_SENSOR_PORTRAIT);
+
+        ((ImageView) findViewById(R.id.login_logo_image))
+                .setColorFilter(ContextCompat.getColor(LoginActivity.this, theme().primaryColor));
+
         super.onCreate(savedInstanceState);
 
-        Button mEmailSignInButton = (Button) findViewById(R.id.email_sign_in_button);
+        Button mEmailSignInButton = (Button) findViewById(R.id.login_button);
         mEmailSignInButton.setOnClickListener(view -> attemptLogin());
     }
 

@@ -75,7 +75,7 @@
     <!-- Sub Categories -->
 
     <string name="pref_cat_behaviour">Verhalten</string>
-    <string name="pref_cat_behaviour_summary">Hier kannst du verschiedene Einstellungen zum verhalten der App vornehmen, z.B. deine Startseite.</string>
+    <string name="pref_cat_behaviour_summary">Hier kannst du verschiedene Einstellungen zum Verhalten der App vornehmen, z.B. deine Startseite.</string>
 
     <string name="pref_cat_behaviour_datausage">Datenverbrauch</string>
     <string name="pref_cat_behaviour_customization">Anpassung</string>
@@ -90,21 +90,21 @@
     <string name="pref_set_wip_summary">Noch in Arbeit...</string>
 
     <string name="pref_theme">Theme auswählen</string>
-    <string name="pref_theme_summary">Hier kannst du das generelle Farbschema der App auswählen, falls die das Standard-Blau nicht so gefällt.</string>
+    <string name="pref_theme_summary">Hier kannst du das generelle Farbschema der App auswählen, falls dir das Standard-Blau nicht so gefällt.</string>
 
     <string name="pref_alarm_on_mobile_data">Warnen bei mobilen Daten</string>
-    <string name="pref_alarm_on_mobile_data_summary_on">Warne mich vor jedem Video falls ich mobile Daten benutze.</string>
+    <string name="pref_alarm_on_mobile_data_summary_on">Warne mich vor jedem Video, falls ich mobile Daten benutze.</string>
     <string name="pref_alarm_on_mobile_data_summary_off">Warne mich nicht falls ich mobile Daten benutze.</string>
     <string name="pref_show_cover_images_title">Serienbilder</string>
     <string name="pref_show_cover_images_summary_on">Zeige mir die Serienbilder in der Hauptansicht</string>
     <string name="pref_show_cover_images_summary_off">Zeige mir keine Serienbilder in der Hauptansicht</string>
 
     <string name="pref_startup_view">Standardansicht</string>
-    <string name="pref_startup_view_summary">Hier kannst du feslegen, was du beim Starten der App als erstes sehen willst.</string>
+    <string name="pref_startup_view_summary">Hier kannst du festlegen was du beim Starten der App als erstes sehen willst.</string>
 
     <string name="pref_update_pseudo_do_update">Nach Updates suchen.</string>
     <string name="pref_update_announcement">Bei neuen Updates benachrichtigen</string>
-    <string name="pref_update_announcement_summary_on">Du wirst benachrichtigt sobald ein neues Update zur verfügung steht.</string>
+    <string name="pref_update_announcement_summary_on">Du wirst benachrichtigt sobald ein neues Update zur Verfügung steht.</string>
     <string name="pref_update_announcement_summary_off">Du keine Benachrichtigung bei neuen Updates.</string>
     <string name="pref_update_channel">Update Channel</string>
     <string name="pref_update_channel_summary">Hier kannst du auswählen auf welchem Update Channel du dich befinden willst.</string>
@@ -114,7 +114,7 @@
     <string name="pref_pseudo_changelog">Changelog</string>
     <string name="pref_pseudo_changelog_summary">Changelog</string>
     <string name="pref_pseudo_website">Website</string>
-    <string name="pref_pseudo_website_summary">Dir gefällt die App? Dann empfiehl sie doch deinen Freunden :)</string>
+    <string name="pref_pseudo_website_summary">Dir gefällt die App? Dann empfehle sie doch deinen Freunden :)</string>
     <string name="pref_pseudo_debug_notification">Testbenachrichtigung</string>
     <string name="pref_pseudo_debug_notification_summary">Zeige eine Test-Benachrichtigung an.</string>
     <string name="pref_pseudo_user">Angemeldeter Benutzer</string>

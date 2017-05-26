@@ -7,11 +7,18 @@ import android.content.Context;
 import android.content.Intent;
 import android.os.Build;
 import android.os.Bundle;
+import android.support.v4.content.ContextCompat;
 import android.support.v7.app.AppCompatActivity;
 import android.text.TextUtils;
+import android.util.Log;
 import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
+import android.widget.ImageView;
+
+import com.crashlytics.android.Crashlytics;
+import com.crashlytics.android.answers.Answers;
+import com.crashlytics.android.answers.LoginEvent;
 
 import java.io.IOException;
 
@@ -22,7 +29,6 @@ import de.m4lik.burningseries.api.API;
 import de.m4lik.burningseries.api.APIInterface;
 import de.m4lik.burningseries.database.MainDBHelper;
 import de.m4lik.burningseries.services.SyncBroadcastReceiver;
-import de.m4lik.burningseries.util.Logger;
 import de.m4lik.burningseries.util.Settings;
 import okhttp3.ResponseBody;
 import retrofit2.Call;
@@ -56,9 +62,12 @@ public class LoginActivity extends AppCompatActivity implements Callback<Respons
         setContentView(R.layout.activity_login);
         ButterKnife.bind(this);
 
+        ((ImageView) findViewById(R.id.login_logo_image))
+                .setColorFilter(ContextCompat.getColor(LoginActivity.this, theme().primaryColor));
+
         super.onCreate(savedInstanceState);
 
-        Button mEmailSignInButton = (Button) findViewById(R.id.email_sign_in_button);
+        Button mEmailSignInButton = (Button) findViewById(R.id.login_button);
         mEmailSignInButton.setOnClickListener(view -> attemptLogin());
     }
 
@@ -103,16 +112,12 @@ public class LoginActivity extends AppCompatActivity implements Callback<Respons
             //Try to login
             loginInProgress = true;
             showProgress(true);
-            try {
                 API api = new API();
                 api.setSession("");
                 api.generateToken("login");
                 APIInterface apii = api.getInterface();
                 Call<ResponseBody> call = apii.login(api.getToken(), api.getUserAgent(), user, password);
                 call.enqueue(this);
-            } catch (Exception e) {
-                e.printStackTrace();
-            }
         }
     }
 
@@ -123,10 +128,16 @@ public class LoginActivity extends AppCompatActivity implements Callback<Respons
             String json = response.body().string();
             if (json.contains("\"error\"")) {
                 userEditText.setError(getString(R.string.error_invalid_credentials));
+                Answers.getInstance().logLogin(new LoginEvent()
+                        .putMethod("Username")
+                        .putSuccess(false));
             } else {
                 /*
                  * {"user":"name","session":"sessionstring"} -> sessionstring
                  */
+                Answers.getInstance().logLogin(new LoginEvent()
+                        .putMethod("Username")
+                        .putSuccess(true));
 
                 SyncBroadcastReceiver.scheduleNextSync(this);
 
@@ -142,8 +153,6 @@ public class LoginActivity extends AppCompatActivity implements Callback<Respons
 
                 getApplicationContext().deleteDatabase(MainDBHelper.DATABASE_NAME);
 
-                Logger.login(context);
-
                 Intent intent = new Intent(this, MainActivity.class);
                 intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP | Intent.FLAG_ACTIVITY_NEW_TASK);
                 startActivity(intent);
@@ -151,6 +160,8 @@ public class LoginActivity extends AppCompatActivity implements Callback<Respons
             }
         } catch (IOException e) {
             e.printStackTrace();
+            Crashlytics.log(Log.ERROR, "LOGIN", "Error while login: " + e.toString());
+            Crashlytics.logException(e);
         }
     }
 

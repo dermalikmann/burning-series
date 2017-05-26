@@ -9,7 +9,7 @@ import android.os.SystemClock;
 import android.support.v4.content.WakefulBroadcastReceiver;
 import android.util.Log;
 
-import com.google.firebase.crash.FirebaseCrash;
+import com.crashlytics.android.Crashlytics;
 
 import org.joda.time.Hours;
 
@@ -66,8 +66,6 @@ public class SyncBroadcastReceiver extends WakefulBroadcastReceiver {
     @Override
     public void onReceive(Context context, Intent intent) {
 
-        Log.d("BSBG", "System says, we shall sync now");
-
         long syncTime;
         if (!Settings.of(context).isLoggedIn())
             syncTime = SystemClock.elapsedRealtime() + standardHours(6).getMillis();
@@ -77,8 +75,7 @@ public class SyncBroadcastReceiver extends WakefulBroadcastReceiver {
         try {
             scheduleNextSync(context, syncTime);
         } catch (Exception err) {
-            FirebaseCrash.logcat(Log.ERROR, "BSBG", "YELP!");
-            FirebaseCrash.report(err);
+            Crashlytics.logException(err);
         }
 
         Intent service = new Intent(context, SyncIntentService.class);

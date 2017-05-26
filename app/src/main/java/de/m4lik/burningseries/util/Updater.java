@@ -11,7 +11,6 @@ import android.util.Log;
 
 import com.google.common.collect.ImmutableList;
 import com.google.common.io.ByteStreams;
-import com.google.firebase.crash.FirebaseCrash;
 import com.google.gson.GsonBuilder;
 
 import java.io.File;
@@ -130,8 +129,6 @@ public class Updater {
             }
         } else {
             File file = new File(context.getExternalCacheDir(), "update.apk");
-
-            //TODO: FA event
             try (InputStream input = new FileInputStream(apk)) {
                 try (OutputStream output = new FileOutputStream(file)) {
                     ByteStreams.copy(input, output);
@@ -140,8 +137,6 @@ public class Updater {
 
             // make file readable
             if (file.setReadable(true))
-                //TODO: FA event
-
                 uri = Uri.fromFile(file);
         }
 
@@ -165,8 +160,6 @@ public class Updater {
                         update -> update.buildNumber() > currentVersion
                 ).map(update -> {
                     String apk = update.apk();
-
-                    //TODO: FA event
                     return ImmutableUpdate.builder()
                             .buildNumber(update.buildNumber())
                             .versionName(update.versionName())
@@ -180,10 +173,8 @@ public class Updater {
         return Observable.from(endpoints)
                 .flatMap(ep -> check(ep)
                         .doOnError(err -> {
-                            //logger.warn("Could not check for update at {}: {}", ep, err.toString());
-                            FirebaseCrash.logcat(Log.ERROR, "BSUD", "Error while checking for new version.");
+                            Logger.warn("Could not check for update at " + ep + ": " + err.toString());
                             err.printStackTrace();
-                            //FirebaseCrash.report(err);
                         })
                         .onErrorResumeNext(Observable.empty())
                 )
@@ -191,9 +182,6 @@ public class Updater {
     }
 
     private interface UpdateApi {
-        @GET("/version/stable/update.json")
-        Call<Update> get();
-
         @GET("/version/{channel}/update.json")
         Call<Update> check(@Path("channel") String channel);
     }

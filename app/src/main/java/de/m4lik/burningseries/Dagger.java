@@ -5,6 +5,8 @@ import android.app.Application;
 import android.content.Context;
 import android.os.AsyncTask;
 
+import com.crashlytics.android.Crashlytics;
+
 import de.m4lik.burningseries.modules.ActivityModule;
 import de.m4lik.burningseries.ui.base.ActivityBase;
 
@@ -41,7 +43,7 @@ public class Dagger {
             try {
                 Dagger.appComponent(application).inject(new EagerSingletons());
             } catch (Throwable error) {
-                //TODO: FA event
+                Crashlytics.logException(error);
             }
         });
     }

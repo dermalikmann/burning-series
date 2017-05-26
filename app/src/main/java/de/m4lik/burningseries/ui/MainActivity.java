@@ -4,7 +4,6 @@ import android.app.ActivityManager;
 import android.app.ProgressDialog;
 import android.content.ContentValues;
 import android.content.Intent;
-import android.content.pm.ActivityInfo;
 import android.database.sqlite.SQLiteDatabase;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
@@ -31,6 +30,7 @@ import android.view.MenuItem;
 import android.view.View;
 import android.widget.TextView;
 
+import com.crashlytics.android.Crashlytics;
 import com.google.firebase.remoteconfig.FirebaseRemoteConfig;
 import com.google.firebase.remoteconfig.FirebaseRemoteConfigSettings;
 import com.trello.rxlifecycle.android.RxLifecycleAndroid;
@@ -60,7 +60,6 @@ import de.m4lik.burningseries.ui.mainFragments.GenresFragment;
 import de.m4lik.burningseries.ui.mainFragments.HistoryFragment;
 import de.m4lik.burningseries.ui.mainFragments.NewsFragment;
 import de.m4lik.burningseries.ui.mainFragments.SeriesFragment;
-import de.m4lik.burningseries.util.Logger;
 import de.m4lik.burningseries.util.Settings;
 import okhttp3.ResponseBody;
 import retrofit2.Call;
@@ -126,12 +125,8 @@ public class MainActivity extends ActivityBase
         }
         setSupportActionBar(toolbar);
 
-        if (getApplicationContext().getResources().getBoolean(R.bool.isTablet)) {
-            this.setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_SENSOR_LANDSCAPE);
+        if (getApplicationContext().getResources().getBoolean(R.bool.isTablet))
             isTablet = true;
-        } else {
-            this.setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_SENSOR_PORTRAIT);
-        }
 
         Settings settings = Settings.of(this);
         userName = settings.getUserName();
@@ -156,6 +151,7 @@ public class MainActivity extends ActivityBase
         userTextView.setText(userName);
 
         if (userSession.equals("")) {
+            Crashlytics.setUserIdentifier(userName);
             navigationView.getMenu().findItem(R.id.login_menu_item).setVisible(true);
             navigationView.getMenu().findItem(R.id.logout_menu_item).setVisible(false);
         } else {
@@ -327,8 +323,6 @@ public class MainActivity extends ActivityBase
         final API api = new API();
         api.setSession(Settings.of(this).getUserSession());
         api.generateToken("logout");
-
-        Logger.logout(getApplicationContext());
 
         APIInterface apii = api.getInterface();
         Call<ResponseBody> call = apii.logout(api.getToken(), api.getUserAgent(), api.getSession());

@@ -20,7 +20,7 @@ dependencies {
     compile "com.android.support:support-v4:$versionSupportLibrary"
     compile 'com.android.support.constraint:constraint-layout:1.0.2'
 
-    compile 'com.devbrackets.android:exomedia:3.1.0'
+    compile 'com.devbrackets.android:exomedia:4.0.2'
 
     compile "com.f2prateek.dart:dart:2.0.1"
     annotationProcessor "com.f2prateek.dart:dart-processor:2.0.1"

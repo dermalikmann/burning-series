@@ -1,4 +1,5 @@
-<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<LinearLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
@@ -15,13 +16,14 @@
         android:text="@string/nothing_watched"
         android:textAppearance="@android:style/TextAppearance.Medium"
         android:textColor="@color/lightgray"
-        android:visibility="gone" />
+        android:visibility="gone"/>
 
     <com.simplecityapps.recyclerview_fastscroll.views.FastScrollRecyclerView
         android:id="@+id/historyRecyclerView"
-        android:layout_width="600dp"
+        android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:layout_gravity="center_horizontal"
-        app:fastScrollPopupBackgroundSize="50dp" />
+        android:layout_margin="25dp"
+        app:fastScrollPopupBackgroundSize="50dp"/>
 
 </LinearLayout>

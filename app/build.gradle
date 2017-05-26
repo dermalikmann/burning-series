@@ -1,14 +1,28 @@
 apply plugin: 'com.android.application'
+apply plugin: 'io.fabric'
+
+repositories {
+    maven { url 'https://maven.fabric.io/public' }
+}
+
+dependencies {
+    compile('com.crashlytics.sdk.android:crashlytics:2.6.8@aar') {
+        transitive = true;
+    }
+}
+
 apply plugin: 'me.tatarka.retrolambda'
 
 buildscript {
     repositories {
         jcenter()
         mavenCentral()
+        maven { url 'https://maven.fabric.io/public' }
     }
 
     dependencies {
         classpath 'me.tatarka:gradle-retrolambda:3.6.0'
+        classpath 'io.fabric.tools:gradle:1.+'
     }
 }
 
@@ -45,7 +59,7 @@ android {
         minSdkVersion 19
         targetSdkVersion 25
         versionCode versionBuild
-        versionName "1.0.3"
+        versionName "1.0.4"
         vectorDrawables.useSupportLibrary = true
         //multiDexEnabled true
     }

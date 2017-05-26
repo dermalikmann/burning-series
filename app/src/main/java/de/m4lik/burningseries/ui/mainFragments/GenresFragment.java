@@ -19,6 +19,7 @@ import de.m4lik.burningseries.ui.ShowActivity;
 import de.m4lik.burningseries.ui.TabletShowActivity;
 import de.m4lik.burningseries.ui.viewAdapters.GenresRecyclerAdapter;
 import de.m4lik.burningseries.ui.viewAdapters.SeriesRecyclerAdapter;
+import de.m4lik.burningseries.util.Logger;
 import de.m4lik.burningseries.util.listeners.RecyclerItemClickListener;
 
 /**
@@ -50,7 +51,9 @@ public class GenresFragment extends Fragment {
     private RecyclerItemClickListener genreClickListener = new RecyclerItemClickListener(getActivity(), genresRecyclerView, new RecyclerItemClickListener.OnItemClickListener() {
         @Override
         public void onItemClick(View view, int position) {
-            populateSeriesList(((TextView) view.findViewById(R.id.genreLable)).getText().toString());
+            String genre = ((TextView) view.findViewById(R.id.genreLable)).getText().toString();
+            populateSeriesList(genre);
+            Logger.genreSelection(genre);
             ((MainActivity) getActivity()).setSeriesList(true);
         }
 

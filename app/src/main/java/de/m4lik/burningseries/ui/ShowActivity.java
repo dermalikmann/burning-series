@@ -1,7 +1,6 @@
 package de.m4lik.burningseries.ui;
 
 import android.content.Intent;
-import android.content.pm.ActivityInfo;
 import android.net.Uri;
 import android.os.Bundle;
 import android.support.design.widget.FloatingActionButton;
@@ -62,12 +61,6 @@ public class ShowActivity extends ActivityBase {
         i = getIntent();
 
         findViewById(R.id.gradient).setBackground(ContextCompat.getDrawable(this, theme().gradient));
-
-        if (getApplicationContext().getResources().getBoolean(R.bool.isTablet)) {
-            this.setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_SENSOR_LANDSCAPE);
-        } else {
-            this.setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_SENSOR_PORTRAIT);
-        }
 
         showName = i.getStringExtra("ShowName");
         selectedShow = i.getIntExtra("ShowID", 60);

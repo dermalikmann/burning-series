@@ -1,6 +1,7 @@
 package de.m4lik.burningseries.ui.showFragments;
 
 import android.app.Fragment;
+import android.content.Context;
 import android.os.Bundle;
 import android.support.design.widget.Snackbar;
 import android.view.LayoutInflater;
@@ -40,6 +41,8 @@ public class SeasonsFragment extends Fragment implements Callback<SeasonObj> {
 
     List<SeasonListItem> seasonsList = new ArrayList<>();
 
+    Context context;
+
     Boolean loaded = false;
 
     public SeasonsFragment() {}
@@ -49,6 +52,8 @@ public class SeasonsFragment extends Fragment implements Callback<SeasonObj> {
                              Bundle savedInstanceState) {
         rootView = inflater.inflate(R.layout.fragment_seasons, container, false);
         ButterKnife.bind(this, rootView);
+
+        context = getActivity();
 
         seasonsListView = (ListView) rootView.findViewById(R.id.seasonsListView);
 
@@ -95,7 +100,7 @@ public class SeasonsFragment extends Fragment implements Callback<SeasonObj> {
 
 
     private void refreshList() {
-        ArrayAdapter<SeasonListItem> adapter = new SeasonsListAdapter(getActivity(), seasonsList);
+        ArrayAdapter<SeasonListItem> adapter = new SeasonsListAdapter(context, seasonsList);
         seasonsListView.setAdapter(adapter);
 
         Integer numOfItems = adapter.getCount();

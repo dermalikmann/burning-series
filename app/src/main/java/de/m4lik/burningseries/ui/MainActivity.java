@@ -4,7 +4,6 @@ import android.app.ActivityManager;
 import android.app.ProgressDialog;
 import android.content.ContentValues;
 import android.content.Intent;
-import android.content.pm.ActivityInfo;
 import android.database.sqlite.SQLiteDatabase;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
@@ -126,12 +125,8 @@ public class MainActivity extends ActivityBase
         }
         setSupportActionBar(toolbar);
 
-        if (getApplicationContext().getResources().getBoolean(R.bool.isTablet)) {
-            this.setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_SENSOR_LANDSCAPE);
+        if (getApplicationContext().getResources().getBoolean(R.bool.isTablet))
             isTablet = true;
-        } else {
-            this.setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_SENSOR_PORTRAIT);
-        }
 
         Settings settings = Settings.of(this);
         userName = settings.getUserName();

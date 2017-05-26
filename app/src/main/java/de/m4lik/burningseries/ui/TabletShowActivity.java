@@ -143,7 +143,7 @@ public class TabletShowActivity extends ActivityBase {
 
         i = getIntent();
 
-        findViewById(R.id.descriptionTV).setBackground(getResources().getDrawable(theme().listItemBackground));
+        findViewById(R.id.descriptionTV).setBackground(ContextCompat.getDrawable(TabletShowActivity.this, theme().listItemBackground));
 
         String title = i.getStringExtra("ShowName");
         currentShow = i.getIntExtra("ShowID", 60);
@@ -402,19 +402,19 @@ public class TabletShowActivity extends ActivityBase {
 
                             DialogBuilder.start(TabletShowActivity.this)
                                     .title(getString(R.string.choose_player_title))
-                                    .adapter(new PlayerChooserListAdapter(TabletShowActivity.this, players), (dialog2, id) -> {
+                                    .adapter(new PlayerChooserListAdapter(TabletShowActivity.this, players), (dialog2, id) ->
 
                                         DialogBuilder.start(TabletShowActivity.this)
                                                 .title("Mobile Daten")
                                                 .content("Achtung! Du bist über mobile Daten im Internet. Willst du Fortfahren?")
-                                                .positive("Weiter", dialog -> {
-                                                    showVideo(hosterList.get(position).getLinkId(), players.get(id).getType());
-                                                })
+                                                .positive("Weiter", dialog ->
+                                                    showVideo(hosterList.get(position).getLinkId(), players.get(id).getType())
+                                                )
                                                 .negative()
                                                 .cancelable()
                                                 .build()
-                                                .show();
-                                    })
+                                                .show()
+                                    )
                                     .cancelable()
                                     .negative()
                                     .build()
@@ -487,9 +487,9 @@ public class TabletShowActivity extends ActivityBase {
         }
 
         seasonsListView.setAdapter(new SeasonsListAdapter(this, seasons));
-        seasonsListView.setOnItemClickListener((parent, view, position, id) -> {
-            showSeason(Integer.parseInt(((TextView) view.findViewById(R.id.seasonId)).getText().toString()));
-        });
+        seasonsListView.setOnItemClickListener((parent, view, position, id) ->
+            showSeason(Integer.parseInt(((TextView) view.findViewById(R.id.seasonId)).getText().toString()))
+        );
     }
 
     private void refreshEpisodesList() {
@@ -623,7 +623,7 @@ public class TabletShowActivity extends ActivityBase {
         String content;
         Boolean external;
 
-        public OpenloadParser(String url, Boolean external) {
+        OpenloadParser(String url, Boolean external) {
             this.url = url;
             this.external = external;
         }
@@ -631,9 +631,8 @@ public class TabletShowActivity extends ActivityBase {
         @Override
         protected Void doInBackground(Void... params) {
             content = null;
-            URLConnection connection = null;
             try {
-                connection = new URL(url).openConnection();
+                URLConnection connection = new URL(url).openConnection();
                 Scanner scanner = new Scanner(connection.getInputStream());
                 scanner.useDelimiter("\\Z");
                 content = scanner.next();

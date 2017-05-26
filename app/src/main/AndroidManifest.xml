@@ -70,8 +70,7 @@
         <activity
             android:name=".ui.TabletShowActivity"
             android:label="@string/title_activity_scrolling"
-            android:parentActivityName=".ui.MainActivity"
-            android:screenOrientation="landscape">
+            android:parentActivityName=".ui.MainActivity">
             <meta-data
                 android:name="android.support.PARENT_ACTIVITY"
                 android:value=".ui.MainActivity"/>
@@ -79,15 +78,14 @@
         <activity
             android:name=".ui.LoginActivity"
             android:label="@string/title_activity_login"
-            android:parentActivityName=".ui.MainActivity"
-            android:screenOrientation="portrait">
+            android:parentActivityName=".ui.MainActivity">
             <meta-data
                 android:name="android.support.PARENT_ACTIVITY"
                 android:value=".ui.MainActivity"/>
         </activity>
         <activity
             android:name=".ui.FullscreenVideoActivity"
-            android:screenOrientation="landscape"
+            android:configChanges="orientation|screenSize"
             android:theme="@style/BurningSeries.NoActionBar.Dark"/>
         <activity
             android:name=".ui.SettingsActivity"
@@ -114,9 +112,10 @@
                 android:name="android.support.PARENT_ACTIVITY"
                 android:value=".ui.MainActivity"/>
         </activity>
+
         <meta-data
             android:name="io.fabric.ApiKey"
-            android:value="2e4738791df023e8d655324723e04d3a23040b6a" />
+            android:value="2e4738791df023e8d655324723e04d3a23040b6a"/>
     </application>
 
 </manifest>

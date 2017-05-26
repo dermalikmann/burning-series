@@ -8,19 +8,20 @@
     tools:context=".ui.mainFragments.SeriesFragment">
 
     <TextView
-        android:id="@+id/nothingWatched"
+        android:id="@+id/nothing_found"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_marginTop="30dp"
         android:gravity="center_horizontal"
-        android:text="@string/nothing_watched"
+        android:text="@string/no_series_found"
         android:textAppearance="@android:style/TextAppearance.Medium"
         android:textColor="@color/lightgray"
+        android:textSize="25sp"
         android:visibility="gone"/>
 
     <com.simplecityapps.recyclerview_fastscroll.views.FastScrollRecyclerView
-        android:id="@+id/historyRecyclerView"
-        android:layout_width="match_parent"
+        android:id="@+id/seriesRecyclerView"
+        android:layout_width="600dp"
         android:layout_height="match_parent"
         android:layout_gravity="center_horizontal"
         android:layout_margin="25dp"

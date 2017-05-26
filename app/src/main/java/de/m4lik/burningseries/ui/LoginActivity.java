@@ -5,7 +5,6 @@ import android.animation.AnimatorListenerAdapter;
 import android.annotation.TargetApi;
 import android.content.Context;
 import android.content.Intent;
-import android.content.pm.ActivityInfo;
 import android.os.Build;
 import android.os.Bundle;
 import android.support.v4.content.ContextCompat;
@@ -62,11 +61,6 @@ public class LoginActivity extends AppCompatActivity implements Callback<Respons
         setTheme(theme().basic);
         setContentView(R.layout.activity_login);
         ButterKnife.bind(this);
-
-        if (getApplicationContext().getResources().getBoolean(R.bool.isTablet))
-            this.setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_SENSOR_LANDSCAPE);
-        else
-            this.setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_SENSOR_PORTRAIT);
 
         ((ImageView) findViewById(R.id.login_logo_image))
                 .setColorFilter(ContextCompat.getColor(LoginActivity.this, theme().primaryColor));

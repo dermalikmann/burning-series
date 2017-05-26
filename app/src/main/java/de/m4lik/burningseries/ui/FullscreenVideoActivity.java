@@ -10,7 +10,7 @@ import android.support.v4.app.NavUtils;
 import android.view.MenuItem;
 import android.view.View;
 
-import com.devbrackets.android.exomedia.ui.widget.EMVideoView;
+import com.devbrackets.android.exomedia.ui.widget.VideoView;
 
 import de.m4lik.burningseries.ActivityComponent;
 import de.m4lik.burningseries.R;
@@ -31,8 +31,8 @@ public class FullscreenVideoActivity extends ActivityBase {
             actionBar.show();
         }
     };
-    private EMVideoView videoView;
-    private int position = 0;
+    private VideoView videoView;
+    private long position = 0;
     private View mContentView;
     private final Runnable mHidePart2Runnable = new Runnable() {
         //@SuppressLint("InlinedApi")
@@ -91,7 +91,7 @@ public class FullscreenVideoActivity extends ActivityBase {
         Uri uri = Uri.parse(videoURL);
 
 
-        videoView = (EMVideoView) mContentView;
+        videoView = (VideoView) mContentView;
         videoView.setVideoURI(uri);
 
         videoView.start();

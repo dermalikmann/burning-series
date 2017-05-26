@@ -9,7 +9,7 @@
          is needed to present your content, e.g. VideoView, SurfaceView,
          TextureView, etc. -->
 
-    <com.devbrackets.android.exomedia.ui.widget.EMVideoView
+    <com.devbrackets.android.exomedia.ui.widget.VideoView
         android:id="@+id/bufferedVideoView"
         android:layout_width="match_parent"
         android:layout_height="match_parent"

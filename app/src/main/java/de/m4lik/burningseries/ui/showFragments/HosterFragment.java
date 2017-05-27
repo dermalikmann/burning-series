@@ -21,8 +21,6 @@ import android.webkit.WebView;
 import android.webkit.WebViewClient;
 import android.widget.TextView;
 
-import java.io.PrintWriter;
-import java.io.StringWriter;
 import java.net.URL;
 import java.net.URLConnection;
 import java.util.ArrayList;
@@ -280,14 +278,10 @@ public class HosterFragment extends Fragment implements Callback<EpisodeObj> {
                 snackbarView.setBackgroundColor(ContextCompat.getColor(getActivity(), theme().primaryColorDark));
                 snackbar.show();
 
-
-                final StringWriter sw = new StringWriter();
-                final PrintWriter pw = new PrintWriter(sw, true);
-                t.printStackTrace(pw);
-
                 DialogBuilder.start(getActivity())
-                        .title("Error")
-                        .content(sw.getBuffer().toString())
+                        .title("Unerwartete Antwort")
+                        .content("Hmm, da ist was schief gelaufen. Hast du vielleicht ein paarmal schnell hintereinander auf einen Hoster getippt?\n" +
+                                "Wenn ja, warte eine halbe Minute, dann sollte wieder alles funktionieren ;)")
                         .negative()
                         .build().show();
             }

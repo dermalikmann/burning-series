@@ -288,7 +288,7 @@ public class HosterFragment extends Fragment implements Callback<EpisodeObj> {
         });
     }
 
-    private void Openload(String videoID, Boolean external) {
+    private void Openload(String content, Boolean external) {
         try {
             WebView wv = new WebView(getActivity());
             wv.getSettings().setJavaScriptEnabled(true);
@@ -311,8 +311,7 @@ public class HosterFragment extends Fragment implements Callback<EpisodeObj> {
                 }
             });
 
-            //wv.loadUrl(fullURL);
-            wv.loadDataWithBaseURL("https://openload.co", videoID, null, null, null);
+            wv.loadDataWithBaseURL("https://openload.co", content, null, null, null);
 
             progressDialog = new ProgressDialog(getActivity());
             progressDialog.setMessage("Hoster wird geöffnet...");
@@ -336,13 +335,14 @@ public class HosterFragment extends Fragment implements Callback<EpisodeObj> {
         @Override
         protected Void doInBackground(Void... params) {
             content = null;
-            URLConnection connection = null;
+            URLConnection connection;
             try {
                 connection = new URL(url).openConnection();
                 Scanner scanner = new Scanner(connection.getInputStream());
                 scanner.useDelimiter("\\Z");
                 content = scanner.next();
                 content = content.replace("<video", "<video preload=none");
+                scanner.close();
             } catch (Exception ex) {
                 ex.printStackTrace();
             }

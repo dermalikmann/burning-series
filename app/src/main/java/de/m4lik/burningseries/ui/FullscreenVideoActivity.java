@@ -111,12 +111,6 @@ public class FullscreenVideoActivity extends ActivityBase {
             return;
         }
 
-        DialogBuilder.start(FullscreenVideoActivity.this)
-                .content(videoURL)
-                .cancelable()
-                .build()
-                .show();
-
         Uri uri = Uri.parse(videoURL);
 
 

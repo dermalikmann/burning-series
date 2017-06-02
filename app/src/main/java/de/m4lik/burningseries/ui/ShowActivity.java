@@ -99,21 +99,32 @@ public class ShowActivity extends ActivityBase {
             }
         });
 
-        setDefaultFragment();
+        if (fromWatchHistory)
+            visibleFragment = "hoster";
     }
 
-    public void setDefaultFragment() {
-        if (fromWatchHistory) {
-            getFragmentManager().beginTransaction()
-                    .replace(R.id.fragmentContainerShow, new HosterFragment())
-                    .commit();
-            visibleFragment = "hoster";
-        } else {
-            getFragmentManager().beginTransaction()
-                    .replace(R.id.fragmentContainerShow, new SeasonsFragment())
-                    .commit();
-            visibleFragment = "seasons";
+    @Override
+    protected void onResume() {
+
+        switch (visibleFragment) {
+            case "seasons":
+                getFragmentManager().beginTransaction()
+                        .replace(R.id.fragmentContainerShow, new SeasonsFragment())
+                        .commit();
+                break;
+            case "episodes":
+                getFragmentManager().beginTransaction()
+                        .replace(R.id.fragmentContainerShow, new EpisodesFragment())
+                        .commit();
+                break;
+            case "hoster":
+                getFragmentManager().beginTransaction()
+                        .replace(R.id.fragmentContainerShow, new HosterFragment())
+                        .commit();
+                break;
         }
+
+        super.onResume();
     }
 
     @Override
@@ -162,8 +173,16 @@ public class ShowActivity extends ActivityBase {
         return selectedSeason;
     }
 
+    public void setSelectedSeason(Integer selectedSeason) {
+        this.selectedSeason = selectedSeason;
+    }
+
     public Integer getSelectedEpisode() {
         return selectedEpisode;
+    }
+
+    public void setSelectedEpisode(Integer selectedEpisode) {
+        this.selectedEpisode = selectedEpisode;
     }
 
     public String getShowName() {
@@ -172,14 +191,6 @@ public class ShowActivity extends ActivityBase {
 
     public String getEpisodeName() {
         return episodeName;
-    }
-
-    public void setSelectedSeason(Integer selectedSeason) {
-        this.selectedSeason = selectedSeason;
-    }
-
-    public void setSelectedEpisode(Integer selectedEpisode) {
-        this.selectedEpisode = selectedEpisode;
     }
 
     public void setEpisodeName(String episodeName) {

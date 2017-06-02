@@ -22,7 +22,7 @@ buildscript {
 
     dependencies {
         classpath 'me.tatarka:gradle-retrolambda:3.6.0'
-        classpath 'io.fabric.tools:gradle:1.+'
+        classpath 'io.fabric.tools:gradle:1.22.0'
     }
 }
 
@@ -59,7 +59,7 @@ android {
         minSdkVersion 19
         targetSdkVersion 25
         versionCode versionBuild
-        versionName "1.0.5.beta"
+        versionName "1.0.5.beta4"
         vectorDrawables.useSupportLibrary = true
         //multiDexEnabled true
     }

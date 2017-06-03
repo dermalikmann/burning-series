@@ -39,7 +39,7 @@ public class DownloadService {
     }
 
     public Observable<Status> downloadUpdate(final String uri) {
-        return Observable.create(subscriber -> {
+        return Observable.unsafeCreate(subscriber -> {
             try {
                 File directory = new File(context.getCacheDir(), "updates");
                 if (!directory.exists() && !directory.mkdirs()) {

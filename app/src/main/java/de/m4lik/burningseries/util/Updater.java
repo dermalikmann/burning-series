@@ -95,8 +95,7 @@ public class Updater {
 
         // install on finish
         final Context appContext = activity.getApplicationContext();
-        progress.filter(
-                DownloadService.Status::finished)
+        progress.filter(DownloadService.Status::finished)
                 .flatMap(status -> {
                     try {
                         install(appContext, status.file);
@@ -151,22 +150,20 @@ public class Updater {
 
     private Observable<Update> check(final String endpoint) {
         return
-                Async.fromCallable(
-                        () -> {
+                Async.fromCallable(() -> {
                             UpdateApi api = buildRetrofit(endpoint).create(UpdateApi.class);
                             return api.check(channel).execute().body();
                         }, BackgroundScheduler.instance()
                 ).filter(
                         update -> update.buildNumber() > currentVersion
-                ).map(update -> {
-                    String apk = update.apk();
-                    return ImmutableUpdate.builder()
-                            .buildNumber(update.buildNumber())
-                            .versionName(update.versionName())
-                            .changelog(update.changelog())
-                            .apk(apk)
-                            .build();
-                });
+                ).map(update ->
+                        ImmutableUpdate.builder()
+                                .buildNumber(update.buildNumber())
+                                .versionName(update.versionName())
+                                .changelog(update.changelog())
+                                .apk(update.apk())
+                                .build()
+                );
     }
 
     public Observable<Update> check() {

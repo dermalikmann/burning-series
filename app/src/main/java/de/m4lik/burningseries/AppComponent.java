@@ -8,6 +8,7 @@ import de.m4lik.burningseries.modules.AppModule;
 import de.m4lik.burningseries.modules.HttpModule;
 import de.m4lik.burningseries.services.DownloadService;
 import de.m4lik.burningseries.services.NotificationService;
+import de.m4lik.burningseries.services.ShowSyncService;
 import de.m4lik.burningseries.services.SyncIntentService;
 import de.m4lik.burningseries.ui.SettingsActivity;
 
@@ -26,6 +27,8 @@ public interface AppComponent {
     ActivityComponent activityComponent(ActivityModule activityModule);
 
     DownloadService downloadService();
+
+    ShowSyncService showSyncService();
 
     NotificationService notificationService();
 

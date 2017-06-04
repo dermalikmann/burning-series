@@ -1,7 +1,6 @@
 package de.m4lik.burningseries.ui;
 
 import android.app.ActivityManager;
-import android.app.ProgressDialog;
 import android.content.Intent;
 import android.database.sqlite.SQLiteDatabase;
 import android.graphics.Bitmap;
@@ -81,8 +80,6 @@ public class MainActivity extends ActivityBase
     private Boolean seriesList = false;
 
     private boolean isTablet = false;
-
-    ProgressDialog progressDialog;
 
     @BindView(R.id.nav_view)
     NavigationView navigationView;

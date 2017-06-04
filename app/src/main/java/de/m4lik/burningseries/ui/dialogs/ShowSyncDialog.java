@@ -118,7 +118,7 @@ public class ShowSyncDialog extends DialogBase {
     @Override
     public Dialog onCreateDialog(Bundle savedInstanceState) {
         Dialog dialog = DialogBuilder.start(getActivity())
-                .layout(R.layout.dialog_synced_progress)
+                .layout(R.layout.dialog_show_sync_progress)
                 .cancelable(false)
                 .show();
         ButterKnife.bind(dialog);

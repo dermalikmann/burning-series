@@ -1,6 +1,5 @@
 package de.m4lik.burningseries.ui;
 
-import android.app.ProgressDialog;
 import android.content.ContentValues;
 import android.content.Context;
 import android.content.Intent;
@@ -44,6 +43,7 @@ import de.m4lik.burningseries.api.objects.VideoObj;
 import de.m4lik.burningseries.database.MainDBHelper;
 import de.m4lik.burningseries.hoster.Hoster;
 import de.m4lik.burningseries.ui.base.ActivityBase;
+import de.m4lik.burningseries.ui.dialogs.BusyDialog;
 import de.m4lik.burningseries.ui.dialogs.DialogBuilder;
 import de.m4lik.burningseries.ui.listitems.EpisodeListItem;
 import de.m4lik.burningseries.ui.listitems.HosterListItem;
@@ -119,8 +119,6 @@ public class TabletShowActivity extends ActivityBase {
     TextView seasonTV;
 
     String userSession;
-
-    ProgressDialog progressDialog;
 
     List<SeasonListItem> seasons = new ArrayList<>();
     List<EpisodeListItem> episodes = new ArrayList<>();
@@ -577,7 +575,7 @@ public class TabletShowActivity extends ActivityBase {
 
     private void Openload(String videoID, Boolean external) {
         try {
-            //String fullURL = "https://openload.co/embed/" + videoID;
+            BusyDialog dialog = BusyDialog.newInstace("Hoster wird geöffnet...");
 
             WebView wv = new WebView(TabletShowActivity.this);
             wv.getSettings().setJavaScriptEnabled(true);
@@ -585,7 +583,7 @@ public class TabletShowActivity extends ActivityBase {
                 @Override
                 public void onPageFinished(WebView view, String url) {
                     view.evaluateJavascript("document.getElementById('streamurl').innerHTML", valueFromJS -> {
-                                progressDialog.dismiss();
+                        dialog.dismiss();
                                 String vurl = "https://openload.co/stream/" + valueFromJS.replace("\"", "") + "?mime=true";
                                 if (!external) {
                                     Intent intent = new Intent(TabletShowActivity.this, FullscreenVideoActivity.class);
@@ -602,11 +600,7 @@ public class TabletShowActivity extends ActivityBase {
 
             //wv.loadUrl(fullURL);
             wv.loadDataWithBaseURL("https://openload.co", videoID, null, null, null);
-
-            progressDialog = new ProgressDialog(TabletShowActivity.this);
-            progressDialog.setMessage("Hoster wird geöffnet...");
-
-            progressDialog.show();
+            dialog.show(getSupportFragmentManager(), null);
         } catch (Exception e) {
             e.printStackTrace();
         }
@@ -648,7 +642,7 @@ public class TabletShowActivity extends ActivityBase {
 
         private VideoObj videoObj;
         private Boolean external;
-        private ProgressDialog progressDialog;
+        private BusyDialog busyDialog;
         private String hosterReturn;
         private Context context;
 
@@ -664,13 +658,8 @@ public class TabletShowActivity extends ActivityBase {
 
         @Override
         protected void onPreExecute() {
-
-            progressDialog = new ProgressDialog(context);
-            progressDialog.setMessage("Hoster wird geöffnet...");
-
-            progressDialog.show();
-            progressDialog.setCancelable(false);
-            progressDialog.setCanceledOnTouchOutside(false);
+            busyDialog = BusyDialog.newInstace("Hoster wird geöffnet...");
+            busyDialog.show(getSupportFragmentManager(), null);
             super.onPreExecute();
         }
 
@@ -685,7 +674,7 @@ public class TabletShowActivity extends ActivityBase {
         @Override
         protected void onPostExecute(Void aVoid) {
 
-            progressDialog.dismiss();
+            busyDialog.dismiss();
 
             Snackbar snackbar;
             View snackbarView;

@@ -2,7 +2,6 @@ package de.m4lik.burningseries.ui.showFragments;
 
 
 import android.app.Fragment;
-import android.app.ProgressDialog;
 import android.content.ContentValues;
 import android.content.Intent;
 import android.database.sqlite.SQLiteDatabase;
@@ -39,6 +38,7 @@ import de.m4lik.burningseries.database.MainDBHelper;
 import de.m4lik.burningseries.hoster.Hoster;
 import de.m4lik.burningseries.ui.FullscreenVideoActivity;
 import de.m4lik.burningseries.ui.ShowActivity;
+import de.m4lik.burningseries.ui.dialogs.BusyDialog;
 import de.m4lik.burningseries.ui.dialogs.DialogBuilder;
 import de.m4lik.burningseries.ui.listitems.HosterListItem;
 import de.m4lik.burningseries.ui.listitems.PlayerChooserListItem;
@@ -68,8 +68,6 @@ public class HosterFragment extends Fragment implements Callback<EpisodeObj> {
     String episodeName;
 
     String userSession;
-
-    ProgressDialog progressDialog;
 
     List<HosterListItem> hosterList = new ArrayList<>();
     String hosterReturn;
@@ -290,13 +288,15 @@ public class HosterFragment extends Fragment implements Callback<EpisodeObj> {
 
     private void Openload(String content, Boolean external) {
         try {
+            BusyDialog dialog = BusyDialog.newInstace("Hoster wird geöffnet....");
+
             WebView wv = new WebView(getActivity());
             wv.getSettings().setJavaScriptEnabled(true);
             wv.setWebViewClient(new WebViewClient() {
                 @Override
                 public void onPageFinished(WebView view, String url) {
                     view.evaluateJavascript("document.getElementById('streamurl').innerHTML", valueFromJS -> {
-                                progressDialog.dismiss();
+                                dialog.dismiss();
                                 String vurl = "https://openload.co/stream/" + valueFromJS.replace("\"", "") + "?mime=true";
                                 if (!external) {
                                     Intent intent = new Intent(getActivity().getApplicationContext(), FullscreenVideoActivity.class);
@@ -312,11 +312,7 @@ public class HosterFragment extends Fragment implements Callback<EpisodeObj> {
             });
 
             wv.loadDataWithBaseURL("https://openload.co", content, null, null, null);
-
-            progressDialog = new ProgressDialog(getActivity());
-            progressDialog.setMessage("Hoster wird geöffnet...");
-
-            progressDialog.show();
+            dialog.show(((ShowActivity) getActivity()).getSupportFragmentManager(), null);
         } catch (Exception e) {
             e.printStackTrace();
         }
@@ -359,6 +355,7 @@ public class HosterFragment extends Fragment implements Callback<EpisodeObj> {
     private class GetVideo extends AsyncTask<Void, Void, Void> {
 
         private VideoObj videoObj;
+        private BusyDialog dialog;
         private Boolean external;
 
         GetVideo(VideoObj videoObj) {
@@ -372,13 +369,8 @@ public class HosterFragment extends Fragment implements Callback<EpisodeObj> {
 
         @Override
         protected void onPreExecute() {
-
-            progressDialog = new ProgressDialog(getActivity());
-            progressDialog.setMessage("Hoster wird geöffnet...");
-
-            progressDialog.show();
-            progressDialog.setCancelable(false);
-            progressDialog.setCanceledOnTouchOutside(false);
+            dialog = BusyDialog.newInstace("Hoster wird geöffnet...");
+            dialog.show(((ShowActivity) getActivity()).getSupportFragmentManager(), null);
             super.onPreExecute();
         }
 
@@ -393,7 +385,7 @@ public class HosterFragment extends Fragment implements Callback<EpisodeObj> {
         @Override
         protected void onPostExecute(Void aVoid) {
 
-            progressDialog.dismiss();
+            dialog.dismiss();
 
             Snackbar snackbar;
             View snackbarView;

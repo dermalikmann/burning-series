@@ -1,7 +1,7 @@
 package de.m4lik.burningseries.ui.showFragments;
 
 
-import android.app.Fragment;
+import android.annotation.SuppressLint;
 import android.content.ContentValues;
 import android.content.Intent;
 import android.database.sqlite.SQLiteDatabase;
@@ -10,6 +10,7 @@ import android.os.AsyncTask;
 import android.os.Bundle;
 import android.support.customtabs.CustomTabsIntent;
 import android.support.design.widget.Snackbar;
+import android.support.v4.app.Fragment;
 import android.support.v4.content.ContextCompat;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
@@ -40,6 +41,7 @@ import de.m4lik.burningseries.ui.FullscreenVideoActivity;
 import de.m4lik.burningseries.ui.ShowActivity;
 import de.m4lik.burningseries.ui.dialogs.BusyDialog;
 import de.m4lik.burningseries.ui.dialogs.DialogBuilder;
+import de.m4lik.burningseries.ui.dialogs.MobileDataAlertDialog;
 import de.m4lik.burningseries.ui.listitems.HosterListItem;
 import de.m4lik.burningseries.ui.listitems.PlayerChooserListItem;
 import de.m4lik.burningseries.ui.viewAdapters.HosterRecyclerAdapter;
@@ -66,19 +68,16 @@ public class HosterFragment extends Fragment implements Callback<EpisodeObj> {
     Integer selectedEpisode;
     String showName;
     String episodeName;
-
     String userSession;
-
     List<HosterListItem> hosterList = new ArrayList<>();
     String hosterReturn;
-
     @BindView(R.id.hosterRecyclerView)
     RecyclerView hosterRecyclerView;
+    private int linkID;
+    private String playerType;
 
 
-    public HosterFragment() {
-        // Required empty public constructor
-    }
+    public HosterFragment() {}
 
 
     @Override
@@ -129,6 +128,11 @@ public class HosterFragment extends Fragment implements Callback<EpisodeObj> {
         snackbar.show();
     }
 
+    @Override
+    public void onActivityResult(int requestCode, int resultCode, Intent data) {
+        showVideo();
+    }
+
     private void refreshList() {
 
         hosterRecyclerView.setLayoutManager(new LinearLayoutManager(getActivity(), LinearLayoutManager.VERTICAL, false));
@@ -140,21 +144,16 @@ public class HosterFragment extends Fragment implements Callback<EpisodeObj> {
                         String defaultPlayer = hosterList.get(position).isSupported() ? "internal" : "appbrowser";
                         if (Settings.of(getActivity()).alarmOnMobile() &&
                                 AndroidUtility.isOnMobile(getActivity())) {
+                            TextView idView = (TextView) view.findViewById(R.id.linkId);
+                            linkID = Integer.parseInt(idView.getText().toString());
+                            playerType = defaultPlayer;
 
-                            DialogBuilder.start(getActivity())
-                                    .title("Mobile Daten")
-                                    .content("Achtung! Du bist über mobile Daten im Internet. Willst du Fortfahren?")
-                                    .positive("Weiter", dialog -> {
-                                        TextView idView = (TextView) view.findViewById(R.id.linkId);
-                                        showVideo(Integer.parseInt(idView.getText().toString()), defaultPlayer);
-                                    })
-                                    .negative()
-                                    .cancelable()
-                                    .build()
-                                    .show();
+                            MobileDataAlertDialog dialog = MobileDataAlertDialog.newInstace();
+                            dialog.setTargetFragment(HosterFragment.this, 0);
+                            dialog.show(getActivity().getSupportFragmentManager(), null);
 
                         } else {
-                            showVideo(hosterList.get(position).getLinkId(), defaultPlayer);
+                            showVideo();
                         }
                     }
 
@@ -185,17 +184,12 @@ public class HosterFragment extends Fragment implements Callback<EpisodeObj> {
                             DialogBuilder.start(getActivity())
                                     .title(getString(R.string.choose_player_title))
                                     .adapter(new PlayerChooserListAdapter(getActivity(), players), (dialog2, id) -> {
+                                        linkID = hosterList.get(position).getLinkId();
+                                        playerType = players.get(id).getType();
 
-                                        DialogBuilder.start(getActivity())
-                                                .title("Mobile Daten")
-                                                .content("Achtung! Du bist über mobile Daten im Internet. Willst du Fortfahren?")
-                                                .positive("Weiter", dialog -> {
-                                                    showVideo(hosterList.get(position).getLinkId(), players.get(id).getType());
-                                                })
-                                                .negative()
-                                                .cancelable()
-                                                .build()
-                                                .show();
+                                        MobileDataAlertDialog dialog = MobileDataAlertDialog.newInstace();
+                                        dialog.setTargetFragment(HosterFragment.this, 0);
+                                        dialog.show(getActivity().getSupportFragmentManager(), null);
                                     })
                                     .cancelable()
                                     .negative()
@@ -207,13 +201,13 @@ public class HosterFragment extends Fragment implements Callback<EpisodeObj> {
         );
     }
 
-    private void showVideo(Integer id, String type) {
+    private void showVideo() {
 
         API api = new API();
         api.setSession(userSession);
-        api.generateToken("watch/" + id);
+        api.generateToken("watch/" + linkID);
         APIInterface apii = api.getInterface();
-        Call<VideoObj> call = apii.watch(api.getToken(), api.getUserAgent(), id, api.getSession());
+        Call<VideoObj> call = apii.watch(api.getToken(), api.getUserAgent(), linkID, api.getSession());
         call.enqueue(new Callback<VideoObj>() {
             @Override
             public void onResponse(Call<VideoObj> call, Response<VideoObj> response) {
@@ -221,7 +215,7 @@ public class HosterFragment extends Fragment implements Callback<EpisodeObj> {
 
                 String hoster = videoObj.getHoster().toLowerCase();
 
-                switch (type) {
+                switch (playerType) {
                     case "internal":
                         if (hoster.equals("openload") || hoster.equals("openloadhd")) {
                             //Openload(videoObj.getUrl(), false);
@@ -286,6 +280,7 @@ public class HosterFragment extends Fragment implements Callback<EpisodeObj> {
         });
     }
 
+    @SuppressLint("SetJavaScriptEnabled")
     private void Openload(String content, Boolean external) {
         try {
             BusyDialog dialog = BusyDialog.newInstace("Hoster wird geöffnet....");
@@ -312,7 +307,7 @@ public class HosterFragment extends Fragment implements Callback<EpisodeObj> {
             });
 
             wv.loadDataWithBaseURL("https://openload.co", content, null, null, null);
-            dialog.show(((ShowActivity) getActivity()).getSupportFragmentManager(), null);
+            dialog.show(getActivity().getSupportFragmentManager(), null);
         } catch (Exception e) {
             e.printStackTrace();
         }
@@ -323,7 +318,7 @@ public class HosterFragment extends Fragment implements Callback<EpisodeObj> {
         String content;
         Boolean external;
 
-        public OpenloadParser(String url, Boolean external) {
+        OpenloadParser(String url, Boolean external) {
             this.url = url;
             this.external = external;
         }
@@ -370,7 +365,7 @@ public class HosterFragment extends Fragment implements Callback<EpisodeObj> {
         @Override
         protected void onPreExecute() {
             dialog = BusyDialog.newInstace("Hoster wird geöffnet...");
-            dialog.show(((ShowActivity) getActivity()).getSupportFragmentManager(), null);
+            dialog.show( getActivity().getSupportFragmentManager(), null);
             super.onPreExecute();
         }
 

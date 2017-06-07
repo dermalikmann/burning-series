@@ -1,5 +1,6 @@
 package de.m4lik.burningseries.ui;
 
+import android.annotation.SuppressLint;
 import android.content.ContentValues;
 import android.content.Context;
 import android.content.Intent;
@@ -513,7 +514,6 @@ public class TabletShowActivity extends ActivityBase {
                 switch (type) {
                     case "internal":
                         if (hoster.equals("openload") || hoster.equals("openloadhd")) {
-                            //Openload(videoObj.getUrl(), false);
                             new OpenloadParser(videoObj.getFullUrl(), false).execute();
                         } else {
                             new GetVideo(videoObj).execute();
@@ -521,7 +521,6 @@ public class TabletShowActivity extends ActivityBase {
                         break;
                     case "external":
                         if (hoster.equals("openload") || hoster.equals("openloadhd")) {
-                            //Openload(videoObj.getUrl(), true);
                             new OpenloadParser(videoObj.getFullUrl(), true).execute();
                         } else {
                             new GetVideo(videoObj, true).execute();
@@ -573,6 +572,7 @@ public class TabletShowActivity extends ActivityBase {
         });
     }
 
+    @SuppressLint("SetJavaScriptEnabled")
     private void Openload(String videoID, Boolean external) {
         try {
             BusyDialog dialog = BusyDialog.newInstace("Hoster wird geöffnet...");

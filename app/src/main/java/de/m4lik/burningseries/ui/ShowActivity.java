@@ -118,7 +118,7 @@ public class ShowActivity extends ActivityBase {
                         .commit();
                 break;
             case "hoster":
-                getFragmentManager().beginTransaction()
+                getSupportFragmentManager().beginTransaction()
                         .replace(R.id.fragmentContainerShow, new HosterFragment())
                         .commit();
                 break;
@@ -223,8 +223,8 @@ public class ShowActivity extends ActivityBase {
 
     public void switchEpisodesToHosters() {
 
-        getFragmentManager().beginTransaction()
-                .setCustomAnimations(R.animator.slide_in_right, R.animator.slide_out_left, 0, 0)
+        getSupportFragmentManager().beginTransaction()
+                //.setCustomAnimations(R.animator.slide_in_right, R.animator.slide_out_left, 0, 0)
                 .replace(R.id.fragmentContainerShow, new HosterFragment())
                 .commit();
 

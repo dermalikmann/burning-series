@@ -113,6 +113,12 @@ public class DialogBuilder {
         return this;
     }
 
+    public DialogBuilder negative(String text, OnClickListener onClick) {
+        builder.setNegativeButton(text, null);
+        negativeOnClick = onClick;
+        return this;
+    }
+
     public DialogBuilder neutral(String text) {
         builder.setNeutralButton(text, null);
         return this;

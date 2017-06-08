@@ -205,7 +205,7 @@ public class ShowActivity extends ActivityBase {
 
         getFragmentManager().beginTransaction()
                 .setCustomAnimations(R.animator.slide_in_right, R.animator.slide_out_left, 0, 0)
-                .replace(R.id.fragmentContainerShow, new EpisodesFragment())
+                .replace(R.id.fragmentContainerShow, new EpisodesFragment(), "episodesFragment")
                 .commit();
 
         visibleFragment = "episodes";
@@ -215,7 +215,7 @@ public class ShowActivity extends ActivityBase {
 
         getFragmentManager().beginTransaction()
                 .setCustomAnimations(R.animator.slide_in_left, R.animator.slide_out_right, 0, 0)
-                .replace(R.id.fragmentContainerShow, new SeasonsFragment())
+                .replace(R.id.fragmentContainerShow, new SeasonsFragment(), "seasonFragment")
                 .commit();
 
         visibleFragment = "seasons";
@@ -223,9 +223,13 @@ public class ShowActivity extends ActivityBase {
 
     public void switchEpisodesToHosters() {
 
+        getFragmentManager().beginTransaction()
+                .remove(getFragmentManager().findFragmentByTag("episodesFragment"))
+                .commit();
+
         getSupportFragmentManager().beginTransaction()
                 //.setCustomAnimations(R.animator.slide_in_right, R.animator.slide_out_left, 0, 0)
-                .replace(R.id.fragmentContainerShow, new HosterFragment())
+                .replace(R.id.fragmentContainerShow, new HosterFragment(), "hosterFragment")
                 .commit();
 
         visibleFragment = "hoster";
@@ -233,9 +237,13 @@ public class ShowActivity extends ActivityBase {
 
     public void switchHosterToEpisodes() {
 
+        getSupportFragmentManager().beginTransaction()
+                .remove(getSupportFragmentManager().findFragmentByTag("hosterFragment"))
+                .commit();
+
         getFragmentManager().beginTransaction()
                 .setCustomAnimations(R.animator.slide_in_left, R.animator.slide_out_right, 0, 0)
-                .replace(R.id.fragmentContainerShow, new EpisodesFragment())
+                .replace(R.id.fragmentContainerShow, new EpisodesFragment(), "episodesFragment")
                 .commit();
 
         visibleFragment = "episodes";

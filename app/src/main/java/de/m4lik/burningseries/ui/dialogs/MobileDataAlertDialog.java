@@ -23,6 +23,7 @@ package de.m4lik.burningseries.ui.dialogs;
 
 import android.app.Activity;
 import android.app.Dialog;
+import android.content.Intent;
 import android.os.Bundle;
 
 import de.m4lik.burningseries.ActivityComponent;
@@ -36,8 +37,18 @@ import de.m4lik.burningseries.ui.base.DialogBase;
 
 public class MobileDataAlertDialog extends DialogBase {
 
-    public static MobileDataAlertDialog newInstace() {
-        return new MobileDataAlertDialog();
+    public static MobileDataAlertDialog newInstance(int linkID, String playerType) {
+        Bundle args = new Bundle();
+        args.putInt("linkID", linkID);
+        args.putString("playerType", playerType);
+
+        System.out.println(linkID);
+        System.out.println(playerType);
+
+        MobileDataAlertDialog dialog = new MobileDataAlertDialog();
+        dialog.setArguments(args);
+        System.out.println(dialog.getArguments().getString("playerType"));
+        return dialog;
     }
 
     @Override
@@ -50,10 +61,14 @@ public class MobileDataAlertDialog extends DialogBase {
         return DialogBuilder.start(getActivity())
                 .title("Mobile Daten")
                 .content("Achtung! Du bist über mobile Daten im Internet. Willst du Fortfahren?")
-                .positive("Weiter", dialog ->
-                        getTargetFragment()
-                                .onActivityResult(
-                                        getTargetRequestCode(), Activity.RESULT_OK, null))
+                .positive("Weiter", dialog -> {
+                    Intent i = new Intent();
+                    i.putExtra("linkID", getArguments().getInt("linkID"));
+                    i.putExtra("playerType", getArguments().getString("playerType"));
+                    getTargetFragment().onActivityResult(
+                            getTargetRequestCode(), Activity.RESULT_OK, i);
+
+                })
                 .negative("Abbruch", dialog -> dismiss())
                 .cancelable()
                 .build();

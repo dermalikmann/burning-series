@@ -42,10 +42,9 @@ import de.m4lik.burningseries.ui.ShowActivity;
 import de.m4lik.burningseries.ui.dialogs.BusyDialog;
 import de.m4lik.burningseries.ui.dialogs.DialogBuilder;
 import de.m4lik.burningseries.ui.dialogs.MobileDataAlertDialog;
+import de.m4lik.burningseries.ui.dialogs.PlayerChooserDialog;
 import de.m4lik.burningseries.ui.listitems.HosterListItem;
-import de.m4lik.burningseries.ui.listitems.PlayerChooserListItem;
 import de.m4lik.burningseries.ui.viewAdapters.HosterRecyclerAdapter;
-import de.m4lik.burningseries.ui.viewAdapters.PlayerChooserListAdapter;
 import de.m4lik.burningseries.util.AndroidUtility;
 import de.m4lik.burningseries.util.Settings;
 import de.m4lik.burningseries.util.listeners.RecyclerItemClickListener;
@@ -63,18 +62,19 @@ public class HosterFragment extends Fragment implements Callback<EpisodeObj> {
 
     View rootView;
 
-    Integer selectedShow;
-    Integer selectedSeason;
-    Integer selectedEpisode;
-    String showName;
-    String episodeName;
-    String userSession;
-    List<HosterListItem> hosterList = new ArrayList<>();
-    String hosterReturn;
+    private Integer selectedShow;
+    private Integer selectedSeason;
+    private Integer selectedEpisode;
+    private String showName;
+    private String episodeName;
+    private String userSession;
+    private List<HosterListItem> hosterList = new ArrayList<>();
+    private String hosterReturn;
+
     @BindView(R.id.hosterRecyclerView)
     RecyclerView hosterRecyclerView;
+
     private int linkID;
-    private String playerType;
 
 
     public HosterFragment() {}
@@ -130,7 +130,7 @@ public class HosterFragment extends Fragment implements Callback<EpisodeObj> {
 
     @Override
     public void onActivityResult(int requestCode, int resultCode, Intent data) {
-        showVideo();
+        showVideo(data.getIntExtra("linkID", 0), data.getStringExtra("playerType"));
     }
 
     private void refreshList() {
@@ -146,62 +146,36 @@ public class HosterFragment extends Fragment implements Callback<EpisodeObj> {
                                 AndroidUtility.isOnMobile(getActivity())) {
                             TextView idView = (TextView) view.findViewById(R.id.linkId);
                             linkID = Integer.parseInt(idView.getText().toString());
-                            playerType = defaultPlayer;
 
-                            MobileDataAlertDialog dialog = MobileDataAlertDialog.newInstace();
+                            System.out.println(linkID);
+                            System.out.println(defaultPlayer);
+
+                            MobileDataAlertDialog dialog = MobileDataAlertDialog.newInstance(linkID, defaultPlayer);
                             dialog.setTargetFragment(HosterFragment.this, 0);
                             dialog.show(getActivity().getSupportFragmentManager(), null);
 
                         } else {
-                            showVideo();
+                            TextView idView = (TextView) view.findViewById(R.id.linkId);
+                            linkID = Integer.parseInt(idView.getText().toString());
+                            showVideo(linkID, defaultPlayer);
                         }
                     }
 
                     @Override
                     public void onLongItemClick(View view, int position) {
-                        if (Settings.of(getActivity()).alarmOnMobile() &&
-                                AndroidUtility.isOnMobile(getActivity())) {
-                            List<PlayerChooserListItem> players = new ArrayList<>();
 
-                            if (hosterList.get(position).isSupported()) {
-                                players.add(new PlayerChooserListItem("Interner Player", "internal",
-                                        Settings.of(getActivity()).isDarkTheme() ?
-                                                R.drawable.ic_ondemand_video_white : R.drawable.ic_ondemand_video));
+                        PlayerChooserDialog dialog = PlayerChooserDialog.newInstance(
+                                hosterList.get(position).getLinkId(),
+                                hosterList.get(position).isSupported());
 
-                                players.add(new PlayerChooserListItem("Externer Player", "external",
-                                        Settings.of(getActivity()).isDarkTheme() ?
-                                                R.drawable.ic_live_tv_white : R.drawable.ic_live_tv));
-
-                                players.add(new PlayerChooserListItem("In-App Browser", "appbrowser",
-                                        Settings.of(getActivity()).isDarkTheme() ?
-                                                R.drawable.ic_open_in_browser_white : R.drawable.ic_open_in_browser));
-                            }
-
-                            players.add(new PlayerChooserListItem("Im Browser öffnen", "browser",
-                                    Settings.of(getActivity()).isDarkTheme() ?
-                                            R.drawable.ic_public_white : R.drawable.ic_public));
-
-                            DialogBuilder.start(getActivity())
-                                    .title(getString(R.string.choose_player_title))
-                                    .adapter(new PlayerChooserListAdapter(getActivity(), players), (dialog2, id) -> {
-                                        linkID = hosterList.get(position).getLinkId();
-                                        playerType = players.get(id).getType();
-
-                                        MobileDataAlertDialog dialog = MobileDataAlertDialog.newInstace();
-                                        dialog.setTargetFragment(HosterFragment.this, 0);
-                                        dialog.show(getActivity().getSupportFragmentManager(), null);
-                                    })
-                                    .cancelable()
-                                    .negative()
-                                    .build()
-                                    .show();
-                        }
+                        dialog.setTargetFragment(HosterFragment.this, 0);
+                        dialog.show(getActivity().getSupportFragmentManager(), null);
                     }
                 })
         );
     }
 
-    private void showVideo() {
+    private void showVideo(Integer linkID, String playerType) {
 
         API api = new API();
         api.setSession(userSession);

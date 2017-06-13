@@ -3,7 +3,6 @@ package de.m4lik.burningseries.ui;
 import android.animation.Animator;
 import android.animation.AnimatorListenerAdapter;
 import android.annotation.TargetApi;
-import android.content.Context;
 import android.content.Intent;
 import android.os.Build;
 import android.os.Bundle;
@@ -112,12 +111,12 @@ public class LoginActivity extends AppCompatActivity implements Callback<Respons
             //Try to login
             loginInProgress = true;
             showProgress(true);
-                API api = new API();
-                api.setSession("");
-                api.generateToken("login");
-                APIInterface apii = api.getInterface();
-                Call<ResponseBody> call = apii.login(api.getToken(), api.getUserAgent(), user, password);
-                call.enqueue(this);
+            API api = new API();
+            api.setSession("");
+            api.generateToken("login");
+            APIInterface apii = api.getInterface();
+            Call<ResponseBody> call = apii.login(api.getToken(), api.getUserAgent(), user, password);
+            call.enqueue(this);
         }
     }
 
@@ -126,11 +125,13 @@ public class LoginActivity extends AppCompatActivity implements Callback<Respons
         showProgress(false);
         try {
             String json = response.body().string();
-            if (json.contains("\"error\"")) {
-                userEditText.setError(getString(R.string.error_invalid_credentials));
+            if (json.contains("{\"error\":")) {
+                userEditText.setError(json.split(":\"")[1].split("\"")[0]);
+                userEditText.requestFocus();
                 Answers.getInstance().logLogin(new LoginEvent()
                         .putMethod("Username")
-                        .putSuccess(false));
+                        .putSuccess(false)
+                        .putCustomAttribute("Error", json));
             } else {
                 /*
                  * {"user":"name","session":"sessionstring"} -> sessionstring
@@ -148,8 +149,6 @@ public class LoginActivity extends AppCompatActivity implements Callback<Respons
                         .putString("pref_session", session)
                         .putString("pref_user", user)
                         .commit();
-
-                Context context = getApplicationContext();
 
                 getApplicationContext().deleteDatabase(MainDBHelper.DATABASE_NAME);
 

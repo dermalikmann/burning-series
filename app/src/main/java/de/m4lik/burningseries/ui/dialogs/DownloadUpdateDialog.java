@@ -2,6 +2,7 @@ package de.m4lik.burningseries.ui.dialogs;
 
 import android.annotation.SuppressLint;
 import android.app.Dialog;
+import android.os.Build;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.widget.ProgressBar;
@@ -72,6 +73,9 @@ public class DownloadUpdateDialog extends DialogBase {
         checkMainThread();
 
         progressBar.setIndeterminate(status.progress < 0);
-        progressBar.setProgress((int) (1000 * status.progress));
+        if (android.os.Build.VERSION.SDK_INT >= Build.VERSION_CODES.N)
+            progressBar.setProgress((int) (1000 * status.progress), true);
+        else
+            progressBar.setProgress((int) (1000 * status.progress));
     }
 }

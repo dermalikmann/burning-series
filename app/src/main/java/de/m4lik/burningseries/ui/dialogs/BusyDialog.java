@@ -56,12 +56,23 @@ public class BusyDialog extends DialogBase {
         return new BusyDialogOperator<>(activity.getSupportFragmentManager(), text, progressMapper);
     }
 
+    public static BusyDialog newInstance() {
+        return new BusyDialog();
+    }
+
+    public static BusyDialog newInstace(String text) {
+        BusyDialog dialog = new BusyDialog();
+        Bundle args = new Bundle();
+        args.putString("text", text);
+        dialog.setArguments(args);
+        return dialog;
+    }
+
     @NonNull
     @Override
     public Dialog onCreateDialog(Bundle savedInstanceState) {
         return DialogBuilder.start(getActivity())
                 .layout(R.layout.dialog_busy)
-                .cancelable()
                 .build();
     }
 
@@ -155,8 +166,6 @@ public class BusyDialog extends DialogBase {
                     if (progressMapper != null) {
                         float progress = progressMapper.call(value);
                         if (progress >= 0 && progress <= 1) {
-
-                            // get the dialog and show the progress value!
                             Fragment dialog = fragmentManager.findFragmentByTag(tag);
                             if (dialog instanceof BusyDialog) {
                                 ((BusyDialog) dialog).updateProgressValue(progress);

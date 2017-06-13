@@ -44,10 +44,8 @@ public abstract class DialogBase extends RxAppCompatDialogFragment {
     public void onStart() {
         super.onStart();
 
-        // bind dialog. It is only created in on start.
         Dialog dialog = getDialog();
         if (dialog != null) {
-            Log.d("BSDB", "Trying to bind views.");
             unbinder = ButterKnife.bind(this, dialog);
             onDialogViewCreated();
         }

@@ -30,8 +30,10 @@ import static org.joda.time.Instant.now;
 public class UpdateDialog extends DialogBase {
     private static final String KEY_LAST_UPDATE_CHECK = "pref_last_update";
     private static final Observable.Operator<Update, Update> NOOP = subscriber -> subscriber;
+
     @Inject
     DownloadManager downloadManager;
+
     @Inject
     SharedPreferences sharedPreferences;
 
@@ -73,7 +75,7 @@ public class UpdateDialog extends DialogBase {
                 .doAfterTerminate(storeCheckTime)
                 .subscribe(update -> {
                     if (interactive || update != null) {
-                        UpdateDialog dialog = newInstance((Update) update);
+                        UpdateDialog dialog = newInstance(update);
                         dialog.show(activity.getSupportFragmentManager(), null);
                     }
                 }, Actions.empty());

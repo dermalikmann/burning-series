@@ -1,8 +1,7 @@
 package de.m4lik.burningseries.ui.showFragments;
 
 
-import android.app.Fragment;
-import android.app.ProgressDialog;
+import android.annotation.SuppressLint;
 import android.content.ContentValues;
 import android.content.Intent;
 import android.database.sqlite.SQLiteDatabase;
@@ -11,6 +10,7 @@ import android.os.AsyncTask;
 import android.os.Bundle;
 import android.support.customtabs.CustomTabsIntent;
 import android.support.design.widget.Snackbar;
+import android.support.v4.app.Fragment;
 import android.support.v4.content.ContextCompat;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
@@ -21,8 +21,6 @@ import android.webkit.WebView;
 import android.webkit.WebViewClient;
 import android.widget.TextView;
 
-import java.io.PrintWriter;
-import java.io.StringWriter;
 import java.net.URL;
 import java.net.URLConnection;
 import java.util.ArrayList;
@@ -41,11 +39,12 @@ import de.m4lik.burningseries.database.MainDBHelper;
 import de.m4lik.burningseries.hoster.Hoster;
 import de.m4lik.burningseries.ui.FullscreenVideoActivity;
 import de.m4lik.burningseries.ui.ShowActivity;
+import de.m4lik.burningseries.ui.dialogs.BusyDialog;
 import de.m4lik.burningseries.ui.dialogs.DialogBuilder;
+import de.m4lik.burningseries.ui.dialogs.MobileDataAlertDialog;
+import de.m4lik.burningseries.ui.dialogs.PlayerChooserDialog;
 import de.m4lik.burningseries.ui.listitems.HosterListItem;
-import de.m4lik.burningseries.ui.listitems.PlayerChooserListItem;
 import de.m4lik.burningseries.ui.viewAdapters.HosterRecyclerAdapter;
-import de.m4lik.burningseries.ui.viewAdapters.PlayerChooserListAdapter;
 import de.m4lik.burningseries.util.AndroidUtility;
 import de.m4lik.burningseries.util.Settings;
 import de.m4lik.burningseries.util.listeners.RecyclerItemClickListener;
@@ -63,26 +62,22 @@ public class HosterFragment extends Fragment implements Callback<EpisodeObj> {
 
     View rootView;
 
-    Integer selectedShow;
-    Integer selectedSeason;
-    Integer selectedEpisode;
-    String showName;
-    String episodeName;
-
-    String userSession;
-
-    ProgressDialog progressDialog;
-
-    List<HosterListItem> hosterList = new ArrayList<>();
-    String hosterReturn;
+    private Integer selectedShow;
+    private Integer selectedSeason;
+    private Integer selectedEpisode;
+    private String showName;
+    private String episodeName;
+    private String userSession;
+    private List<HosterListItem> hosterList = new ArrayList<>();
+    private String hosterReturn;
 
     @BindView(R.id.hosterRecyclerView)
     RecyclerView hosterRecyclerView;
 
+    private int linkID;
 
-    public HosterFragment() {
-        // Required empty public constructor
-    }
+
+    public HosterFragment() {}
 
 
     @Override
@@ -133,6 +128,11 @@ public class HosterFragment extends Fragment implements Callback<EpisodeObj> {
         snackbar.show();
     }
 
+    @Override
+    public void onActivityResult(int requestCode, int resultCode, Intent data) {
+        showVideo(data.getIntExtra("linkID", 0), data.getStringExtra("playerType"));
+    }
+
     private void refreshList() {
 
         hosterRecyclerView.setLayoutManager(new LinearLayoutManager(getActivity(), LinearLayoutManager.VERTICAL, false));
@@ -144,80 +144,44 @@ public class HosterFragment extends Fragment implements Callback<EpisodeObj> {
                         String defaultPlayer = hosterList.get(position).isSupported() ? "internal" : "appbrowser";
                         if (Settings.of(getActivity()).alarmOnMobile() &&
                                 AndroidUtility.isOnMobile(getActivity())) {
+                            TextView idView = (TextView) view.findViewById(R.id.linkId);
+                            linkID = Integer.parseInt(idView.getText().toString());
 
-                            DialogBuilder.start(getActivity())
-                                    .title("Mobile Daten")
-                                    .content("Achtung! Du bist über mobile Daten im Internet. Willst du Fortfahren?")
-                                    .positive("Weiter", dialog -> {
-                                        TextView idView = (TextView) view.findViewById(R.id.linkId);
-                                        showVideo(Integer.parseInt(idView.getText().toString()), defaultPlayer);
-                                    })
-                                    .negative()
-                                    .cancelable()
-                                    .build()
-                                    .show();
+                            System.out.println(linkID);
+                            System.out.println(defaultPlayer);
+
+                            MobileDataAlertDialog dialog = MobileDataAlertDialog.newInstance(linkID, defaultPlayer);
+                            dialog.setTargetFragment(HosterFragment.this, 0);
+                            dialog.show(getActivity().getSupportFragmentManager(), null);
 
                         } else {
-                            showVideo(hosterList.get(position).getLinkId(), defaultPlayer);
+                            TextView idView = (TextView) view.findViewById(R.id.linkId);
+                            linkID = Integer.parseInt(idView.getText().toString());
+                            showVideo(linkID, defaultPlayer);
                         }
                     }
 
                     @Override
                     public void onLongItemClick(View view, int position) {
-                        if (Settings.of(getActivity()).alarmOnMobile() &&
-                                AndroidUtility.isOnMobile(getActivity())) {
-                            List<PlayerChooserListItem> players = new ArrayList<>();
 
-                            if (hosterList.get(position).isSupported()) {
-                                players.add(new PlayerChooserListItem("Interner Player", "internal",
-                                        Settings.of(getActivity()).isDarkTheme() ?
-                                                R.drawable.ic_ondemand_video_white : R.drawable.ic_ondemand_video));
+                        PlayerChooserDialog dialog = PlayerChooserDialog.newInstance(
+                                hosterList.get(position).getLinkId(),
+                                hosterList.get(position).isSupported());
 
-                                players.add(new PlayerChooserListItem("Externer Player", "external",
-                                        Settings.of(getActivity()).isDarkTheme() ?
-                                                R.drawable.ic_live_tv_white : R.drawable.ic_live_tv));
-
-                                players.add(new PlayerChooserListItem("In-App Browser", "appbrowser",
-                                        Settings.of(getActivity()).isDarkTheme() ?
-                                                R.drawable.ic_open_in_browser_white : R.drawable.ic_open_in_browser));
-                            }
-
-                            players.add(new PlayerChooserListItem("Im Browser öffnen", "browser",
-                                    Settings.of(getActivity()).isDarkTheme() ?
-                                            R.drawable.ic_public_white : R.drawable.ic_public));
-
-                            DialogBuilder.start(getActivity())
-                                    .title(getString(R.string.choose_player_title))
-                                    .adapter(new PlayerChooserListAdapter(getActivity(), players), (dialog2, id) -> {
-
-                                        DialogBuilder.start(getActivity())
-                                                .title("Mobile Daten")
-                                                .content("Achtung! Du bist über mobile Daten im Internet. Willst du Fortfahren?")
-                                                .positive("Weiter", dialog -> {
-                                                    showVideo(hosterList.get(position).getLinkId(), players.get(id).getType());
-                                                })
-                                                .negative()
-                                                .cancelable()
-                                                .build()
-                                                .show();
-                                    })
-                                    .cancelable()
-                                    .negative()
-                                    .build()
-                                    .show();
-                        }
+                        dialog.setTargetFragment(HosterFragment.this, 0);
+                        dialog.show(getActivity().getSupportFragmentManager(), null);
                     }
                 })
         );
     }
 
-    private void showVideo(Integer id, String type) {
+    private void showVideo(Integer linkID, String playerType) {
 
         API api = new API();
         api.setSession(userSession);
-        api.generateToken("watch/" + id);
+        api.generateToken("watch/" + linkID);
         APIInterface apii = api.getInterface();
-        Call<VideoObj> call = apii.watch(api.getToken(), api.getUserAgent(), id, api.getSession());
+        Call<VideoObj> call = apii.watch(api.getToken(), api.getUserAgent(), linkID, api.getSession());
         call.enqueue(new Callback<VideoObj>() {
             @Override
             public void onResponse(Call<VideoObj> call, Response<VideoObj> response) {
@@ -225,7 +189,7 @@ public class HosterFragment extends Fragment implements Callback<EpisodeObj> {
 
                 String hoster = videoObj.getHoster().toLowerCase();
 
-                switch (type) {
+                switch (playerType) {
                     case "internal":
                         if (hoster.equals("openload") || hoster.equals("openloadhd")) {
                             //Openload(videoObj.getUrl(), false);
@@ -280,29 +244,28 @@ public class HosterFragment extends Fragment implements Callback<EpisodeObj> {
                 snackbarView.setBackgroundColor(ContextCompat.getColor(getActivity(), theme().primaryColorDark));
                 snackbar.show();
 
-
-                final StringWriter sw = new StringWriter();
-                final PrintWriter pw = new PrintWriter(sw, true);
-                t.printStackTrace(pw);
-
                 DialogBuilder.start(getActivity())
-                        .title("Error")
-                        .content(sw.getBuffer().toString())
+                        .title("Unerwartete Antwort")
+                        .content("Hmm, da ist was schief gelaufen. Hast du vielleicht ein paarmal schnell hintereinander auf einen Hoster getippt?\n" +
+                                "Wenn ja, warte eine halbe Minute, dann sollte wieder alles funktionieren ;)")
                         .negative()
                         .build().show();
             }
         });
     }
 
-    private void Openload(String videoID, Boolean external) {
+    @SuppressLint("SetJavaScriptEnabled")
+    private void Openload(String content, Boolean external) {
         try {
+            BusyDialog dialog = BusyDialog.newInstace("Hoster wird geöffnet....");
+
             WebView wv = new WebView(getActivity());
             wv.getSettings().setJavaScriptEnabled(true);
             wv.setWebViewClient(new WebViewClient() {
                 @Override
                 public void onPageFinished(WebView view, String url) {
                     view.evaluateJavascript("document.getElementById('streamurl').innerHTML", valueFromJS -> {
-                                progressDialog.dismiss();
+                                dialog.dismiss();
                                 String vurl = "https://openload.co/stream/" + valueFromJS.replace("\"", "") + "?mime=true";
                                 if (!external) {
                                     Intent intent = new Intent(getActivity().getApplicationContext(), FullscreenVideoActivity.class);
@@ -317,13 +280,8 @@ public class HosterFragment extends Fragment implements Callback<EpisodeObj> {
                 }
             });
 
-            //wv.loadUrl(fullURL);
-            wv.loadDataWithBaseURL("https://openload.co", videoID, null, null, null);
-
-            progressDialog = new ProgressDialog(getActivity());
-            progressDialog.setMessage("Hoster wird geöffnet...");
-
-            progressDialog.show();
+            wv.loadDataWithBaseURL("https://openload.co", content, null, null, null);
+            dialog.show(getActivity().getSupportFragmentManager(), null);
         } catch (Exception e) {
             e.printStackTrace();
         }
@@ -334,7 +292,7 @@ public class HosterFragment extends Fragment implements Callback<EpisodeObj> {
         String content;
         Boolean external;
 
-        public OpenloadParser(String url, Boolean external) {
+        OpenloadParser(String url, Boolean external) {
             this.url = url;
             this.external = external;
         }
@@ -342,13 +300,14 @@ public class HosterFragment extends Fragment implements Callback<EpisodeObj> {
         @Override
         protected Void doInBackground(Void... params) {
             content = null;
-            URLConnection connection = null;
+            URLConnection connection;
             try {
                 connection = new URL(url).openConnection();
                 Scanner scanner = new Scanner(connection.getInputStream());
                 scanner.useDelimiter("\\Z");
                 content = scanner.next();
                 content = content.replace("<video", "<video preload=none");
+                scanner.close();
             } catch (Exception ex) {
                 ex.printStackTrace();
             }
@@ -365,6 +324,7 @@ public class HosterFragment extends Fragment implements Callback<EpisodeObj> {
     private class GetVideo extends AsyncTask<Void, Void, Void> {
 
         private VideoObj videoObj;
+        private BusyDialog dialog;
         private Boolean external;
 
         GetVideo(VideoObj videoObj) {
@@ -378,13 +338,8 @@ public class HosterFragment extends Fragment implements Callback<EpisodeObj> {
 
         @Override
         protected void onPreExecute() {
-
-            progressDialog = new ProgressDialog(getActivity());
-            progressDialog.setMessage("Hoster wird geöffnet...");
-
-            progressDialog.show();
-            progressDialog.setCancelable(false);
-            progressDialog.setCanceledOnTouchOutside(false);
+            dialog = BusyDialog.newInstace("Hoster wird geöffnet...");
+            dialog.show( getActivity().getSupportFragmentManager(), null);
             super.onPreExecute();
         }
 
@@ -399,7 +354,7 @@ public class HosterFragment extends Fragment implements Callback<EpisodeObj> {
         @Override
         protected void onPostExecute(Void aVoid) {
 
-            progressDialog.dismiss();
+            dialog.dismiss();
 
             Snackbar snackbar;
             View snackbarView;

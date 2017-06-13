@@ -11,6 +11,9 @@ import de.m4lik.burningseries.ui.StatisticsActivity;
 import de.m4lik.burningseries.ui.TabletShowActivity;
 import de.m4lik.burningseries.ui.dialogs.DownloadUpdateDialog;
 import de.m4lik.burningseries.ui.dialogs.ErrorDialog;
+import de.m4lik.burningseries.ui.dialogs.MobileDataAlertDialog;
+import de.m4lik.burningseries.ui.dialogs.PlayerChooserDialog;
+import de.m4lik.burningseries.ui.dialogs.ShowSyncDialog;
 import de.m4lik.burningseries.ui.dialogs.UpdateDialog;
 import de.m4lik.burningseries.util.ContextSingleton;
 
@@ -39,6 +42,12 @@ public interface ActivityComponent {
 
 
     void inject(DownloadUpdateDialog dialog);
+
+    void inject(MobileDataAlertDialog dialog);
+
+    void inject(PlayerChooserDialog dialog);
+
+    void inject(ShowSyncDialog dialog);
 
     void inject(ErrorDialog dialog);
 

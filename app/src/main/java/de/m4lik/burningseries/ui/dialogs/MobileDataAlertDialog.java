@@ -27,6 +27,7 @@ import android.content.Intent;
 import android.os.Bundle;
 
 import de.m4lik.burningseries.ActivityComponent;
+import de.m4lik.burningseries.ui.TabletShowActivity;
 import de.m4lik.burningseries.ui.base.DialogBase;
 
 /**
@@ -65,9 +66,13 @@ public class MobileDataAlertDialog extends DialogBase {
                     Intent i = new Intent();
                     i.putExtra("linkID", getArguments().getInt("linkID"));
                     i.putExtra("playerType", getArguments().getString("playerType"));
-                    getTargetFragment().onActivityResult(
-                            getTargetRequestCode(), Activity.RESULT_OK, i);
 
+                    if (getTargetFragment() != null)
+                        getTargetFragment().onActivityResult(
+                                getTargetRequestCode(), Activity.RESULT_OK, i);
+                    else
+                        ((TabletShowActivity) getActivity())
+                                .onDialogCallback(0, Activity.RESULT_OK, i);
                 })
                 .negative("Abbruch", dialog -> dismiss())
                 .cancelable()

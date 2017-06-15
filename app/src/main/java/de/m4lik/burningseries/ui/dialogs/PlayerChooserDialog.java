@@ -10,6 +10,7 @@ import java.util.List;
 
 import de.m4lik.burningseries.ActivityComponent;
 import de.m4lik.burningseries.R;
+import de.m4lik.burningseries.ui.TabletShowActivity;
 import de.m4lik.burningseries.ui.base.DialogBase;
 import de.m4lik.burningseries.ui.listitems.PlayerChooserListItem;
 import de.m4lik.burningseries.ui.viewAdapters.PlayerChooserListAdapter;
@@ -65,14 +66,20 @@ public class PlayerChooserDialog extends DialogBase {
                             AndroidUtility.isOnMobile(getActivity())) {
                         MobileDataAlertDialog dialog = MobileDataAlertDialog
                                 .newInstance(getArguments().getInt("linkID"), players.get(id).getType());
-                        dialog.setTargetFragment(getTargetFragment(), 0);
+                        if (getTargetFragment() != null)
+                            dialog.setTargetFragment(getTargetFragment(), 0);
                         dialog.show(getActivity().getSupportFragmentManager(), null);
                     } else {
                         Intent i = new Intent();
                         i.putExtra("linkID", getArguments().getInt("linkID"));
                         i.putExtra("playerType", players.get(id).getType());
-                        getTargetFragment().onActivityResult(
-                                getTargetRequestCode(), Activity.RESULT_OK, i);
+
+                        if (getTargetFragment() != null)
+                            getTargetFragment().onActivityResult(
+                                    getTargetRequestCode(), Activity.RESULT_OK, i);
+                        else
+                            ((TabletShowActivity) getActivity())
+                                    .onDialogCallback(0, Activity.RESULT_OK, i);
                     }
                 })
                 .cancelable()

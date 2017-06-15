@@ -46,15 +46,19 @@ import de.m4lik.burningseries.hoster.Hoster;
 import de.m4lik.burningseries.ui.base.ActivityBase;
 import de.m4lik.burningseries.ui.dialogs.BusyDialog;
 import de.m4lik.burningseries.ui.dialogs.DialogBuilder;
+import de.m4lik.burningseries.ui.dialogs.MobileDataAlertDialog;
+import de.m4lik.burningseries.ui.dialogs.PlayerChooserDialog;
 import de.m4lik.burningseries.ui.listitems.EpisodeListItem;
 import de.m4lik.burningseries.ui.listitems.HosterListItem;
 import de.m4lik.burningseries.ui.listitems.PlayerChooserListItem;
 import de.m4lik.burningseries.ui.listitems.SeasonListItem;
+import de.m4lik.burningseries.ui.showFragments.HosterFragment;
 import de.m4lik.burningseries.ui.viewAdapters.EpisodesRecyclerAdapter;
 import de.m4lik.burningseries.ui.viewAdapters.HosterRecyclerAdapter;
 import de.m4lik.burningseries.ui.viewAdapters.PlayerChooserListAdapter;
 import de.m4lik.burningseries.ui.viewAdapters.SeasonsListAdapter;
 import de.m4lik.burningseries.util.AndroidUtility;
+import de.m4lik.burningseries.util.DialogCallback;
 import de.m4lik.burningseries.util.Settings;
 import de.m4lik.burningseries.util.ShowUtils;
 import de.m4lik.burningseries.util.listeners.RecyclerItemClickListener;
@@ -65,7 +69,7 @@ import retrofit2.Response;
 import static de.m4lik.burningseries.database.SeriesContract.historyTable;
 import static de.m4lik.burningseries.services.ThemeHelperService.theme;
 
-public class TabletShowActivity extends ActivityBase {
+public class TabletShowActivity extends ActivityBase implements DialogCallback{
 
     Integer currentShow;
     Integer currentSeason;
@@ -125,7 +129,7 @@ public class TabletShowActivity extends ActivityBase {
     List<EpisodeListItem> episodes = new ArrayList<>();
     List<HosterListItem> hosterList = new ArrayList<>();
 
-    Intent i;
+    private int linkID;
 
     @Override
     protected void injectComponent(ActivityComponent appComponent) {
@@ -138,7 +142,7 @@ public class TabletShowActivity extends ActivityBase {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_show_tablet);
 
-        i = getIntent();
+        Intent i = getIntent();
 
         findViewById(R.id.descriptionTV).setBackground(ContextCompat.getDrawable(TabletShowActivity.this, theme().listItemBackground));
 
@@ -193,6 +197,10 @@ public class TabletShowActivity extends ActivityBase {
         setupHosterList();
     }
 
+    @Override
+    public void onDialogCallback(int requestCode, int resultCode, Intent data) {
+        onActivityResult(requestCode, resultCode, data);
+    }
 
     public void showSeason(final Integer season) {
 
@@ -352,71 +360,33 @@ public class TabletShowActivity extends ActivityBase {
                 new RecyclerItemClickListener(TabletShowActivity.this, hosterRecyclerView, new RecyclerItemClickListener.OnItemClickListener() {
                     @Override
                     public void onItemClick(View view, int position) {
-                        String playerType = hosterList.get(position).isSupported() ? "internal" : "appbrowser";
+                        String defaultPlayer = hosterList.get(position).isSupported() ? "internal" : "appbrowser";
                         if (Settings.of(TabletShowActivity.this).alarmOnMobile() &&
                                 AndroidUtility.isOnMobile(TabletShowActivity.this)) {
+                            TextView idView = (TextView) view.findViewById(R.id.linkId);
+                            linkID = Integer.parseInt(idView.getText().toString());
 
-                            DialogBuilder.start(TabletShowActivity.this)
-                                    .title("Mobile Daten")
-                                    .content("Achtung! Du bist über mobile Daten im Internet. Willst du Fortfahren?")
-                                    .positive("Weiter", dialog -> {
-                                        TextView idView = (TextView) view.findViewById(R.id.linkId);
-                                        showVideo(Integer.parseInt(idView.getText().toString()), playerType);
-                                    })
-                                    .negative()
-                                    .cancelable()
-                                    .build()
-                                    .show();
+                            System.out.println(linkID);
+                            System.out.println(defaultPlayer);
+
+                            MobileDataAlertDialog dialog = MobileDataAlertDialog.newInstance(linkID, defaultPlayer);
+                            dialog.show(TabletShowActivity.this.getSupportFragmentManager(), null);
 
                         } else {
-                            showVideo(hosterList.get(position).getLinkId(), playerType);
+                            TextView idView = (TextView) view.findViewById(R.id.linkId);
+                            linkID = Integer.parseInt(idView.getText().toString());
+                            showVideo(linkID, defaultPlayer);
                         }
                     }
 
                     @Override
                     public void onLongItemClick(View view, int position) {
-                        if (Settings.of(TabletShowActivity.this).alarmOnMobile() &&
-                                AndroidUtility.isOnMobile(TabletShowActivity.this)) {
-                            List<PlayerChooserListItem> players = new ArrayList<>();
 
-                            if (hosterList.get(position).isSupported()) {
-                                players.add(new PlayerChooserListItem("Interner Player", "internal",
-                                        Settings.of(TabletShowActivity.this).isDarkTheme() ?
-                                                R.drawable.ic_ondemand_video_white : R.drawable.ic_ondemand_video));
+                        PlayerChooserDialog dialog = PlayerChooserDialog.newInstance(
+                                hosterList.get(position).getLinkId(),
+                                hosterList.get(position).isSupported());
 
-                                players.add(new PlayerChooserListItem("Externer Player", "external",
-                                        Settings.of(TabletShowActivity.this).isDarkTheme() ?
-                                                R.drawable.ic_live_tv_white : R.drawable.ic_live_tv));
-
-                                players.add(new PlayerChooserListItem("In-App Browser", "appbrowser",
-                                        Settings.of(TabletShowActivity.this).isDarkTheme() ?
-                                                R.drawable.ic_open_in_browser_white : R.drawable.ic_open_in_browser));
-                            }
-
-                            players.add(new PlayerChooserListItem("Im Browser öffnen", "browser",
-                                    Settings.of(TabletShowActivity.this).isDarkTheme() ?
-                                            R.drawable.ic_public_white : R.drawable.ic_public));
-
-                            DialogBuilder.start(TabletShowActivity.this)
-                                    .title(getString(R.string.choose_player_title))
-                                    .adapter(new PlayerChooserListAdapter(TabletShowActivity.this, players), (dialog2, id) ->
-
-                                        DialogBuilder.start(TabletShowActivity.this)
-                                                .title("Mobile Daten")
-                                                .content("Achtung! Du bist über mobile Daten im Internet. Willst du Fortfahren?")
-                                                .positive("Weiter", dialog ->
-                                                    showVideo(hosterList.get(position).getLinkId(), players.get(id).getType())
-                                                )
-                                                .negative()
-                                                .cancelable()
-                                                .build()
-                                                .show()
-                                    )
-                                    .cancelable()
-                                    .negative()
-                                    .build()
-                                    .show();
-                        }
+                        dialog.show(TabletShowActivity.this.getSupportFragmentManager(), null);
                     }
                 })
         );

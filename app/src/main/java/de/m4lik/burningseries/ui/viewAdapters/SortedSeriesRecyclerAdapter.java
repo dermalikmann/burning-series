@@ -113,7 +113,10 @@ public class SortedSeriesRecyclerAdapter extends RecyclerView.Adapter<SortedSeri
 
     public void remove(List<ShowListItem> models) {
         showListItemSortedList.beginBatchedUpdates();
-        models.forEach(showListItemSortedList::remove);
+        for (ShowListItem item :
+                models) {
+            showListItemSortedList.remove(item);
+        }
         showListItemSortedList.endBatchedUpdates();
     }
 
@@ -141,13 +144,15 @@ public class SortedSeriesRecyclerAdapter extends RecyclerView.Adapter<SortedSeri
         public void bind(ShowListItem item) {
             binding.setShow(item);
             binding.getRoot().findViewById(R.id.listItemContainer).setBackground(ContextCompat.getDrawable(context, theme().listItemBackground));
-            if (!item.loaded && Settings.of(context).showCovers())
-                Glide.with(context)
-                        .load(Uri.parse("https://bs.to/public/img/cover/" + item.getId() + ".jpg"))
-                        .into((ImageView) binding.getRoot().findViewById(R.id.coverImage));
 
-            if (!Settings.of(context).showCovers()) {
-                binding.getRoot().findViewById(R.id.coverImage).setVisibility(View.GONE);
+            ImageView coverImage = (ImageView) binding.getRoot().findViewById(R.id.coverImage);
+
+            if (Settings.of(context).showCovers()) {
+                    Glide.with(context)
+                            .load(Uri.parse("https://bs.to/public/img/cover/" + item.getId() + ".jpg"))
+                            .into(coverImage);
+            } else {
+                coverImage.setVisibility(View.GONE);
             }
 
             item.loaded = true;

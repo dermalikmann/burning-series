@@ -28,7 +28,7 @@ public class EpisodeObj {
         return episode;
     }
 
-    public Hoster[] getHoster() {
+    public Hoster[] getHosters() {
         return hoster;
     }
 
@@ -75,7 +75,7 @@ public class EpisodeObj {
             this.id = id;
         }
 
-        public String getHoster() {
+        public String getName() {
             return hoster;
         }
 

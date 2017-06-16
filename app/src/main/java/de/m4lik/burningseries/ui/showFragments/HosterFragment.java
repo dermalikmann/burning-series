@@ -109,12 +109,12 @@ public class HosterFragment extends Fragment implements Callback<EpisodeObj> {
     public void onResponse(Call<EpisodeObj> call, Response<EpisodeObj> response) {
         EpisodeObj episode = response.body();
 
-        for (EpisodeObj.Hoster hoster : episode.getHoster())
-            if (Hoster.compatibleHosters.contains(hoster.getHoster()))
-                hosterList.add(new HosterListItem(hoster.getLinkId(), hoster.getHoster(), hoster.getPart(), true));
-        for (EpisodeObj.Hoster hoster : episode.getHoster())
-            if (!Hoster.compatibleHosters.contains(hoster.getHoster()))
-                hosterList.add(new HosterListItem(hoster.getLinkId(), hoster.getHoster(), hoster.getPart()));
+        for (EpisodeObj.Hoster hoster : episode.getHosters())
+            if (Hoster.compatibleHosters.contains(hoster.getName()))
+                hosterList.add(new HosterListItem(hoster.getLinkId(), hoster.getName(), hoster.getPart(), true));
+        for (EpisodeObj.Hoster hoster : episode.getHosters())
+            if (!Hoster.compatibleHosters.contains(hoster.getName()))
+                hosterList.add(new HosterListItem(hoster.getLinkId(), hoster.getName(), hoster.getPart()));
 
         refreshList();
     }
@@ -270,6 +270,10 @@ public class HosterFragment extends Fragment implements Callback<EpisodeObj> {
                                 if (!external) {
                                     Intent intent = new Intent(getActivity().getApplicationContext(), FullscreenVideoActivity.class);
                                     intent.putExtra("burning-series.videoURL", vurl);
+                                    intent.putExtra("show", selectedShow);
+                                    intent.putExtra("season", selectedSeason);
+                                    intent.putExtra("episode", selectedEpisode);
+                                    intent.putExtra("hoster", "openload");
                                     startActivity(intent);
                                 } else {
                                     Intent browserIntent = new Intent(Intent.ACTION_VIEW, Uri.parse(vurl));
@@ -395,6 +399,10 @@ public class HosterFragment extends Fragment implements Callback<EpisodeObj> {
             if (!external) {
                 Intent intent = new Intent(getActivity().getApplicationContext(), FullscreenVideoActivity.class);
                 intent.putExtra("burning-series.videoURL", hosterReturn);
+                intent.putExtra("show", selectedShow);
+                intent.putExtra("season", selectedSeason);
+                intent.putExtra("episode", selectedEpisode);
+                intent.putExtra("hoster", videoObj.getHoster().toLowerCase());
                 startActivity(intent);
             } else {
                 Intent browserIntent = new Intent(Intent.ACTION_VIEW, Uri.parse(hosterReturn));

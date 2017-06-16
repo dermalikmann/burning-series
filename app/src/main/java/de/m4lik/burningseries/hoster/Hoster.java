@@ -31,7 +31,6 @@ public class Hoster {
 
     public static final List<String> compatibleHosters = new ArrayList<>();
     private static final String[] userAgents;
-    private Context context;
 
     static {
         compatibleHosters.add("PowerWatch");

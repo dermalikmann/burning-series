@@ -2,60 +2,75 @@ package de.m4lik.burningseries.ui;
 
 import android.annotation.SuppressLint;
 import android.app.ActionBar;
-import android.content.Context;
 import android.content.Intent;
 import android.net.Uri;
 import android.os.Bundle;
 import android.os.Handler;
-import android.support.annotation.IntRange;
+import android.support.design.widget.Snackbar;
 import android.support.v4.app.NavUtils;
-import android.util.AttributeSet;
+import android.support.v4.content.ContextCompat;
 import android.util.Patterns;
 import android.view.MenuItem;
 import android.view.View;
+import android.widget.ImageButton;
 
 import com.crashlytics.android.answers.Answers;
 import com.crashlytics.android.answers.CustomEvent;
-import com.devbrackets.android.exomedia.ui.widget.VideoControls;
 import com.devbrackets.android.exomedia.ui.widget.VideoView;
+
+import java.util.ArrayList;
 
 import de.m4lik.burningseries.ActivityComponent;
 import de.m4lik.burningseries.R;
+import de.m4lik.burningseries.api.API;
+import de.m4lik.burningseries.api.APIInterface;
+import de.m4lik.burningseries.api.objects.EpisodeObj;
+import de.m4lik.burningseries.hoster.Hoster;
 import de.m4lik.burningseries.ui.base.ActivityBase;
 import de.m4lik.burningseries.ui.dialogs.DialogBuilder;
+import de.m4lik.burningseries.util.Settings;
+import retrofit2.Call;
+import retrofit2.Callback;
+import retrofit2.Response;
 
 /**
  * An example full-screen activity that shows and hides the system UI (i.e.
  * status bar and navigation/system bar) with user interaction.
  */
-public class FullscreenVideoActivity extends ActivityBase {
+public class FullscreenVideoActivity extends ActivityBase implements Callback<EpisodeObj> {
 
     private static final int UI_ANIMATION_DELAY = 300;
     private final Handler mHideHandler = new Handler();
-    private final Runnable mShowPart2Runnable = () -> {
 
+    private View mContentView;
+    private VideoView videoView;
+
+    private long position = 0;
+    private boolean visible;
+
+    private Integer show;
+    private Integer season;
+    private Integer episode;
+    private String hoster;
+
+    private final Runnable hideUI = this::hide;
+
+    private final Runnable mShowPart2Runnable = () -> {
         ActionBar actionBar = getActionBar();
         if (actionBar != null) {
             actionBar.show();
         }
     };
-    private VideoView videoView;
-    private long position = 0;
-    private View mContentView;
-    private final Runnable mHidePart2Runnable = new Runnable() {
-        //@SuppressLint("InlinedApi")
-        @Override
-        public void run() {
-            mContentView.setSystemUiVisibility(View.SYSTEM_UI_FLAG_LOW_PROFILE
-                    | View.SYSTEM_UI_FLAG_FULLSCREEN
-                    | View.SYSTEM_UI_FLAG_LAYOUT_STABLE
-                    | View.SYSTEM_UI_FLAG_IMMERSIVE_STICKY
-                    | View.SYSTEM_UI_FLAG_LAYOUT_HIDE_NAVIGATION
-                    | View.SYSTEM_UI_FLAG_HIDE_NAVIGATION);
-        }
+
+    private final Runnable mHidePart2Runnable = () -> {
+        mContentView.setSystemUiVisibility(View.SYSTEM_UI_FLAG_LOW_PROFILE
+                | View.SYSTEM_UI_FLAG_FULLSCREEN
+                | View.SYSTEM_UI_FLAG_LAYOUT_STABLE
+                | View.SYSTEM_UI_FLAG_IMMERSIVE_STICKY
+                | View.SYSTEM_UI_FLAG_LAYOUT_HIDE_NAVIGATION
+                | View.SYSTEM_UI_FLAG_HIDE_NAVIGATION);
     };
-    private boolean visible;
-    private final Runnable hideUI = this::hide;
+
 
     @Override
     protected void injectComponent(ActivityComponent appComponent) {
@@ -95,6 +110,11 @@ public class FullscreenVideoActivity extends ActivityBase {
 
         String videoURL = intent.getStringExtra("burning-series.videoURL");
 
+        show = intent.getIntExtra("show", -1);
+        season = intent.getIntExtra("show", -1);
+        episode = intent.getIntExtra("show", -1);
+        hoster = intent.getStringExtra("hoster");
+
         if (!Patterns.WEB_URL.matcher(videoURL).matches()) {
 
             DialogBuilder.start(FullscreenVideoActivity.this)
@@ -113,9 +133,18 @@ public class FullscreenVideoActivity extends ActivityBase {
 
         Uri uri = Uri.parse(videoURL);
 
+        checkForAutoplay();
 
         videoView = (VideoView) mContentView;
         videoView.setVideoURI(uri);
+
+        /*
+        ImageButton test = new ImageButton(this);
+        test.setImageDrawable(ContextCompat.getDrawable(this, R.drawable.ic_next_episode));
+        test.setBackground(null);
+
+        videoView.getVideoControls().addExtraView(test);
+        */
 
         videoView.start();
     }
@@ -139,6 +168,50 @@ public class FullscreenVideoActivity extends ActivityBase {
             return true;
         }
         return super.onOptionsItemSelected(item);
+    }
+
+    private void checkForAutoplay() {
+        API api = new API();
+        api.setSession(Settings.of(this).getUserSession());
+        episode++;
+        api.generateToken("series/" + show + "/" + season + "/" + episode);
+        APIInterface apii = api.getInterface();
+        Call<EpisodeObj> call = apii.getEpisode(api.getToken(), api.getUserAgent(), show, season, episode, api.getSession());
+        call.enqueue(this);
+    }
+
+    @Override
+    public void onResponse(Call<EpisodeObj> call, Response<EpisodeObj> response) {
+        EpisodeObj episode = response.body();
+
+        ArrayList<String> hosters = new ArrayList<>();
+
+        for (EpisodeObj.Hoster tmp : episode.getHosters())
+            hosters.add(tmp.getName().toLowerCase());
+
+        if (hosters.contains(hoster.toLowerCase())) {
+
+            Snackbar.make(findViewById(android.R.id.content), "Yaay", Snackbar.LENGTH_SHORT).show();
+
+            return;
+        }
+
+
+        for (String tmp : Hoster.compatibleHosters)
+            if (hosters.contains(tmp)) {
+
+                Snackbar.make(findViewById(android.R.id.content), "Yay", Snackbar.LENGTH_SHORT).show();
+                // TODO: Implement auto play for any supported hoster
+
+                return;
+            }
+
+        // Bad luck: No auto play for you...
+    }
+
+    @Override
+    public void onFailure(Call<EpisodeObj> call, Throwable t) {
+
     }
 
     private void toggle() {
@@ -174,68 +247,8 @@ public class FullscreenVideoActivity extends ActivityBase {
         mHideHandler.postDelayed(mShowPart2Runnable, UI_ANIMATION_DELAY);
     }
 
-
     private void delayedHide(int delayMillis) {
         mHideHandler.removeCallbacks(hideUI);
         mHideHandler.postDelayed(hideUI, delayMillis);
-    }
-
-    private class CustomControlls extends VideoControls {
-
-        public CustomControlls(Context context) {
-            super(context);
-        }
-
-        public CustomControlls(Context context, AttributeSet attrs) {
-            super(context, attrs);
-        }
-
-        public CustomControlls(Context context, AttributeSet attrs, int defStyleAttr) {
-            super(context, attrs, defStyleAttr);
-        }
-
-        public CustomControlls(Context context, AttributeSet attrs, int defStyleAttr, int defStyleRes) {
-            super(context, attrs, defStyleAttr, defStyleRes);
-        }
-
-        @Override
-        public void setPosition(@IntRange(from = 0L) long position) {
-
-        }
-
-        @Override
-        public void setDuration(@IntRange(from = 0L) long duration) {
-
-        }
-
-        @Override
-        public void updateProgress(@IntRange(from = 0L) long position, @IntRange(from = 0L) long duration, @IntRange(from = 0L, to = 100L) int bufferPercent) {
-
-        }
-
-        @Override
-        protected int getLayoutResource() {
-            return 0;
-        }
-
-        @Override
-        protected void animateVisibility(boolean toVisible) {
-
-        }
-
-        @Override
-        protected void updateTextContainerVisibility() {
-
-        }
-
-        @Override
-        public void showLoading(boolean initialLoad) {
-
-        }
-
-        @Override
-        public void finishLoading() {
-
-        }
     }
 }

@@ -50,12 +50,9 @@ import de.m4lik.burningseries.ui.dialogs.MobileDataAlertDialog;
 import de.m4lik.burningseries.ui.dialogs.PlayerChooserDialog;
 import de.m4lik.burningseries.ui.listitems.EpisodeListItem;
 import de.m4lik.burningseries.ui.listitems.HosterListItem;
-import de.m4lik.burningseries.ui.listitems.PlayerChooserListItem;
 import de.m4lik.burningseries.ui.listitems.SeasonListItem;
-import de.m4lik.burningseries.ui.showFragments.HosterFragment;
 import de.m4lik.burningseries.ui.viewAdapters.EpisodesRecyclerAdapter;
 import de.m4lik.burningseries.ui.viewAdapters.HosterRecyclerAdapter;
-import de.m4lik.burningseries.ui.viewAdapters.PlayerChooserListAdapter;
 import de.m4lik.burningseries.ui.viewAdapters.SeasonsListAdapter;
 import de.m4lik.burningseries.util.AndroidUtility;
 import de.m4lik.burningseries.util.DialogCallback;
@@ -261,14 +258,14 @@ public class TabletShowActivity extends ActivityBase implements DialogCallback{
 
                 hosterList = new ArrayList<>();
 
-                for (EpisodeObj.Hoster hoster : episode.getHoster())
-                    if (Hoster.compatibleHosters.contains(hoster.getHoster())) {
-                        hosterList.add(new HosterListItem(hoster.getLinkId(), hoster.getHoster(), hoster.getPart(), true));
+                for (EpisodeObj.Hoster hoster : episode.getHosters())
+                    if (Hoster.compatibleHosters.contains(hoster.getName())) {
+                        hosterList.add(new HosterListItem(hoster.getLinkId(), hoster.getName(), hoster.getPart(), true));
 
                     }
-                for (EpisodeObj.Hoster hoster : episode.getHoster())
-                    if (!Hoster.compatibleHosters.contains(hoster.getHoster()))
-                        hosterList.add(new HosterListItem(hoster.getLinkId(), hoster.getHoster(), hoster.getPart()));
+                for (EpisodeObj.Hoster hoster : episode.getHosters())
+                    if (!Hoster.compatibleHosters.contains(hoster.getName()))
+                        hosterList.add(new HosterListItem(hoster.getLinkId(), hoster.getName(), hoster.getPart()));
 
                 refreshHosterList();
             }

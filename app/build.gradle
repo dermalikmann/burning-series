@@ -7,11 +7,9 @@ repositories {
 
 dependencies {
     compile('com.crashlytics.sdk.android:crashlytics:2.6.8@aar') {
-        transitive = true;
+        transitive = true
     }
 }
-
-apply plugin: 'me.tatarka.retrolambda'
 
 buildscript {
     repositories {
@@ -22,19 +20,19 @@ buildscript {
 
     dependencies {
         classpath 'me.tatarka:gradle-retrolambda:3.6.0'
-        classpath 'io.fabric.tools:gradle:1.22.0'
+        classpath 'io.fabric.tools:gradle:1.22.1'
     }
 }
 
 android {
-    compileSdkVersion 25
+    compileSdkVersion 26
     buildToolsVersion "25.0.3"
 
     def versionPropsFile = file('version.properties')
     def versionBuild
 
     if (versionPropsFile.canRead()) {
-        def Properties versionProps = new Properties()
+        Properties versionProps = new Properties()
         versionProps.load(new FileInputStream(versionPropsFile))
         versionBuild = versionProps['VERSION_BUILD'].toInteger()
     } else {
@@ -44,7 +42,7 @@ android {
     ext.autoIncrementBuildNumber = {
 
         if (versionPropsFile.canRead()) {
-            def Properties versionProps = new Properties()
+            Properties versionProps = new Properties()
             versionProps.load(new FileInputStream(versionPropsFile))
             versionBuild = versionProps['VERSION_BUILD'].toInteger() + 1
             versionProps['VERSION_BUILD'] = versionBuild.toString()
@@ -57,11 +55,10 @@ android {
     defaultConfig {
         applicationId "de.m4lik.burningseries"
         minSdkVersion 19
-        targetSdkVersion 25
+        targetSdkVersion 26
         versionCode versionBuild
         versionName "1.0.5"
         vectorDrawables.useSupportLibrary = true
-        //multiDexEnabled true
     }
 
     buildTypes {
@@ -72,10 +69,8 @@ android {
             testProguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
             versionNameSuffix ".dev"
             applicationVariants.all { variant ->
-                variant.outputs.each { output ->
-                    output.outputFile = new File(output.outputFile.parent,
-                            output.outputFile.name.replace("app-debug", "bs-" + versionName)
-                    )
+                variant.outputs.all {
+                    outputFileName = "bs-${versionName}.apk"
                 }
             }
         }
@@ -85,10 +80,8 @@ android {
             shrinkResources true
             proguardFiles 'proguard-rules.pro', getDefaultProguardFile('proguard-android-optimize.txt')
             applicationVariants.all { variant ->
-                variant.outputs.each { output ->
-                    output.outputFile = new File(output.outputFile.parent,
-                            output.outputFile.name.replace("app-release", "bs-" + versionName)
-                    )
+                variant.outputs.all {
+                    outputFileName = "bs-${versionName}.apk"
                 }
             }
         }
@@ -125,10 +118,6 @@ android {
     dataBinding {
         enabled = true
     }
-}
-
-retrolambda {
-    incremental true
 }
 
 apply from: "dependencies.gradle"

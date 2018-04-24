@@ -6,7 +6,7 @@ repositories {
 }
 
 dependencies {
-    compile('com.crashlytics.sdk.android:crashlytics:2.6.8@aar') {
+    implementation('com.crashlytics.sdk.android:crashlytics:2.9.1@aar') {
         transitive = true
     }
 }
@@ -20,13 +20,13 @@ buildscript {
 
     dependencies {
         classpath 'me.tatarka:gradle-retrolambda:3.6.0'
-        classpath 'io.fabric.tools:gradle:1.22.1'
+        classpath 'io.fabric.tools:gradle:1.25.3'
     }
 }
 
 android {
-    compileSdkVersion 26
-    buildToolsVersion "25.0.3"
+    compileSdkVersion 27
+    buildToolsVersion '27.0.3'
 
     def versionPropsFile = file('version.properties')
     def versionBuild
@@ -55,7 +55,7 @@ android {
     defaultConfig {
         applicationId "de.m4lik.burningseries"
         minSdkVersion 19
-        targetSdkVersion 26
+        targetSdkVersion 27
         versionCode versionBuild
         versionName "1.0.5"
         vectorDrawables.useSupportLibrary = true

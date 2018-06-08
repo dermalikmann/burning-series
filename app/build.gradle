@@ -55,7 +55,7 @@ android {
     defaultConfig {
         applicationId "de.m4lik.burningseries"
         minSdkVersion 19
-        targetSdkVersion 27
+        targetSdkVersion 28
         versionCode versionBuild
         versionName "1.0.5"
         vectorDrawables.useSupportLibrary = true
